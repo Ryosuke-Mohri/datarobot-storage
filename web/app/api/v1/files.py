@@ -729,7 +729,10 @@ async def upload_drive_files(
 
                 fs = get_file_system()
                 # Ensure directory exists
-                fs.mkdir(str(file_dir), create_parents=True)
+                try:
+                    fs.mkdir(str(file_dir), create_parents=True)
+                except FileExistsError:
+                    pass
 
                 file_path = str(file_dir / filename)
 
@@ -769,6 +772,7 @@ async def upload_drive_files(
                 results.append(FileSchema.from_file(db_file, owner_uuid=user_uuid))
 
             except Exception as e:
+                logger.exception("Failed to import from Google Drive")
                 results.append(
                     {
                         "file_id": file_id,
@@ -847,7 +851,10 @@ async def upload_box_files(
 
     fs = get_file_system()
     # Ensure directory exists
-    fs.mkdir(str(file_dir), create_parents=True)
+    try:
+        fs.mkdir(str(file_dir), create_parents=True)
+    except FileExistsError:
+        pass
 
     results: list[FileSchema | dict[str, Any]] = []
 
