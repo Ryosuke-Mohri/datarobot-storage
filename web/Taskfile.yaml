@@ -5,11 +5,10 @@ version: '3'
 tasks:
   install:
     desc: "🔧 Install dependencies"
-    deps:
-      - migrate
     cmds:
       - echo "🔧 Installing dependencies.."
       - uv sync --all-extras --dev
+      - task: migrate
 
   build-frontend:
     silent: true
