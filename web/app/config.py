@@ -13,9 +13,10 @@
 # limitations under the License.
 from typing import Sequence
 
-from app.auth.oauth import OAuthImpl
 from core.config import DataRobotAppFrameworkBaseSettings
 from core.telemetry.logging import FormatType, LogLevel
+
+from app.auth.oauth import OAuthImpl
 
 
 class Config(DataRobotAppFrameworkBaseSettings):
@@ -52,5 +53,5 @@ class Config(DataRobotAppFrameworkBaseSettings):
 
     storage_path: str = ".data/storage"
 
-    log_level: LogLevel = LogLevel.INFO
+    log_level: LogLevel = LogLevel.DEBUG
     log_format: FormatType = "text"

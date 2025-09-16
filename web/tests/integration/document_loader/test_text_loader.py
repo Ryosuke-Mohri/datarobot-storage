@@ -14,7 +14,6 @@
 from pathlib import Path
 
 import pytest
-
 from core.document_loader import convert_document_to_text
 
 

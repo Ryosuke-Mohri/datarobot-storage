@@ -750,7 +750,7 @@ requires-dist = [
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8.0" },
     { name = "pulumi", specifier = ">=3.175.0" },
     { name = "pulumi-command", specifier = ">=1.0.0" },
-    { name = "pulumi-datarobot", specifier = ">=0.10.15" },
+    { name = "pulumi-datarobot", specifier = ">=0.10.17" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.4.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=6.1.1" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.3.0" },

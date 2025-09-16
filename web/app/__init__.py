@@ -18,6 +18,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import AsyncGenerator
 
+from core.telemetry import configure_uvicorn_logging, init_logging
 from datarobot_asgi_middleware import DataRobotASGIMiddleware
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.responses import HTMLResponse
@@ -28,7 +29,6 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.api import router as api_router
 from app.config import Config
 from app.deps import Deps, create_deps
-from core.telemetry import configure_uvicorn_logging, init_logging
 
 base_router = APIRouter()
 

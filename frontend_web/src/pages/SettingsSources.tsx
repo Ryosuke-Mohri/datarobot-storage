@@ -1,17 +1,16 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { CheckCircle2 } from 'lucide-react';
-import { useQueryClient } from '@tanstack/react-query';
+import { CheckCircle2, AlertCircle } from 'lucide-react';
 import { useOauthProviders, useAuthorizeProvider } from '@/api/oauth/hooks';
-import { authKeys, useCurrentUser } from '@/api/auth/hooks';
+import { useCurrentUser } from '@/api/auth/hooks';
 import { getBaseUrl } from '@/lib/utils.ts';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { PATHS } from '@/constants/paths';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export const SettingsSources = () => {
-    const queryClient = useQueryClient();
     const {
         data: providers = [],
         isLoading,
@@ -34,14 +33,16 @@ export const SettingsSources = () => {
     const redirectUri = `${window.location.origin}${baseUrl}${PATHS.OAUTH_CB}`;
     const location = useLocation();
     const navigate = useNavigate();
-    const [oauthError, setOauthError] = useState<string | null>(null);
+    const [oauthError, setOauthError] = useState<{ code: string; message?: string } | null>(null);
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
-        const err = params.get('error');
-        if (err) {
-            setOauthError(err);
+        const errorCode = params.get('error');
+        const errorMessage = params.get('error_message');
+        if (errorCode) {
+            setOauthError({ code: errorCode, message: errorMessage || undefined });
             params.delete('error');
+            params.delete('error_message');
             navigate({ pathname: location.pathname, search: params.toString() }, { replace: true });
         }
     }, [location, navigate]);
@@ -49,7 +50,28 @@ export const SettingsSources = () => {
     return (
         <ScrollArea className="flex-1 p-8">
             <h2 className="text-xl font-semibold mb-6">Connected sources</h2>
-            {oauthError && <p className="text-destructive mb-4">Failed to connect: {oauthError}</p>}
+            {oauthError && (
+                <Alert variant="destructive" className="mb-6">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                        <div>
+                            <p className="font-medium mb-1">Failed to connect to OAuth provider</p>
+                            {oauthError.message &&
+                            oauthError.message !== 'OAuth connection failed' ? (
+                                <p className="text-sm">
+                                    {typeof oauthError.message === 'string'
+                                        ? oauthError.message
+                                        : 'Please try again or contact support if the problem persists.'}
+                                </p>
+                            ) : (
+                                <p className="text-sm">
+                                    Please try again or contact support if the problem persists.
+                                </p>
+                            )}
+                        </div>
+                    </AlertDescription>
+                </Alert>
+            )}
 
             {isLoading && (
                 <div className="space-y-4">
@@ -97,9 +119,6 @@ export const SettingsSources = () => {
                                             },
                                             {
                                                 onSuccess: ({ redirect_url }) => {
-                                                    queryClient.invalidateQueries({
-                                                        queryKey: authKeys.currentUser,
-                                                    });
                                                     window.location.href = redirect_url;
                                                 },
                                                 onError: () => {

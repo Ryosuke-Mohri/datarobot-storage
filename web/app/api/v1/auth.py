@@ -210,11 +210,25 @@ async def oauth_callback(
         "exchanging oauth authorization code", extra={"provider_id": provider_id}
     )
 
-    oauth_data: OAuthData = await auth.exchange_code(
-        provider_id=provider_id,
-        sess=oauth_sess,
-        params=params,
-    )
+    try:
+        oauth_data: OAuthData = await auth.exchange_code(
+            provider_id=provider_id,
+            sess=oauth_sess,
+            params=params,
+        )
+    except Exception as e:
+        logger.exception(
+            "OAuth service error during code exchange",
+            extra={"provider_id": provider_id, "error": str(e)},
+            exc_info=True,
+        )
+        err = ErrorSchema(
+            code=ErrorCodes.UNKNOWN_ERROR,
+            message=str(e),
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=err.model_dump()
+        )
 
     token_data = oauth_data.token_data
     user_profile = oauth_data.user_profile

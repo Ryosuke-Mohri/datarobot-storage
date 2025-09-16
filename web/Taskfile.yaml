@@ -8,7 +8,6 @@ tasks:
     cmds:
       - echo "🔧 Installing dependencies.."
       - uv sync --all-extras --dev
-      - task: migrate
 
   build-frontend:
     silent: true

@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import logging
 from typing import TYPE_CHECKING, Awaitable, Callable, Final
 
 from datarobot.auth.oauth import OAuthToken, Profile
@@ -31,6 +32,8 @@ if TYPE_CHECKING:
 
 
 AUTH_SESS_KEY: Final[str] = "auth"
+
+logger = logging.getLogger(name=__name__)
 
 
 class DRAppCtx(BaseModel):
@@ -59,9 +62,34 @@ async def get_auth_ctx(
     TODO: there may be a room for consolidation of this logic with the logic we have in the callback handler:
         web/app/api/v1/auth.py:143
     """
+    auth_ctx: AuthCtx[Metadata]
     if auth_sess := request.session.get(AUTH_SESS_KEY, {}):
-        # let's just use the existing in-app session
-        return AuthCtx[Metadata](**auth_sess)
+        # Validate that the session user still exists in the database
+        # This handles cases where the database was reset but session cookies remain
+        try:
+            auth_ctx = AuthCtx[Metadata](**auth_sess)
+            user_repo = request.app.state.deps.user_repo
+
+            # Check if the user still exists in the database
+            user = await user_repo.get_user(user_id=int(auth_ctx.user.id))
+
+            if user:
+                # User exists, return the valid session
+                return auth_ctx
+            else:
+                # User doesn't exist (database was reset), clear the invalid session
+                logger.warning(
+                    "Session user not found in database, clearing session",
+                    extra={"user_id": auth_ctx.user.id},
+                )
+                request.session.clear()
+                # Continue to re-authenticate the user below
+        except (KeyError, ValueError, TypeError) as e:
+            # Session data is corrupted, clear it
+            logger.warning(
+                "Invalid session data, clearing session", extra={"error": str(e)}
+            )
+            request.session.clear()
 
     # no active app user session found, must be the first application visit
     api_key_validator: APIKeyValidator = request.app.state.deps.api_key_validator
@@ -147,7 +175,7 @@ async def get_auth_ctx(
 
     # reload the user account data
     user = await user_repo.get_user(user_id=identity.user_id)
-    auth_ctx: AuthCtx[Metadata] = user.to_auth_ctx()
+    auth_ctx = user.to_auth_ctx()
 
     request.session[AUTH_SESS_KEY] = auth_ctx.model_dump()
 

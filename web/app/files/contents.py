@@ -18,8 +18,9 @@ import logging
 from functools import partial
 from typing import TYPE_CHECKING
 
-from core import document_loader
 from core.persistent_fs.dr_file_system import get_file_system
+
+from core import document_loader
 
 if TYPE_CHECKING:
     from app.files.models import File, FileRepository

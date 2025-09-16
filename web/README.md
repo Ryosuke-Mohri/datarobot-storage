@@ -60,7 +60,7 @@ In order to give it access to those files, you need to configure OAuth Applicati
   - `http://localhost:8080/api/v1/oauth/callback/` - the local web API (optional).
   -  For production, you'll want to add your DataRobot callback URL. For example, in US Prod it is `https://app.datarobot.com/custom_applications/{appId}/oauth/callback`.
 - Hit "Save Changes" after that.
-- Under the "Application Scopes", please make sure you have `Read all files and folders stored in Box` checkbox selected.
+- Under the "Application Scopes", please make sure you have both `Read all files and folders stored in Box` and "Write all files and folders store in Box" checkboxes selected. We need both because we need to "write" to the log that we've downloaded the selected files.
 - Finally, under the "OAuth 2.0 Credentials" section, you should be able to find your Client ID and Client Secret pair to setup in the template env variables as `BOX_CLIENT_ID` and `BOX_CLIENT_SECRET` correspondingly.
 
 

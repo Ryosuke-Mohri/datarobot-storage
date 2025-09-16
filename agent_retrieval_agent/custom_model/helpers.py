@@ -18,15 +18,17 @@ import uuid
 from typing import Any, Union
 
 from crewai import CrewOutput
-from crewai.utilities.events import (
+from crewai.events.base_event_listener import BaseEventListener
+from crewai.events.event_bus import CrewAIEventsBus
+from crewai.events.types.agent_events import (
     AgentExecutionCompletedEvent,
     AgentExecutionStartedEvent,
-    CrewAIEventsBus,
-    CrewKickoffStartedEvent,
+)
+from crewai.events.types.crew_events import CrewKickoffStartedEvent
+from crewai.events.types.tool_usage_events import (
     ToolUsageFinishedEvent,
     ToolUsageStartedEvent,
 )
-from crewai.utilities.events.base_event_listener import BaseEventListener
 from openai.types import CompletionUsage
 from openai.types.chat import (
     ChatCompletion,

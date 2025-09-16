@@ -24,6 +24,7 @@ from aiogoogle.auth.creds import UserCreds
 from aiogoogle.client import Aiogoogle
 from box_sdk_gen import BoxClient, BoxDeveloperTokenAuth
 from box_sdk_gen.schemas import Items as BoxItems
+from core.persistent_fs.dr_file_system import get_file_system
 from datarobot.auth.oauth import OAuthToken
 from datarobot.auth.session import AuthCtx
 from datarobot.auth.typing import Metadata
@@ -39,7 +40,6 @@ from app.knowledge_bases import KnowledgeBaseRepository
 from app.users.identity import ProviderType
 from app.users.user import UserRepository
 from core import document_loader
-from core.persistent_fs.dr_file_system import get_file_system
 
 logger = logging.getLogger(__name__)
 
@@ -132,8 +132,13 @@ async def get_google_files(
         expires_at=token_data.expires_at,
     )  # type: ignore[no-untyped-call]
 
-    # TODO: review the implementation to make sure it's good for the use case
-    #  This is a test endpoint that illustrates how to authenticate Google Drive API
+    if not token_data.access_token:
+        logger.error(
+            "Invalid or missing Google access token", extra={"token_data": token_data}
+        )
+        raise HTTPException(
+            status_code=401, detail="Invalid or expired Google access token"
+        )
 
     async with Aiogoogle(user_creds=user_creds) as aiogoogle:
         drive_v3 = await aiogoogle.discover("drive", "v3")

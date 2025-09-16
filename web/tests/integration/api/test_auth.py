@@ -11,6 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from unittest.mock import AsyncMock, patch
+
 from datarobot.auth.oauth import OAuthData, OAuthFlowSession, OAuthProvider, OAuthToken
 from datarobot.auth.session import AuthCtx
 from datarobot.auth.typing import Metadata
@@ -311,3 +314,91 @@ def test__auth__logout(
 ) -> None:
     resp = client.post("/api/v1/logout/")
     assert resp.status_code == 204
+
+
+async def test__auth__oauth_callback__multiple_requests_same_code(
+    db_deps: Deps,
+    dr_oauth_data: OAuthData,
+    auth_ctx: AuthCtx[Metadata],
+    oauth_sess: OAuthFlowSession,
+) -> None:
+    """
+    Test that reproduces the multiple callback issue where the same OAuth
+    authorization code gets used multiple times, causing the DataRobot OAuth
+    service to return "Authorization session not found" error.
+
+    This scenario can happen when:
+    - Frontend makes duplicate requests to the callback endpoint
+    - User refreshes the page during OAuth flow
+    - Network issues cause request retries
+    - Concurrent requests hit the callback simultaneously
+
+    The first request succeeds and consumes the one-time authorization code,
+    while subsequent requests fail because the OAuth session is invalidated.
+    """
+
+    # Mock the specific DataRobot OAuth service error from the logs
+    class MockOAuthServiceClientErr(Exception):
+        """Mock the actual DataRobot OAuth service exception"""
+
+        def __init__(self, message: str):
+            self.message = message
+            super().__init__(message)
+
+    # Use patch to mock exchange_code with proper AsyncMock capabilities
+    with patch.object(
+        db_deps.auth, "exchange_code", new=AsyncMock()
+    ) as mock_exchange_code:
+        # Configure different responses for each call to exchange_code
+        mock_exchange_code.side_effect = [
+            dr_oauth_data,  # First call succeeds
+            MockOAuthServiceClientErr(  # Second call fails with the actual error message
+                'Client error occurred: {"message":"Authorization session not found for provider '
+                "Talk to My Docs Box Client Secret [TTMDocs_Demo_Workshop]-37aad6f. "
+                'Please go through the authorization process again"}'
+            ),
+        ]
+
+        webapp = create_app(config=db_deps.config, deps=db_deps)
+        webapp.dependency_overrides[get_auth_ctx] = dep(
+            None
+        )  # No existing user session
+
+        callback_params = {
+            "code": "test-one-time-code",
+            "state": oauth_sess.state,
+        }
+
+        with TestClient(webapp) as client:
+            set_sess, _ = sess_client(client)
+
+            # First request: Set up OAuth session and make successful callback
+            set_sess({get_oauth_sess_key(oauth_sess.state): oauth_sess.model_dump()})
+
+            resp1 = client.post("/api/v1/oauth/callback/", params=callback_params)
+            assert resp1.status_code == 200, (
+                f"First request should succeed: {resp1.text}"
+            )
+
+            # Verify user was created successfully
+            user_data = UserSchema(**resp1.json())
+            assert user_data.uuid
+            assert len(user_data.identities) == 1
+
+            # Second request: Restore OAuth session to simulate duplicate request
+            # In real scenarios, the session might still exist locally even though
+            # the OAuth service has invalidated it
+            set_sess({get_oauth_sess_key(oauth_sess.state): oauth_sess.model_dump()})
+
+            # This request should fail with 500 because the OAuth service
+            # throws an exception for the already-used authorization code
+            resp2 = client.post("/api/v1/oauth/callback/", params=callback_params)
+            assert resp2.status_code == 500, (
+                f"Second request should fail with 500 Internal Server Error "
+                f"due to OAuth service exception, got {resp2.status_code}: {resp2.text}"
+            )
+
+            # Verify the mock was called twice (reproducing the double exchange_code calls from logs)
+            assert mock_exchange_code.call_count == 2, (
+                f"exchange_code should be called twice, got {mock_exchange_code.call_count} calls"
+            )

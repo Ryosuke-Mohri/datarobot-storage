@@ -10,8 +10,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { CloudUpload, FileIcon, FolderIcon, ExternalLink, Search } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+    CloudUpload,
+    FileIcon,
+    FolderIcon,
+    ExternalLink,
+    Search,
+    AlertCircle,
+    RefreshCw,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { AxiosError } from 'axios';
 
 interface ConnectedSourcesDialogProps {
     onFileSelect: (file: ExternalFile, source: 'google' | 'box') => void;
@@ -33,15 +43,22 @@ export function ConnectedSourcesDialog({
     const [boxSearchQuery, setBoxSearchQuery] = useState<string>('');
     const navigate = useNavigate();
 
-    const { data: googleFiles, isLoading: isLoadingGoogle } = useGoogleFiles(
+    const {
+        data: googleFiles,
+        isLoading: isLoadingGoogle,
+        error: googleError,
+        refetch: refetchGoogle,
+    } = useGoogleFiles(
         selectedGoogleFolder,
         open && connectedSources.some(s => s.type === 'google')
     );
 
-    const { data: boxFiles, isLoading: isLoadingBox } = useBoxFiles(
-        selectedBoxFolder,
-        open && connectedSources.some(s => s.type === 'box')
-    );
+    const {
+        data: boxFiles,
+        isLoading: isLoadingBox,
+        error: boxError,
+        refetch: refetchBox,
+    } = useBoxFiles(selectedBoxFolder, open && connectedSources.some(s => s.type === 'box'));
 
     const handleFileSelect = (file: ExternalFile, source: 'google' | 'box') => {
         if (file.type === 'folder') {
@@ -72,11 +89,88 @@ export function ConnectedSourcesDialog({
         onOpenChange(open);
     };
 
+    // Helper function to get error message from different error types
+    const getErrorMessage = (error: unknown): string => {
+        if (typeof error === 'object' && error && 'response' in error) {
+            const axiosError = error as AxiosError;
+
+            // Handle authentication errors specifically
+            if (axiosError.response?.status === 401) {
+                if (
+                    axiosError.response?.data &&
+                    typeof axiosError.response.data === 'object' &&
+                    'detail' in axiosError.response.data
+                ) {
+                    return axiosError.response.data.detail as string;
+                }
+                return 'Authentication failed. Please reconnect your account.';
+            }
+
+            // Handle authorization errors
+            if (axiosError.response?.status === 403) {
+                return 'Access denied. Please check your account permissions.';
+            }
+        }
+
+        return 'Unable to connect. Please try again or reconnect your account.';
+    };
+
+    // Helper function to determine if we should show retry vs reconnect
+    const shouldShowReconnect = (error: unknown): boolean => {
+        if (typeof error === 'object' && error && 'response' in error) {
+            const axiosError = error as AxiosError;
+            return axiosError.response?.status === 401 || axiosError.response?.status === 403;
+        }
+        return false;
+    };
+
     const renderFileList = (
         files: ExternalFile[] | undefined,
         source: 'google' | 'box',
-        isLoading: boolean
+        isLoading: boolean,
+        error: unknown,
+        refetch: () => void
     ) => {
+        // Handle error state
+        if (error) {
+            const errorMessage = getErrorMessage(error);
+            const needsReconnect = shouldShowReconnect(error);
+
+            return (
+                <div className="p-4 space-y-4">
+                    <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>
+                            <div>
+                                <p className="font-medium">
+                                    Unable to connect to{' '}
+                                    {source === 'google' ? 'Google Drive' : 'Box'}
+                                </p>
+                                <p className="text-sm mt-1">{errorMessage}</p>
+                            </div>
+                        </AlertDescription>
+                    </Alert>
+                    <div className="flex justify-center">
+                        {needsReconnect ? (
+                            <Button onClick={goToSettings} variant="outline" size="sm">
+                                Reconnect Account
+                            </Button>
+                        ) : (
+                            <Button
+                                onClick={refetch}
+                                variant="outline"
+                                size="sm"
+                                className="flex items-center gap-2"
+                            >
+                                <RefreshCw className="w-3 h-3" />
+                                Try Again
+                            </Button>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
         if (isLoading) {
             return <div className="p-4 text-center text-gray-500">Loading files...</div>;
         }
@@ -256,13 +350,17 @@ export function ConnectedSourcesDialog({
                                                 renderFileList(
                                                     googleFiles?.files,
                                                     'google',
-                                                    isLoadingGoogle
+                                                    isLoadingGoogle,
+                                                    googleError,
+                                                    refetchGoogle
                                                 )}
                                             {source.type === 'box' &&
                                                 renderFileList(
                                                     boxFiles?.files,
                                                     'box',
-                                                    isLoadingBox
+                                                    isLoadingBox,
+                                                    boxError,
+                                                    refetchBox
                                                 )}
                                         </div>
                                     </div>

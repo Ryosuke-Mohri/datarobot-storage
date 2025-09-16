@@ -13,6 +13,18 @@ export const useGoogleFiles = (folderId?: string, enabled: boolean = true) => {
         queryKey: externalFilesKeys.googleFolder(folderId),
         queryFn: () => getGoogleFiles(folderId),
         enabled,
+        retry: (failureCount, error) => {
+            // Don't retry on authentication errors (401) or authorization errors (403)
+            if (error && typeof error === 'object' && 'response' in error) {
+                const axiosError = error as AxiosError;
+                if (axiosError.response?.status === 401 || axiosError.response?.status === 403) {
+                    return false;
+                }
+            }
+            // For other errors, retry up to 2 times
+            return failureCount < 2;
+        },
+        retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
     });
 };
 
@@ -21,6 +33,18 @@ export const useBoxFiles = (folderId: string = '0', enabled: boolean = true) => 
         queryKey: externalFilesKeys.boxFolder(folderId),
         queryFn: () => getBoxFiles(folderId),
         enabled,
+        retry: (failureCount, error) => {
+            // Don't retry on authentication errors (401) or authorization errors (403)
+            if (error && typeof error === 'object' && 'response' in error) {
+                const axiosError = error as AxiosError;
+                if (axiosError.response?.status === 401 || axiosError.response?.status === 403) {
+                    return false;
+                }
+            }
+            // For other errors, retry up to 2 times
+            return failureCount < 2;
+        },
+        retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
     });
 };
 

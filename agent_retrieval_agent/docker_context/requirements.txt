@@ -5,9 +5,9 @@ aioboto3==14.3.0
 aiobotocore==2.22.0
 aiofiles==24.1.0
 aiohappyeyeballs==2.6.1
-aiohttp==3.11.18
+aiohttp==3.12.14
 aioitertools==0.12.0
-aiosignal==1.3.2
+aiosignal==1.4.0
 aiosqlite==0.21.0
 alembic==1.15.2
 annotated-types==0.7.0
@@ -49,7 +49,7 @@ colorama==0.4.6
 coloredlogs==15.0.1
 comm==0.2.2
 coverage==7.8.2
-crewai==0.140.0
+crewai==0.186.1
 crewai-tools==0.48.0
 cryptography==44.0.3
 dataclasses-json==0.6.7
@@ -80,7 +80,7 @@ embedchain==0.1.128
 et-xmlfile==2.0.0
 execnet==2.1.1
 executing==2.2.0
-fastapi==0.115.12
+fastapi==0.116.1
 fastavro==1.10.0
 fastembed==0.6.0 ; python_full_version < '3.14'
 fastjsonschema==2.21.1
@@ -110,7 +110,7 @@ grpc-google-iam-v1==0.14.2
 grpcio==1.71.0
 grpcio-status==1.71.0
 h11==0.16.0
-h2==4.2.0
+h2==4.3.0
 hf-xet==1.1.0 ; platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'arm64' or platform_machine == 'x86_64'
 hpack==4.1.0
 httpcore==1.0.9
@@ -160,26 +160,26 @@ jupyterlab-pygments==0.3.0
 keyring==25.6.0
 kubernetes==32.0.1
 lancedb==0.22.0
-langchain==0.3.25
+langchain==0.3.27
 langchain-cohere==0.3.5
 langchain-community==0.3.23
-langchain-core==0.3.59
+langchain-core==0.3.76
 langchain-experimental==0.3.4
 langchain-mcp-adapters==0.1.9
 langchain-nvidia-ai-endpoints==0.3.10
 langchain-openai==0.2.14
-langchain-text-splitters==0.3.8
+langchain-text-splitters==0.3.11
 langgraph==0.4.10
 langgraph-checkpoint==2.1.0
 langgraph-prebuilt==0.2.3
 langgraph-sdk==0.1.66
-langsmith==0.3.42
+langsmith==0.3.45
 lark==1.2.2
 legacy-cgi==2.6.3
-litellm==1.72.6
+litellm==1.74.9
 llama-cloud==0.1.21
 llama-cloud-services==0.6.15
-llama-index==0.12.35
+llama-index==0.12.38
 llama-index-agent-openai==0.4.7
 llama-index-cli==0.4.1
 llama-index-core==0.12.48
@@ -298,7 +298,7 @@ pillow==11.3.0
 pkginfo==1.10.0
 platformdirs==4.3.8
 pluggy==1.6.0
-portalocker==2.10.1
+portalocker==2.7.0
 posthog==3.25.0
 progress==1.6
 prometheus-client==0.21.1
@@ -320,7 +320,7 @@ pydantic-core==2.33.2
 pydantic-settings==2.9.1
 pygments==2.19.1
 pyjwt==2.10.1
-pypdf==5.4.0
+pypdf==5.9.0
 pypdfium2==4.30.1
 pypika==0.48.9
 pyproject-hooks==1.2.0
@@ -376,7 +376,7 @@ soupsieve==2.7
 sqlalchemy==2.0.40
 sse-starlette==2.4.1
 stack-data==0.6.3
-starlette==0.46.2
+starlette==0.47.2
 strenum==0.4.15
 strictyaml==1.4.2
 striprtf==0.0.26
@@ -406,7 +406,7 @@ typing-inspection==0.4.0
 tzdata==2025.2
 uri-template==1.3.0
 urllib3==2.5.0
-uv==0.7.3
+uv==0.8.6
 uvicorn==0.35.0
 uvloop==0.21.0 ; platform_python_implementation != 'PyPy' and sys_platform != 'cygwin' and sys_platform != 'win32'
 uwsgi==2.0.29

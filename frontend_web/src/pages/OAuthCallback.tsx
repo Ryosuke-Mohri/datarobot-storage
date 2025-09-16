@@ -1,13 +1,24 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { useOauthCallback } from '@/api/oauth/hooks';
+import { authKeys } from '@/api/auth/hooks';
+import { oauthKeys } from '@/api/oauth/keys';
 import { PATHS } from '@/constants/paths';
 
 const OAuthCallback = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const queryClient = useQueryClient();
 
-    const buildErrorUrl = (e: string) => `${PATHS.SETTINGS.SOURCES}?error=${e}`;
+    const buildErrorUrl = (errorCode: string, errorMessage?: string) => {
+        const params = new URLSearchParams();
+        params.set('error', errorCode);
+        if (errorMessage) {
+            params.set('error_message', errorMessage);
+        }
+        return `${PATHS.SETTINGS.SOURCES}?${params.toString()}`;
+    };
 
     const params = new URLSearchParams(location.search);
     const providerError = params.get('error');
@@ -21,12 +32,39 @@ const OAuthCallback = () => {
 
     const state = params.get('state');
 
-    const { isSuccess, isError } = useOauthCallback(location.search, !!state && !providerError);
+    const { isSuccess, isError, error } = useOauthCallback(
+        location.search,
+        !!state && !providerError
+    );
 
     useEffect(() => {
-        if (isSuccess) navigate(PATHS.SETTINGS.SOURCES, { replace: true });
-        if (isError) navigate(buildErrorUrl('oauth_failed'), { replace: true });
-    }, [isSuccess, isError, navigate]);
+        if (isSuccess) {
+            // Invalidate current user to refresh connected identities
+            queryClient.invalidateQueries({ queryKey: authKeys.currentUser });
+            // Invalidate OAuth providers in case connection state changed
+            queryClient.invalidateQueries({ queryKey: oauthKeys.all });
+            navigate(PATHS.SETTINGS.SOURCES, { replace: true });
+        }
+        if (isError) {
+            // Just show the error message as a string
+            let errorMessage = 'OAuth connection failed';
+            if (error && typeof error === 'object' && 'response' in error) {
+                const axiosError = error as { response?: { data?: { detail?: unknown } } };
+                const detail = axiosError.response?.data?.detail;
+                if (
+                    detail &&
+                    typeof detail === 'object' &&
+                    detail !== null &&
+                    'message' in detail
+                ) {
+                    errorMessage = String(detail.message);
+                } else if (typeof detail === 'string') {
+                    errorMessage = detail;
+                }
+            }
+            navigate(buildErrorUrl('oauth_failed', errorMessage), { replace: true });
+        }
+    }, [isSuccess, isError, navigate, queryClient, error]);
 
     return <div className="flex items-center justify-center h-full">Finishing sign-in…</div>;
 };

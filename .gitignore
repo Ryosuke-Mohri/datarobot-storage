@@ -178,5 +178,9 @@ tmp
 
 .DS_Store
 
+# No locking for npm deps:
+package-lock.json
+
 # Pulumi output from the latest stack apply
 pulumi_config.json
+
