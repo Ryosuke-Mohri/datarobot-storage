@@ -167,7 +167,7 @@ class MyAgent:
             verbose=self.verbose,
             max_iter=3,
             llm=self.model_factory(
-                model="datarobot/anthropic/claude-sonnet-4-20250514",
+                model="datarobot/bedrock/anthropic.claude-sonnet-4-20250514-v1:0",
                 use_deployment=True,
             ),
         )

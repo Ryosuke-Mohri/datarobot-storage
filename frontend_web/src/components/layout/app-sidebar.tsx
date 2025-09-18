@@ -158,7 +158,6 @@ export function AppSidebar() {
                         </div>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Profile</DropdownMenuItem>
                         <DropdownMenuItem
                             onSelect={handleSettingsClick}
                             data-testid="app-sidebar-settings-item"

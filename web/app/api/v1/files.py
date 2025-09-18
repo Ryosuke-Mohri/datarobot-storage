@@ -898,7 +898,7 @@ async def upload_box_files(
 
             # Stream to disk
             total_bytes = 0
-            async with fs.open(file_path, "wb") as buffer:
+            with fs.open(file_path, "wb") as buffer:
                 for chunk in file_stream:
                     if isinstance(chunk, str):
                         chunk = chunk.encode("utf-8")

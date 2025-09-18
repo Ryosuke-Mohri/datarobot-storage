@@ -21,7 +21,6 @@ dependencies = [
     "greenlet>=3.2.1",
     "aiogoogle>=5.15.0",
     "box-sdk-gen>=1.14.0",
-    "aiofiles>=24.1.0",
     "asyncpg>=0.30.0",
     "datarobot[auth-authlib]>=3.8.2,<=3.9.0",
     "litellm>=1.76.0",

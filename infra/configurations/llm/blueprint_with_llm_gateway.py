@@ -47,6 +47,14 @@ REQUIRED_FEATURE_FLAGS = {
     "ENABLE_CUSTOM_INFERENCE_MODEL": True,
     "ENABLE_PUBLIC_NETWORK_ACCESS_FOR_ALL_CUSTOM_MODELS": True,
     "ENABLE_MLOPS_TEXT_GENERATION_TARGET_TYPE": True,
+    # The LLMs used in the agent deployment when the LLM Gateway is in use.
+    # To maintain portability and ensure your app template works for each
+    # user that may consume it, we recommend you keep these up to date
+    # with the LLMs in use in the agent.
+    "ENABLE_LLM_AWS_ANTHROPIC_CLAUDE_SONNET_4_V1": True,
+    "ENABLE_LLM_AWS_ANTHROPIC_CLAUDE_3_7_SONNET": True,
+    "ENABLE_LLM_AZURE_OPENAI_GPT_4_O": True,
+    "ENABLE_LLM_GCP_GEMINI_25_FLASH": True,
 }
 
 __all__ = [

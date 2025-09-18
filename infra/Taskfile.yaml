@@ -1,6 +1,6 @@
 ---
 # https://taskfile.dev
-version: '3'
+version: "3"
 
 tasks:
   install:
@@ -89,6 +89,7 @@ tasks:
           --target 'urn:pulumi:*::talk-to-my-docs::datarobot:index/useCase:UseCase::Talk to My Docs [*]' \
           --target 'urn:pulumi:*::talk-to-my-docs::datarobot:index/customModel:CustomModel::Talk to My Docs LLM Blueprint Model [*]' \
           --target 'urn:pulumi:*::talk-to-my-docs::datarobot:index/customModel:CustomModel::Talk to My Docs Playground Model [*]' \
+          --target 'urn:pulumi:*::talk-to-my-docs::datarobot:index/apiTokenCredential:ApiTokenCredential::*' \
           --target 'urn:pulumi:*::talk-to-my-docs::datarobot:index/registeredModel:RegisteredModel::Talk to My Docs LLM Registered Model [*]' \
           --target 'urn:pulumi:*::talk-to-my-docs::datarobot:index/llmBlueprint:LlmBlueprint::Talk to My Docs LLM Blueprint [*]' \
           --target 'urn:pulumi:*::talk-to-my-docs::datarobot:index/playground:Playground::Talk to My Docs Playground [*]' \

@@ -377,7 +377,7 @@ class TestGetOrCreateEncodedContent:
         with patch(
             "core.document_loader.convert_document_to_text", return_value=mock_content
         ):
-            with patch("aiofiles.open", side_effect=Exception("Write failed")):
+            with patch("builtins.open", side_effect=Exception("Write failed")):
                 result = await get_or_create_encoded_content(
                     mock_file_for_temp_path, mock_file_repo
                 )
