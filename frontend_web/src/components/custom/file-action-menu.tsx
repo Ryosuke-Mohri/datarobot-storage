@@ -12,9 +12,11 @@ import { FileSchema } from '@/api/knowledge-bases/types.ts';
 export function FileActionMenu({
     file,
     onDelete,
+    ariaLabel = 'File actions',
 }: {
     file: FileSchema;
     onDelete: (file: FileSchema) => void;
+    ariaLabel?: string;
 }) {
     const [open, setOpen] = useState(false);
 
@@ -34,6 +36,7 @@ export function FileActionMenu({
                     variant="ghost"
                     size="icon"
                     onClick={() => true}
+                    aria-label={ariaLabel}
                 >
                     <EllipsisVertical strokeWidth="4" />
                 </Button>

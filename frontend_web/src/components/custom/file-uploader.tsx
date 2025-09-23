@@ -8,13 +8,14 @@ import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ConfirmDialog } from '@/components/custom/confirm-dialog';
 import { FileSchema, useFileUploadMutation } from '@/api/knowledge-bases/hooks';
+import { getApiErrorMessage } from '@/api/utils';
 import { FileActionMenu } from '@/components/custom/file-action-menu.tsx';
 
 interface FileUploaderProps {
     maxSize?: number;
     accept?: { [key: string]: string[] };
     onFilesChange: (files: File[]) => void;
-    onDeleteFile: (fileUuid: string) => void;
+    onDeleteFile: (fileUuid: string) => Promise<void> | void;
     baseUuid?: string;
     onUploadComplete?: () => void;
     existingFiles?: FileSchema[];
@@ -38,6 +39,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
 }) => {
     const [files, setFiles] = useState<File[]>([]);
     const [filesToRemove, setFilesToRemove] = useState<FileSchema | undefined>();
+    const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
 
     const {
         mutate: uploadFiles,
@@ -54,7 +56,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
             }
         },
         onError: error => {
-            toast.error(`Upload failed: ${error}`);
+            toast.error(getApiErrorMessage(error, 'Upload failed'));
         },
     });
 
@@ -94,6 +96,24 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
     };
 
     const currentProgress = progress;
+
+    const handleConfirmDelete = async () => {
+        const fileUuid = filesToRemove?.uuid;
+        if (!fileUuid) {
+            setFilesToRemove(undefined);
+            return;
+        }
+
+        setIsConfirmingDelete(true);
+        try {
+            await Promise.resolve(onDeleteFile(fileUuid));
+            setFilesToRemove(undefined);
+        } catch (error) {
+            console.error('Failed to delete file', error);
+        } finally {
+            setIsConfirmingDelete(false);
+        }
+    };
 
     return (
         <div className="w-full">
@@ -142,12 +162,12 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
                                     {files.map((file, index) => (
                                         <div
                                             key={`new-${index}`}
-                                            className="group flex items-center pt-4 gap-4 w-full"
+                                            className="group flex items-center pt-4 gap-4 pr-4 w-full"
                                         >
                                             <div className="flex justify-center items-center w-8">
                                                 <FileChartColumnIncreasing className="w-6 text-muted-foreground" />
                                             </div>
-                                            <div className="flex flex-col flex-1 min-w-0">
+                                            <div className="flex-1 min-w-0">
                                                 <div className="text-sm font-normal leading-tight truncate">
                                                     {file.name}
                                                 </div>
@@ -175,12 +195,12 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
                                 return (
                                     <div
                                         key={`existing-${index}`}
-                                        className="group flex items-center pt-4 gap-4 w-full border-gray-100 pb-4"
+                                        className="group flex items-center pt-4 gap-4 w-full border-gray-100 pb-4 pr-1"
                                     >
                                         <div className="flex justify-center items-center w-8">
                                             <FileChartColumnIncreasing className="w-6 text-blue-500" />
                                         </div>
-                                        <div className="flex flex-col flex-1 min-w-0">
+                                        <div className="flex-1 w-0">
                                             <div className="text-sm font-normal leading-tight truncate">
                                                 {file.filename}
                                             </div>
@@ -227,14 +247,18 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
             <ConfirmDialog
                 open={Boolean(filesToRemove)}
                 confirmButtonText="Remove"
-                onOpenChange={() => {
-                    setFilesToRemove(undefined);
+                onOpenChange={open => {
+                    if (!open) {
+                        if (isConfirmingDelete) {
+                            return;
+                        }
+                        setFilesToRemove(undefined);
+                    }
                 }}
                 title={`Remove File: ${filesToRemove?.filename || ''}`}
-                onConfirm={() => {
-                    onDeleteFile(filesToRemove?.uuid || '');
-                    setFilesToRemove(undefined);
-                }}
+                confirmLoading={isConfirmingDelete}
+                confirmLoadingText="Deleting..."
+                onConfirm={handleConfirmDelete}
             >
                 <div>Are you sure you want to remove this file?</div>
             </ConfirmDialog>

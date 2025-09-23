@@ -2,15 +2,27 @@ import React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { Sheet, SheetPortal, SheetClose, SheetOverlay, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '../ui/button';
+import { Spinner } from '@/components/ui/spinner';
 
 export const ConfirmDialog: React.FC<{
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onConfirm?: () => void;
     title?: string;
-    confirmButtonText?: string;
+    confirmButtonText: string;
+    confirmLoadingText?: string;
+    confirmLoading?: boolean;
     children: React.ReactNode;
-}> = ({ open, onOpenChange, title, onConfirm, confirmButtonText, children }) => (
+}> = ({
+    open,
+    onOpenChange,
+    title,
+    onConfirm,
+    confirmButtonText,
+    confirmLoadingText,
+    confirmLoading = false,
+    children,
+}) => (
     <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetPortal>
             <SheetOverlay className="fixed inset-0 bg-black/50 z-50" />
@@ -22,9 +34,20 @@ export const ConfirmDialog: React.FC<{
                 {children}
                 <div className="flex justify-end gap-2 mt-6">
                     <SheetClose asChild>
-                        <Button variant="outline">Close</Button>
+                        <Button variant="outline" disabled={confirmLoading}>
+                            Close
+                        </Button>
                     </SheetClose>
-                    <Button onClick={onConfirm}>{confirmButtonText || 'OK'}</Button>
+                    <Button variant="destructive" onClick={onConfirm} disabled={confirmLoading}>
+                        {confirmLoading ? (
+                            <span className="flex items-center gap-2">
+                                <Spinner size="small" className="text-current" />
+                                {confirmLoadingText || confirmButtonText}
+                            </span>
+                        ) : (
+                            confirmButtonText
+                        )}
+                    </Button>
                 </div>
             </DialogPrimitive.Content>
         </SheetPortal>

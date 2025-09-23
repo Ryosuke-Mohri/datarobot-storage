@@ -116,6 +116,8 @@ def get_web_app_files(
                 continue
             file_path = os.path.join(dirpath, filename)
             rel_path = os.path.relpath(file_path, web_application_path)
+            # Convert to forward slashes for Linux destination
+            rel_path = rel_path.replace(os.path.sep, "/")
             source_files.append((os.path.abspath(file_path), rel_path))
     # Add the metadata.yaml file
     source_files.append(

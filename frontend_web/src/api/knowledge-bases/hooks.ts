@@ -106,17 +106,27 @@ export const useListFiles = (knowledgeBaseUuid?: string) => {
 // Delete file
 export const useFileDelete = (knowledgeBaseUuid?: string) => {
     const queryClient = useQueryClient();
+    const queryKey = knowledgeBaseUuid
+        ? knowledgeBasesKeys.files(knowledgeBaseUuid)
+        : knowledgeBasesKeys.allFiles;
+
     return useMutation({
         mutationFn: ({ fileUuid }: { fileUuid: string }) => deleteFile(fileUuid),
+        onMutate: async ({ fileUuid }) => {
+            await queryClient.cancelQueries({ queryKey });
+
+            queryClient.setQueryData<FileSchema[]>(queryKey, old =>
+                (old || []).filter(file => file.uuid !== fileUuid)
+            );
+        },
         onSuccess: () => {
-            const queryKey = knowledgeBaseUuid
-                ? knowledgeBasesKeys.files(knowledgeBaseUuid)
-                : knowledgeBasesKeys.allFiles;
-            queryClient.invalidateQueries({ queryKey });
             toast.success('File has been successfully removed');
         },
         onError: error => {
             toast.error(error?.message || 'Failed to send message');
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey });
         },
     });
 };

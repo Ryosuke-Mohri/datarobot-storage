@@ -88,8 +88,12 @@ winget install --id=OpenJS.NodeJS -e
 winget install pulumi
 winget upgrade pulumi
 # Windows Developer Tools
-winget install Microsoft.VisualStudio.2022.BuildTools
+winget install Microsoft.VisualStudio.2022.BuildTools --force --override "--wait --passive --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.Windows11SDK.22621"
+
 # For Windows 10/11, toggle Developer Mode to "On" under System > For developer to enable symbolic link
+# Additionally, we use symlinks in the repo. Please set
+git config --global core.symlink true
+# Alternatively, you can do it for just this repo by omitting the --global and running this in the repo.
 ```
 
 ### Pulumi Login

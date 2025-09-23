@@ -85,7 +85,7 @@ export const KnowledgeBaseFormPage = () => {
     };
 
     const handleFileDelete = (fileUuid: string) => {
-        deleteFileMutation.mutate({ fileUuid });
+        return deleteFileMutation.mutateAsync({ fileUuid });
     };
 
     if (isLoadingKnowledgeBase && knowledgeBaseUuid) {
