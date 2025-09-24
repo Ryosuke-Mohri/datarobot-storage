@@ -55,21 +55,24 @@ export function ChatPromptInput({
         setSelectedKnowledgeBaseId,
         selectedExternalFileId,
         setSelectedExternalFileId,
+        selectedLocalFileId,
+        setSelectedLocalFileId,
+        removeSelectedLocalFileId,
     } = useAppState();
     const { data: selectedKnowledgeBase } = useGetKnowledgeBase(
         selectedKnowledgeBaseId ?? undefined
     );
     const { data: bases = [], isFetched: isKnowledgeBasesFetched } = useListKnowledgeBases();
-    const { data: uploadedFiles = [], isFetched: isUploadedFilesFetched } = useListFiles(
-        selectedKnowledgeBaseId ?? undefined
-    );
-    const [files, setFiles] = useState<FileSchema[]>([]);
+    const { data: uploadedFiles = [] } = useListFiles();
     const [isSelectFileActionMenuOpen, setIsSelectFileActionMenuOpen] = useState(false);
     const [isConnectedSourcesOpen, setIsConnectedSourcesOpen] = useState(false);
     const [isComposing, setIsComposing] = useState(false);
+
     const { mutate } = useFileUploadMutation({
         onSuccess: data => {
-            setFiles(data);
+            if (data?.[0]?.uuid) {
+                setSelectedLocalFileId(data?.[0]?.uuid);
+            }
         },
         onError: error => {
             console.error('Error uploading file:', error);
@@ -80,23 +83,14 @@ export function ChatPromptInput({
         [hasPendingMessage, isSendingMessage, isStartingChat]
     );
 
-    // Deselect External File when it is no longer found in uploadedFiles
-    useEffect(() => {
-        if (
-            isUploadedFilesFetched &&
-            selectedExternalFileId &&
-            !uploadedFiles.some(file => file.uuid === selectedExternalFileId) &&
-            !files.some(file => file.uuid === selectedExternalFileId)
-        ) {
-            setSelectedExternalFileId(null);
-        }
-    }, [
-        selectedExternalFileId,
-        uploadedFiles,
-        files,
-        isUploadedFilesFetched,
-        setSelectedExternalFileId,
-    ]);
+    const files = useMemo<FileSchema[]>(() => {
+        return (
+            uploadedFiles.filter(
+                file =>
+                    file.uuid === selectedExternalFileId || selectedLocalFileId.includes(file.uuid)
+            ) || []
+        );
+    }, [uploadedFiles, selectedExternalFileId, selectedLocalFileId]);
 
     // Deselect Knowledge Base when it is no longer found
     useEffect(() => {
@@ -109,18 +103,9 @@ export function ChatPromptInput({
         }
     }, [selectedKnowledgeBaseId, bases, isKnowledgeBasesFetched, setSelectedKnowledgeBaseId]);
 
-    useEffect(() => {
-        const selectedFile = uploadedFiles.find(file => file.uuid === selectedExternalFileId);
-        if (selectedFile) {
-            // We currently only support one file
-            setFiles([selectedFile]);
-        }
-    }, [uploadedFiles, selectedExternalFileId]);
-
     const { mutate: mutateExternalFile, isPending: isExternalFileUploading } =
         useExternalFileUploadMutation({
             onSuccess: data => {
-                setFiles(data);
                 setIsConnectedSourcesOpen(false);
                 // We currently only support 1 file selection
                 if (data?.[0]?.uuid) {
@@ -202,10 +187,14 @@ export function ChatPromptInput({
         }
     };
 
-    function onRemove(index: number) {
+    function onRemove(fileId: string) {
         if (!files) return;
-        const newFiles = files.filter((_, i) => i !== index);
-        setFiles(newFiles);
+        if (selectedLocalFileId.includes(fileId)) {
+            removeSelectedLocalFileId(fileId);
+        }
+        if (fileId === selectedExternalFileId) {
+            setSelectedExternalFileId(null);
+        }
     }
 
     return (
@@ -409,8 +398,10 @@ export function ChatPromptInput({
                                     className="w-4 h-4 cursor-pointer text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
                                     onClick={event => {
                                         event.stopPropagation();
-                                        setSelectedExternalFileId(null);
-                                        onRemove(index);
+                                        if (isPromptPending) {
+                                            return;
+                                        }
+                                        onRemove(file.uuid);
                                     }}
                                 />
                             </div>

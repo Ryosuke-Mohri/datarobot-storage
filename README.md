@@ -10,9 +10,9 @@ A modular, application template for building, developing, and deploying an AI-po
 ## Table of Contents
 
 1. [Quick Start](#quick-start)
-2. [Architecture Overview](#architecture-overview)
-3. [Development Workflow](#development-workflow)
-4. [Deployment](#deployment)
+2. [Development Workflow](#development-workflow)
+3. [Deployment](#deployment)
+4. [Architecture Overview](#architecture-overview)
 5. [Change the LLM](#change-the-llm)
 6. [Web Configuration](#web-configuration)
 7. [OAuth Applications](#oauth-applications)
@@ -147,32 +147,9 @@ Get-Content .env | ForEach-Object {
 
 ---
 
-## Architecture Overview
-
-This template is organized into modular components:
-
-- **agent_retrieval_agent/**: Multi-agent orchestration and core agent logic using CrewAI for complex processing and capabilities with you documents ([README](agent_retrieval_agent/README.md))
-- **core/**: Shared Python core logic ([README](core/README.md))
-- **frontend_web/**: React + Vite web frontend ([README](frontend_web/README.md))
-- **web/**: FastAPI backend ([README](web/README.md))
-- **infra/**: Pulumi infrastructure-as-code
-
-![Architectural Diagram](_docs/static/img/architectural-diagram.png)
-
-Each component can be developed and deployed independently or as part of the full stack.
-
----
-
 ## Development Workflow
 
 All subprojects use [Taskfile.dev](https://taskfile.dev/#/installation) for common tasks. See each subproject’s README for details.
-
-### Common Tasks
-
-The project uses [Taskfile.dev](https://taskfile.dev/#/) to manage common development tasks. Here are the most frequently used commands:
-
-- `task install-all`: Installs all dependencies for every subproject.
-- `task dev-all`: Starts all development servers and processes.
 
 ### Getting Started
 
@@ -240,6 +217,22 @@ uv run pulumi up
 
 There are also several shortcut tasks in that `task infra:` component such as only
 deploying the backing LLM, getting stack info, or changing your stack if you have multiple stacks.
+
+---
+
+## Architecture Overview
+
+This template is organized into modular components:
+
+- **agent_retrieval_agent/**: Multi-agent orchestration and core agent logic using CrewAI for complex processing and capabilities with you documents ([README](agent_retrieval_agent/README.md))
+- **core/**: Shared Python core logic ([README](core/README.md))
+- **frontend_web/**: React + Vite web frontend ([README](frontend_web/README.md))
+- **web/**: FastAPI backend ([README](web/README.md))
+- **infra/**: Pulumi infrastructure-as-code
+
+![Architectural Diagram](_docs/static/img/architectural-diagram.png)
+
+Each component can be developed and deployed independently or as part of the full stack.
 
 ---
 

@@ -136,7 +136,7 @@ class KnowledgeBaseRepository:
             is_public=knowledge_base_data.is_public,
         )
 
-        async with self._db.session() as session:
+        async with self._db.session(writable=True) as session:
             session.add(knowledge_base)
             await session.flush()  # Flush to get the generated UUID and ID
 
@@ -153,7 +153,7 @@ class KnowledgeBaseRepository:
         self, knowledge_base_id: int, owner_id: int
     ) -> bool:
         """Delete a knowledge base and all its files (must be owned by the user)."""
-        async with self._db.session() as session:
+        async with self._db.session(writable=True) as session:
             # First verify the knowledge base exists and is owned by the user
             query = await session.exec(
                 select(KnowledgeBase).where(
@@ -177,7 +177,7 @@ class KnowledgeBaseRepository:
         update: "KnowledgeBaseUpdate",
     ) -> KnowledgeBase | None:
         """Update a knowledge base (must be owned by the user)."""
-        async with self._db.session() as session:
+        async with self._db.session(writable=True) as session:
             query = await session.exec(
                 select(KnowledgeBase).where(
                     KnowledgeBase.id == knowledge_base_id,
@@ -205,7 +205,7 @@ class KnowledgeBaseRepository:
             knowledge_base: The knowledge base to update
             token_count: The new token count to set
         """
-        async with self._db.session() as session:
+        async with self._db.session(writable=True) as session:
             if not knowledge_base or not knowledge_base.id:
                 return None
 

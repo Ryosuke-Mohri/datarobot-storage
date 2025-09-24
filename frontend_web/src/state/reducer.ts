@@ -2,6 +2,11 @@ import { AppStateData, Action, LLM_MODEL } from './types';
 import { ACTION_TYPES, DEFAULT_VALUES, STORAGE_KEYS } from './constants';
 import { getStorageItem, removeStorageItem, setStorageItem } from './storage';
 
+const getLocalFileIds = (storageKey: string): string[] => {
+    const storedIds = getStorageItem(storageKey);
+    return storedIds ? storedIds.split(',') : [];
+};
+
 export const createInitialState = (): AppStateData => {
     return {
         selectedLlmModel: getStorageItem(STORAGE_KEYS.SELECTED_LLM_MODEL)
@@ -14,6 +19,9 @@ export const createInitialState = (): AppStateData => {
             ? getStorageItem(STORAGE_KEYS.SELECTED_EXTERNAL_FILE_ID)
             : DEFAULT_VALUES.selectedExternalFileId,
         availableLlmModels: null,
+        selectedLocalFileId: getStorageItem(STORAGE_KEYS.SET_SELECTED_LOCAL_FILE_ID)
+            ? getLocalFileIds(STORAGE_KEYS.SET_SELECTED_LOCAL_FILE_ID)
+            : DEFAULT_VALUES.selectedLocalFileId,
         showRenameChatModalForId: DEFAULT_VALUES.showRenameChatModalForId,
     };
 };
@@ -51,6 +59,32 @@ export const reducer = (state: AppStateData, action: Action): AppStateData => {
                 ...state,
                 selectedExternalFileId: action.payload.id,
             };
+        case ACTION_TYPES.SET_SELECTED_LOCAL_FILE_ID: {
+            // For the first relase we only allow one selected local file ID at a time
+            const selectedLocalIds = [action.payload.id!];
+
+            setStorageItem(STORAGE_KEYS.SET_SELECTED_LOCAL_FILE_ID, selectedLocalIds.join(','));
+
+            return {
+                ...state,
+                selectedLocalFileId: selectedLocalIds,
+            };
+        }
+        case ACTION_TYPES.REMOVE_SELECTED_LOCAL_FILE_ID: {
+            const selectedLocalIds = action.payload.id
+                ? state.selectedLocalFileId.filter(id => id !== action.payload.id)
+                : [];
+
+            if (!action.payload.id) {
+                removeStorageItem(STORAGE_KEYS.SET_SELECTED_LOCAL_FILE_ID); // Clear all if null
+            } else {
+                setStorageItem(STORAGE_KEYS.SET_SELECTED_LOCAL_FILE_ID, selectedLocalIds.join(','));
+            }
+            return {
+                ...state,
+                selectedLocalFileId: selectedLocalIds,
+            };
+        }
         case ACTION_TYPES.SET_SHOW_RENAME_CHAT_MODAL_FOR_ID:
             return {
                 ...state,
@@ -81,5 +115,13 @@ export const actions = {
     setShowRenameChatModalForId: (chatId: string | null): Action => ({
         type: ACTION_TYPES.SET_SHOW_RENAME_CHAT_MODAL_FOR_ID,
         payload: { chatId },
+    }),
+    setSelectedLocalFileId: (id: string): Action => ({
+        type: ACTION_TYPES.SET_SELECTED_LOCAL_FILE_ID,
+        payload: { id },
+    }),
+    removeSelectedLocalFileId: (id: string | null): Action => ({
+        type: ACTION_TYPES.REMOVE_SELECTED_LOCAL_FILE_ID,
+        payload: { id },
     }),
 };

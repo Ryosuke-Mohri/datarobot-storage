@@ -101,8 +101,8 @@ async def test_upsert_identity_concurrent_insert_simulated(
     call_counter = {"count": 0}
 
     @asynccontextmanager
-    async def wrapped_session():  # type: ignore[no-untyped-def]
-        async with original_session_ctx() as sess:  # noqa: SIM117 (explicit for clarity)
+    async def wrapped_session(writable: bool = False):  # type: ignore[no-untyped-def]
+        async with original_session_ctx(writable) as sess:  # noqa: SIM117 (explicit for clarity)
             original_commit = sess.commit
 
             async def failing_commit():  # type: ignore[no-untyped-def]

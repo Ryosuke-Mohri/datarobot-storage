@@ -113,7 +113,7 @@ class UserRepository:
         """
         user = User(**user_data.model_dump())
 
-        async with self._db.session() as session:
+        async with self._db.session(writable=True) as session:
             session.add(user)
             await session.commit()
             await session.refresh(user)

@@ -97,7 +97,7 @@ class MessageRepository:
 
         message = Message(**message_data.model_dump())
 
-        async with self._db.session() as session:
+        async with self._db.session(writable=True) as session:
             session.add(message)
             try:
                 await session.commit()
@@ -113,7 +113,7 @@ class MessageRepository:
         update: "MessageUpdate",
     ) -> Message | None:
         """Update a knowledge base (must be owned by the user)."""
-        async with self._db.session() as session:
+        async with self._db.session(writable=True) as session:
             query = await session.exec(
                 select(Message).where(
                     Message.uuid == uuid,

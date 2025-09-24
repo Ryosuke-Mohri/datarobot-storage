@@ -20,8 +20,9 @@ from core.persistent_fs.dr_file_system import (
     all_env_variables_present,
     calculate_checksum,
 )
-from sqlalchemy import text
+from sqlalchemy import event, text
 from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import UOWTransaction
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 
@@ -46,7 +47,6 @@ class DBCtx:
         self.engine = engine
 
         self._session = async_sessionmaker(
-            autocommit=False,
             autoflush=False,
             class_=AsyncSession,
             bind=engine,
@@ -62,7 +62,24 @@ class DBCtx:
             self._lock = Lock()
 
     @asynccontextmanager
-    async def session(self) -> AsyncGenerator[AsyncSession, None]:
+    async def _read_session(self) -> AsyncGenerator[AsyncSession, None]:
+        def prevent_writes(
+            session_: AsyncSession, flush_context: UOWTransaction, instances: None
+        ) -> None:
+            if session_.dirty or session_.new or session_.deleted:
+                raise RuntimeError(
+                    "This session is read-only and cannot perform writes."
+                )
+
+        if self._persistence_fs and self._persistence_fs.exists(self._db_path):
+            self._persistence_fs.get(self._db_path, self._db_path)
+
+        async with self._session() as session:
+            event.listen(session.sync_session, "before_flush", prevent_writes)
+            yield session
+
+    @asynccontextmanager
+    async def _write_session(self) -> AsyncGenerator[AsyncSession, None]:
         async with self._lock:
             checksum: bytes | None = None
             if self._persistence_fs and self._persistence_fs.exists(self._db_path):
@@ -76,6 +93,14 @@ class DBCtx:
                 new_checksum = calculate_checksum(cast(str, self._db_path))
                 if new_checksum != checksum:
                     self._persistence_fs.put(self._db_path, self._db_path)
+
+    @asynccontextmanager
+    async def session(
+        self, writable: bool = False
+    ) -> AsyncGenerator[AsyncSession, None]:
+        session_context = self._write_session if writable else self._read_session
+        async with session_context() as session:
+            yield session
 
     async def shutdown(self) -> None:
         """

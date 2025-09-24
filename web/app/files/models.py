@@ -99,7 +99,7 @@ class FileRepository:
             owner_id=owner_id,
         )
 
-        async with self._db.session() as session:
+        async with self._db.session(writable=True) as session:
             session.add(file)
             await session.commit()
             await session.refresh(file)
@@ -142,7 +142,7 @@ class FileRepository:
         self, file_id: int, file_data: FileUpdate, owner_id: int
     ) -> File | None:
         """Update a file (must be owned by the user)."""
-        async with self._db.session() as session:
+        async with self._db.session(writable=True) as session:
             query = await session.exec(
                 select(File).where(File.id == file_id, File.owner_id == owner_id)
             )
@@ -161,7 +161,7 @@ class FileRepository:
 
     async def delete_file(self, file_id: int, owner_id: int) -> bool:
         """Delete a file (must be owned by the user)."""
-        async with self._db.session() as session:
+        async with self._db.session(writable=True) as session:
             query = await session.exec(
                 select(File).where(File.id == file_id, File.owner_id == owner_id)
             )

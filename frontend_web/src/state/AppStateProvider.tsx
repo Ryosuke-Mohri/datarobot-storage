@@ -29,12 +29,22 @@ export const AppStateProvider: React.FC<{
         dispatch(actions.setShowRenameChatModalForId(chatId));
     };
 
+    const setSelectedLocalFileId = (id: string) => {
+        dispatch(actions.setSelectedLocalFileId(id));
+    };
+
+    const removeSelectedLocalFileId = (id: string | null) => {
+        dispatch(actions.removeSelectedLocalFileId(id));
+    };
+
     const contextValue: AppState = {
         ...state,
         setSelectedLlmModel,
         setAvailableLlmModels,
+        setSelectedLocalFileId,
         setSelectedKnowledgeBaseId,
         setSelectedExternalFileId,
+        removeSelectedLocalFileId,
         setShowRenameChatModalForId,
     };
 

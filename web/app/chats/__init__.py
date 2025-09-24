@@ -63,7 +63,7 @@ class ChatRepository:
     async def create_chat(self, chat_data: ChatCreate) -> Chat:
         chat = Chat(**chat_data.model_dump())
 
-        async with self._db.session() as session:
+        async with self._db.session(writable=True) as session:
             session.add(chat)
             await session.commit()
             await session.refresh(chat)
@@ -83,7 +83,7 @@ class ChatRepository:
             return response.all()
 
     async def update_chat_name(self, uuid: uuidpkg.UUID, name: str) -> Chat | None:
-        async with self._db.session() as sess:
+        async with self._db.session(writable=True) as sess:
             response = await sess.exec(select(Chat).where(Chat.uuid == uuid).limit(1))
             chat = response.one()
             if not chat:
@@ -100,7 +100,7 @@ class ChatRepository:
         Delete a chat by UUID.
         The associated messages will be automatically deleted via CASCADE foreign key constraint.
         """
-        async with self._db.session() as sess:
+        async with self._db.session(writable=True) as sess:
             response = await sess.exec(select(Chat).where(Chat.uuid == uuid).limit(1))
             chat = response.first()
             if not chat:
