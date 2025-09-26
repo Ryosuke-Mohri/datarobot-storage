@@ -5,7 +5,6 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu.tsx';
-import { useChatsDelete } from '@/api/chat/hooks';
 import { Button } from '@/components/ui/button.tsx';
 import { EllipsisVertical, TextCursorInput, Trash } from 'lucide-react';
 import { IChat } from '@/api/chat/types.ts';
@@ -13,12 +12,16 @@ import { useAppState } from '@/state';
 
 export function ChatActionMenu({ chat }: { chat: IChat }) {
     const [open, setOpen] = useState(false);
-    const { mutate: deleteChat } = useChatsDelete();
-    const { setShowRenameChatModalForId } = useAppState();
+    const { setShowRenameChatModalForId, setShowDeleteChatModalForId } = useAppState();
 
-    const handleDeleteChat = (chatId: string) => {
-        deleteChat({ chatId });
-    };
+    const handleDeleteChat = useCallback(
+        (chatId: string) => {
+            setOpen(false);
+            setShowDeleteChatModalForId(chatId);
+        },
+        [setShowDeleteChatModalForId]
+    );
+
     const handleRenameChat = useCallback(
         (chatId: string) => {
             setOpen(false);

@@ -135,6 +135,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
                                 className="cursor-pointer"
                                 type="button"
                                 size="sm"
+                                disabled={isUploading}
                             >
                                 <Plus className="h-4 w-4 mr-2" />
                                 Add files

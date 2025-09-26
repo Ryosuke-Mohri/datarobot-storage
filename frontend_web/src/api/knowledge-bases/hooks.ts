@@ -123,10 +123,13 @@ export const useFileDelete = (knowledgeBaseUuid?: string) => {
             toast.success('File has been successfully removed');
         },
         onError: error => {
-            toast.error(error?.message || 'Failed to send message');
+            toast.error(error?.message || 'Failed to delete file');
         },
         onSettled: () => {
             queryClient.invalidateQueries({ queryKey });
+            queryClient.invalidateQueries({
+                queryKey: knowledgeBasesKeys.all,
+            });
         },
     });
 };
@@ -162,6 +165,9 @@ export const useFileUploadMutation = ({
                 ? knowledgeBasesKeys.files(baseUuid)
                 : knowledgeBasesKeys.allFiles;
             queryClient.invalidateQueries({ queryKey });
+            queryClient.invalidateQueries({
+                queryKey: knowledgeBasesKeys.all,
+            });
             onSuccess(data as FileSchema[]);
         },
         onError: (error: UploadError | AxiosError) => {

@@ -3,6 +3,7 @@ import { useChats } from '@/api/chat/hooks';
 import { getChatNameOrDefaultWithTimestamp } from '@/lib/utils.ts';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ChatActionMenu } from '@/components/custom/chat-action-menu.tsx';
+import { TruncatedWithTooltip } from '@/components/custom/truncated-with-tooltip.tsx';
 
 export const SettingsChats: React.FC = () => {
     const { data: chats = [], isLoading } = useChats();
@@ -19,8 +20,11 @@ export const SettingsChats: React.FC = () => {
                             key={chat.uuid}
                             className="mb-2 flex items-center justify-between p-4 hover:bg-accent/30 rounded-md text-primary text-gray-500"
                         >
-                            <div className="flex items-center justify-between truncate max-w-[400px]">
-                                {getChatNameOrDefaultWithTimestamp(chat)}
+                            <div className="flex items-center justify-between">
+                                <TruncatedWithTooltip
+                                    text={getChatNameOrDefaultWithTimestamp(chat)}
+                                    maxWidthClass="max-w-[400px]"
+                                />
                             </div>
                             <ChatActionMenu chat={chat} />
                         </li>

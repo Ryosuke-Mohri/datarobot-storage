@@ -26,6 +26,7 @@ import { useLlmCatalog } from '@/api/chat/hooks';
 import { useCurrentUser } from '@/api/auth/hooks.ts';
 import { Toaster } from './components/ui/toast';
 import { RenameChatModal } from '@/components/custom/rename-chat-modal.tsx';
+import { DeleteChatModal } from '@/components/custom/delete-chat-modal.tsx';
 
 function App() {
     const {
@@ -70,6 +71,7 @@ function App() {
                             <Pages />
                             <Toaster />
                             <RenameChatModal />
+                            <DeleteChatModal />
                         </>
                     )}
                 </div>

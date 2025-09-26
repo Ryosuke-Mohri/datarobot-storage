@@ -15,6 +15,9 @@ type INewBaseForm = {
     isEditing?: boolean;
 };
 
+const MAX_NAME_CHARS = 255;
+const MAX_DESCRIPTION_CHARS = 1000;
+
 export function KnowledgeBaseForm({
     formValues,
     onSave,
@@ -49,15 +52,22 @@ export function KnowledgeBaseForm({
                 <span className="text-sm font-medium">What are you working on?</span>
                 <span className="ml-1 text-xs text-gray-400">(Required)</span>
             </Label>
-            <Input
-                data-testid="name-input"
-                type="text"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                required
-                placeholder="Will be used as Knowledge Base name"
-                className="w-full dark:bg-accent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-gray-500"
-            />
+            <div>
+                <Input
+                    data-testid="name-input"
+                    type="text"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    required
+                    maxLength={MAX_NAME_CHARS}
+                    placeholder="Will be used as Knowledge Base name"
+                    className="w-full dark:bg-accent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-gray-500"
+                />
+                <div className="text-xs text-gray-400 text-right mt-1">
+                    ({name.length}/{MAX_NAME_CHARS} characters)
+                </div>
+            </div>
+
             <Label className="mt-4 block">
                 <span className="text-sm font-medium">What are you trying to achieve?</span>
                 <span className="ml-1 text-xs text-gray-400">(Required)</span>
@@ -65,15 +75,21 @@ export function KnowledgeBaseForm({
                     A detailed description helps generate more accurate results.
                 </p>
             </Label>
-            <Textarea
-                data-testid="description-textarea"
-                value={description}
-                required
-                placeholder="Additional context for the Knowledge Base"
-                className="w-full dark:bg-accent focus-visible:border-ring focus-visible:ring-0 focus-visible:ring-offset-0  placeholder:text-gray-500"
-                onChange={e => setDescription(e.target.value)}
-                rows={3}
-            />
+            <div>
+                <Textarea
+                    data-testid="description-textarea"
+                    value={description}
+                    required
+                    placeholder="Additional context for the Knowledge Base"
+                    className="w-full dark:bg-accent focus-visible:border-ring focus-visible:ring-0 focus-visible:ring-offset-0  placeholder:text-gray-500 pb-0"
+                    onChange={e => setDescription(e.target.value)}
+                    rows={3}
+                    maxLength={MAX_DESCRIPTION_CHARS}
+                />
+                <div className="text-xs text-gray-400 text-right mt-1">
+                    ({description.length}/{MAX_DESCRIPTION_CHARS} characters)
+                </div>
+            </div>
 
             <Label className="mt-4">
                 <span className="text-sm font-medium">Visibility</span>

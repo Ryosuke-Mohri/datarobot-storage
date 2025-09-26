@@ -5,6 +5,7 @@ import { SidebarMenuButton, SidebarMenu, SidebarMenuItem } from '@/components/ui
 import { Spinner } from '@/components/ui/spinner.tsx';
 import { cn, getChatNameOrDefaultWithTimestamp } from '@/lib/utils.ts';
 import { ChatActionMenu } from '@/components/custom/chat-action-menu.tsx';
+import { TruncatedWithTooltip } from '@/components/custom/truncated-with-tooltip.tsx';
 
 export const ChatList: React.FC = () => {
     const { data: chats = [], isLoading } = useChats();
@@ -44,11 +45,14 @@ export const ChatList: React.FC = () => {
                         <div className="px-0 py-0">
                             <Link
                                 to={`/chat/${chat.uuid}`}
-                                title={getChatNameOrDefaultWithTimestamp(chat)}
-                                className="truncate ml-2 flex-grow-1"
+                                aria-label={getChatNameOrDefaultWithTimestamp(chat)}
+                                className="ml-2 flex-grow-1"
                                 data-testid={`chat-link-${chat.uuid}`}
                             >
-                                {getChatNameOrDefaultWithTimestamp(chat)}
+                                <TruncatedWithTooltip
+                                    text={getChatNameOrDefaultWithTimestamp(chat)}
+                                    maxWidthClass="max-w-[180px]"
+                                />
                             </Link>
                             <ChatActionMenu chat={chat} />
                         </div>

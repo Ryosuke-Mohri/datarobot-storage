@@ -25,6 +25,12 @@ export const RenameChatModal = () => {
         return chats.find(chat => chat.uuid === showRenameChatModalForId);
     }, [chats, showRenameChatModalForId]);
 
+    const handleXButton = (open: boolean) => {
+        if (!open) {
+            setShowRenameChatModalForId(null);
+        }
+    };
+
     useEffect(() => {
         if (chat) {
             setName(getChatNameOrDefaultWithTimestamp(chat));
@@ -32,7 +38,7 @@ export const RenameChatModal = () => {
     }, [chat]);
 
     return (
-        <Dialog defaultOpen={false} open={!!chat}>
+        <Dialog defaultOpen={false} open={!!chat} onOpenChange={handleXButton}>
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
                     <DialogTitle>Rename Chat</DialogTitle>

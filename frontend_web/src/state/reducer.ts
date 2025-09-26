@@ -23,6 +23,7 @@ export const createInitialState = (): AppStateData => {
             ? getLocalFileIds(STORAGE_KEYS.SET_SELECTED_LOCAL_FILE_ID)
             : DEFAULT_VALUES.selectedLocalFileId,
         showRenameChatModalForId: DEFAULT_VALUES.showRenameChatModalForId,
+        showDeleteChatModalForId: DEFAULT_VALUES.showDeleteChatModalForId,
     };
 };
 
@@ -90,6 +91,11 @@ export const reducer = (state: AppStateData, action: Action): AppStateData => {
                 ...state,
                 showRenameChatModalForId: action.payload.chatId,
             };
+        case ACTION_TYPES.SET_SHOW_DELETE_CHAT_MODAL_FOR_ID:
+            return {
+                ...state,
+                showDeleteChatModalForId: action.payload.chatId,
+            };
         default:
             return state;
     }
@@ -114,6 +120,10 @@ export const actions = {
     }),
     setShowRenameChatModalForId: (chatId: string | null): Action => ({
         type: ACTION_TYPES.SET_SHOW_RENAME_CHAT_MODAL_FOR_ID,
+        payload: { chatId },
+    }),
+    setShowDeleteChatModalForId: (chatId: string | null): Action => ({
+        type: ACTION_TYPES.SET_SHOW_DELETE_CHAT_MODAL_FOR_ID,
         payload: { chatId },
     }),
     setSelectedLocalFileId: (id: string): Action => ({

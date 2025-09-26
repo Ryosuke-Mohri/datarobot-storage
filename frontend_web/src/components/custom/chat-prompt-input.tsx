@@ -129,6 +129,8 @@ export function ChatPromptInput({
         if (uploadedFile && uploadedFile[0]) {
             mutate({ files: [uploadedFile[0]] });
         }
+        // Reset the input so the same file can be selected again
+        e.target.value = '';
     };
 
     const handleExternalFileSelect = (file: ExternalFile, source: 'google' | 'box') => {

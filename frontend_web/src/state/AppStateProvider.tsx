@@ -29,6 +29,10 @@ export const AppStateProvider: React.FC<{
         dispatch(actions.setShowRenameChatModalForId(chatId));
     };
 
+    const setShowDeleteChatModalForId = (chatId: string | null) => {
+        dispatch(actions.setShowDeleteChatModalForId(chatId));
+    };
+
     const setSelectedLocalFileId = (id: string) => {
         dispatch(actions.setSelectedLocalFileId(id));
     };
@@ -46,6 +50,7 @@ export const AppStateProvider: React.FC<{
         setSelectedExternalFileId,
         removeSelectedLocalFileId,
         setShowRenameChatModalForId,
+        setShowDeleteChatModalForId,
     };
 
     return <AppStateContext.Provider value={contextValue}>{children}</AppStateContext.Provider>;
