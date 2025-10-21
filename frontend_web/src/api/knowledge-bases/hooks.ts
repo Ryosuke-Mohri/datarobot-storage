@@ -64,6 +64,10 @@ export const useCreateKnowledgeBase = () => {
         mutationFn: (data: KnowledgeBaseCreateRequest) => createKnowledgeBase(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: knowledgeBasesKeys.all });
+            toast.success('Knowledge base created successfully');
+        },
+        onError: error => {
+            toast.error(error?.message || 'Failed to create knowledge base');
         },
     });
 };
@@ -77,6 +81,10 @@ export const useUpdateKnowledgeBase = () => {
         onSuccess: updatedBase => {
             queryClient.invalidateQueries({ queryKey: knowledgeBasesKeys.all });
             queryClient.setQueryData(knowledgeBasesKeys.byId(updatedBase.uuid), updatedBase);
+            toast.success('Knowledge base updated successfully');
+        },
+        onError: error => {
+            toast.error(error?.message || 'Failed to update knowledge base');
         },
     });
 };

@@ -10,14 +10,16 @@ import { ChatUserMessage } from '@/components/custom/chat-user-message';
 import { ChatResponseMessage } from '@/components/custom/chat-response-message';
 import { ChatLoadingScreen } from '@/components/custom/chat-loading-screen';
 import { useChatMessages } from '@/api/chat/hooks.ts';
+import { useChatStream } from '@/hooks/useChatStream';
 
 const Chat = () => {
     const { selectedLlmModel } = useAppState();
     const { chatId } = useParams<{ chatId: string }>();
     const [hasPendingMessageRequest, setHasPendingMessageRequest] = useState<boolean>(false);
+    const { isPollingFallbackActive } = useChatStream(chatId);
     const { data: messages = [], isLoading: isMessagesLoading } = useChatMessages({
         chatId,
-        shouldRefetch: hasPendingMessageRequest ? 5000 : undefined,
+        shouldRefetch: isPollingFallbackActive ? 5000 : undefined,
     });
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -42,7 +44,7 @@ const Chat = () => {
         }
 
         return () => clearTimeout(timeoutId);
-    }, [messages, hasPendingMessageRequest, setHasPendingMessageRequest, chatId]);
+    }, [messages, hasPendingMessageRequest, chatId]);
 
     if (isMessagesLoading) {
         return <ChatLoadingScreen />;

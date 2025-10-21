@@ -99,13 +99,13 @@ async def create_deps(
     upload_path.mkdir(parents=True, exist_ok=True)
 
     if config.test_user_api_key:
-        logger.warning(
+        logger.error(
             "Test User API key is set, so the application will assume the mocked user. "
             "This must be enabled during local development only."
         )
 
     if config.test_user_email:
-        logger.warning(
+        logger.error(
             "Test User email is set, so the application will assume the mocked user. "
             "This must be enabled during local development only."
         )

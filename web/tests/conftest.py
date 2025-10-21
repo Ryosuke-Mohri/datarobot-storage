@@ -34,6 +34,7 @@ from app.deps import Deps, create_deps
 from app.files import FileRepository
 from app.knowledge_bases import KnowledgeBaseRepository
 from app.messages import MessageRepository
+from app.streams import ChatStreamManager
 from app.users.identity import AuthSchema, Identity, IdentityCreate, IdentityRepository
 from app.users.tokens import Tokens
 from app.users.user import User, UserCreate, UserRepository
@@ -107,7 +108,9 @@ def webapp(config: Config, deps: Deps) -> FastAPI:
     """
     Create a FastAPI app instance with the provided configuration.
     """
-    return create_app(config=config, deps=deps)
+    app = create_app(config=config, deps=deps)
+    app.state.stream_manager = ChatStreamManager()
+    return app
 
 
 @pytest.fixture
@@ -117,6 +120,7 @@ def db_webapp(config: Config, db_deps: Deps) -> FastAPI:
     """
     app = create_app(config=config, deps=db_deps)
     app.state.deps = db_deps
+    app.state.stream_manager = ChatStreamManager()
     return app
 
 
@@ -143,6 +147,7 @@ def simple_client(config: Config, deps: Deps) -> TestClient:
     app = create_app(config=config, deps=deps)
     # Explicitly set the state since lifespan may not work correctly in TestClient
     app.state.deps = deps
+    app.state.stream_manager = ChatStreamManager()
     return TestClient(app)
 
 
@@ -328,6 +333,7 @@ def authenticated_client(
     """
     app = create_app(config=config, deps=deps)
     app.state.deps = deps
+    app.state.stream_manager = ChatStreamManager()
 
     # Create a test client with authentication headers
     client = TestClient(app)

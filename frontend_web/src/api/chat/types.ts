@@ -20,6 +20,7 @@ export interface IUserMessage {
     };
     knowledgeBase?: KnowledgeBaseSchema;
     knowledgeBaseId?: string;
+    type?: 'suggestion' | 'message';
 }
 
 export interface IPostMessageContext {
@@ -43,5 +44,6 @@ export interface IPostMessageParams {
     knowledgeBase?: KnowledgeBaseSchema;
     knowledgeBaseId?: string;
     fileIds?: string[];
+    type?: 'suggestion' | 'message';
     signal?: AbortSignal;
 }

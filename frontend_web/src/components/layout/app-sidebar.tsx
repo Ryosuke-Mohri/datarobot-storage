@@ -19,8 +19,8 @@ import {
     SidebarMenuButton,
     SidebarHeader,
     SidebarGroup,
-    useSidebar,
 } from '@/components/ui/sidebar';
+import { useSidebar } from '@/hooks';
 import { Button } from '@/components/ui/button.tsx';
 import { ROUTES } from '@/pages/routes';
 import { Separator } from '@/components/ui/separator';
@@ -90,14 +90,15 @@ export function AppSidebar() {
                                     'flex gap-2 pr-3 pl-2 py-2 rounded-l-none border-l-2 border-transparent overflow-hidden transition-colors cursor-pointer hover:bg-card',
                                     {
                                         'rounded-l-none border-l-2 border-white bg-card':
-                                            location.pathname === item.url,
+                                            location.pathname === item.url ||
+                                            (item.url === ROUTES.KNOWLEDGE_BASES &&
+                                                location.pathname.startsWith(
+                                                    PATHS.KNOWLEDGE_BASES
+                                                )),
                                     }
                                 )}
                             >
-                                <SidebarMenuButton
-                                    asChild
-                                    isActive={location.pathname === item.url}
-                                >
+                                <SidebarMenuButton asChild>
                                     <Link to={item.url}>
                                         <item.icon />
                                         <span>{item.title}</span>

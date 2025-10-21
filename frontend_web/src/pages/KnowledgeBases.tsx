@@ -4,6 +4,7 @@ import { Edit, Trash2, FileText, Calendar } from 'lucide-react';
 
 import noBasesPreview from '@/assets/no_bases_preview.svg';
 import { Button } from '@/components/ui/button.tsx';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ROUTES } from './routes';
 import {
     useListKnowledgeBases,
@@ -122,18 +123,36 @@ export const KnowledgeBases = () => {
                     >
                         <div className="flex justify-between items-start mb-4">
                             <div className="flex-1">
-                                <h3
-                                    data-testid="knowledge-base-title"
-                                    className="font-semibold text-lg mb-2 line-clamp-2 text-white"
-                                >
-                                    {base.title}
-                                </h3>
-                                <p
-                                    data-testid="knowledge-base-description"
-                                    className="text-gray-300 text-sm line-clamp-3 mb-3"
-                                >
-                                    {base.description}
-                                </p>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <h3
+                                                data-testid="knowledge-base-title"
+                                                className="font-semibold text-lg mb-2 line-clamp-2 text-white wrap-anywhere"
+                                            >
+                                                {base.title}
+                                            </h3>
+                                        </TooltipTrigger>
+                                        <TooltipContent className="max-w-xs whitespace-normal break-words">
+                                            <p>{base.title}</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <p
+                                                data-testid="knowledge-base-description"
+                                                className="text-gray-300 text-sm line-clamp-3 mb-3 wrap-anywhere"
+                                            >
+                                                {base.description}
+                                            </p>
+                                        </TooltipTrigger>
+                                        <TooltipContent className="max-w-xs whitespace-normal break-words">
+                                            {base.description}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
                             </div>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>

@@ -11,18 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import asyncio
 import json
 import logging
 import uuid as uuidpkg
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 from typing import TYPE_CHECKING, Any, AsyncIterator, Callable, Coroutine, List
 
 import datarobot as dr
 import litellm
 from datarobot.auth.session import AuthCtx
 from datarobot.auth.typing import Metadata
+from datarobot.core import getenv
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from sqlalchemy.exc import NoResultFound
 
 from app.api.v1.knowledge_bases import (
@@ -33,7 +35,13 @@ from app.chats import Chat, ChatCreate, ChatRepository
 from app.config import Config
 from app.files.contents import get_or_create_encoded_content
 from app.messages import Message, MessageCreate, MessageRepository, MessageUpdate, Role
-from core import getenv
+from app.streams import (
+    ChatStreamManager,
+    MessageEvent,
+    SnapshotEvent,
+    StreamEvent,
+    encode_sse_event,
+)
 
 if TYPE_CHECKING:
     from app.files.models import File, FileRepository
@@ -53,6 +61,19 @@ SYSTEM_PROMPT = (
     "as accurately as possible. If the answer is not contained in the documents, "
     "say you don't know. When documents have page numbers, you can reference "
     "specific pages and their filenames in your answer."
+)
+
+SUGGESTIONS_PROMPT = (
+    "You are a helpful assistant that generates relevant questions about the provided documents. "
+    "Based on the content and context of the documents, generate 3-5 thoughtful questions that "
+    "users might want to ask. Focus on the key topics, insights, and information contained in the documents. "
+    "Return the questions as a unordered markdown list and prefix each question with **SUGGESTION:**. "
+    "Example response: "
+    "```markdown\n"
+    "The following questions may be helpful:"
+    "- **SUGGESTION:**What are the main features of this product?\n"
+    "- **SUGGESTION:**How does the pricing structure work?\n"
+    "- **SUGGESTION:**What are the system requirements?"
 )
 
 
@@ -240,7 +261,9 @@ async def _create_new_message_exchange(
 
 @asynccontextmanager
 async def _update_message_on_exception(
-    request: Request, message_uuid: uuidpkg.UUID
+    request: Request,
+    message_uuid: uuidpkg.UUID,
+    stream_manager: ChatStreamManager,
 ) -> AsyncIterator[None]:
     """
     Context manager for running a chat completions safely
@@ -254,24 +277,34 @@ async def _update_message_on_exception(
         logger.error(f"{type(e).__name__} occurred %s", str(e))
         message_repo: MessageRepository = request.app.state.deps.message_repo
         update_model = MessageUpdate(in_progress=False, error=str(e))
-        await message_repo.update_message(
+        updated_message = await message_repo.update_message(
             uuid=message_uuid,
             update=update_model,
         )
+        if updated_message and updated_message.chat_id:
+            stream_manager.publish(
+                updated_message.chat_id,
+                MessageEvent(data=updated_message.dump_json_compatible()),
+            )
 
 
 def _get_safe_completion_task(
     model: str,
     request: Request,
     message_uuid: uuidpkg.UUID,
+    stream_manager: ChatStreamManager,
     auth_ctx: AuthCtx[Metadata] = Depends(must_get_auth_ctx),
 ) -> Callable[[], Coroutine[Any, Any, None]]:
     async def task() -> None:
-        async with _update_message_on_exception(request, message_uuid):
+        async with _update_message_on_exception(request, message_uuid, stream_manager):
             if model == AGENT_MODEL_NAME:
-                await _send_chat_agent_completion(request, message_uuid, auth_ctx)
+                await _send_chat_agent_completion(
+                    request, message_uuid, stream_manager, auth_ctx
+                )
             else:
-                await _send_chat_completion(request, message_uuid, auth_ctx)
+                await _send_chat_completion(
+                    request, message_uuid, stream_manager, auth_ctx
+                )
 
     return task
 
@@ -279,6 +312,7 @@ def _get_safe_completion_task(
 async def _send_chat_completion(
     request: Request,
     message_uuid: uuidpkg.UUID,
+    stream_manager: ChatStreamManager,
     auth_ctx: AuthCtx[Metadata] = Depends(must_get_auth_ctx),
 ) -> None:
     # Get current user's UUID
@@ -291,6 +325,7 @@ async def _send_chat_completion(
     model = request_data["model"]
     file_ids_str = request_data.get("file_ids", [])
     knowledge_base_uuid_str = request_data.get("knowledge_base_id")
+    request_type = request_data.get("type", "message")
 
     # Get repositories
     file_repo: FileRepository = request.app.state.deps.file_repo
@@ -315,6 +350,10 @@ async def _send_chat_completion(
 
     message_repo: MessageRepository = request.app.state.deps.message_repo
 
+    # Determine system prompt and message based on request type
+    system_prompt = (
+        SUGGESTIONS_PROMPT if request_type == "suggestion" else SYSTEM_PROMPT
+    )
     # Augment the message with file content if they exist
     augmented_message = message
     if combined_files:
@@ -328,7 +367,7 @@ async def _send_chat_completion(
 
     # Create OpenAI messages
     messages: list[dict[str, str]] = [
-        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "system", "content": system_prompt},
         {"role": "user", "content": augmented_message},
     ]
 
@@ -346,15 +385,25 @@ async def _send_chat_completion(
     # Extract message content from LiteLLM response
     llm_message_content = completion["choices"][0]["message"]["content"] or ""
     update_model = MessageUpdate(content=llm_message_content, in_progress=False)
-    await message_repo.update_message(
+    updated_message = await message_repo.update_message(
         uuid=message_uuid,
         update=update_model,
     )
+    if updated_message and updated_message.chat_id:
+        stream_manager.publish(
+            updated_message.chat_id,
+            MessageEvent(data=updated_message.dump_json_compatible()),
+        )
+    else:
+        logger.warning(
+            "Failed to update assistant message %s for stream broadcast", message_uuid
+        )
 
 
 async def _send_chat_agent_completion(
     request: Request,
     message_uuid: uuidpkg.UUID,
+    stream_manager: ChatStreamManager,
     auth_ctx: AuthCtx[Metadata] = Depends(must_get_auth_ctx),
 ) -> None:
     # Get current user's UUID
@@ -367,6 +416,7 @@ async def _send_chat_agent_completion(
     llm_model = request_data.get("model", AGENT_MODEL_NAME)
     knowledge_base_uuid_str = request_data.get("knowledge_base_id")
     file_ids_str = request_data.get("file_ids", [])
+    request_type = request_data.get("type", "message")
 
     message_repo: MessageRepository = request.app.state.deps.message_repo
     file_repo: FileRepository = request.app.state.deps.file_repo
@@ -401,6 +451,7 @@ async def _send_chat_agent_completion(
             )
 
     # URL/token selection now centralized in build_acompletion_args
+    message = message if request_type == "message" else SUGGESTIONS_PROMPT
     augmented_message = message
     if files:
         augmented_message = await _augment_message_with_files(
@@ -450,9 +501,124 @@ async def _send_chat_agent_completion(
     llm_message_content = completion["choices"][0]["message"]["content"] or ""
 
     update_model = MessageUpdate(content=llm_message_content, in_progress=False)
-    await message_repo.update_message(
+    updated_message = await message_repo.update_message(
         uuid=message_uuid,
         update=update_model,
+    )
+    if updated_message and updated_message.chat_id:
+        stream_manager.publish(
+            updated_message.chat_id,
+            MessageEvent(data=updated_message.dump_json_compatible()),
+        )
+    else:
+        logger.warning(
+            "Failed to update agent message %s for stream broadcast", message_uuid
+        )
+
+
+@chat_router.get("/chat/{chat_uuid}/messages-stream")
+async def stream_chat(
+    request: Request,
+    chat_uuid: uuidpkg.UUID,
+    auth_ctx: AuthCtx[Metadata] = Depends(must_get_auth_ctx),
+) -> StreamingResponse:
+    current_user = await _get_current_user(
+        request.app.state.deps.user_repo, int(auth_ctx.user.id)
+    )
+
+    chat_repo = request.app.state.deps.chat_repo
+    chat = await chat_repo.get_chat(chat_uuid)
+    if not chat or chat.user_uuid != current_user.uuid:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Chat not found",
+        )
+
+    message_repo = request.app.state.deps.message_repo
+    stream_manager: ChatStreamManager = request.app.state.stream_manager
+
+    logger.debug(
+        "SSE stream opened for chat %s by user %s", chat_uuid, current_user.uuid
+    )
+
+    async def event_generator() -> AsyncIterator[str]:
+        async with stream_manager.subscribe(chat_uuid) as subscriber:
+            messages = await message_repo.get_chat_messages(chat_uuid)
+            yield encode_sse_event(
+                SnapshotEvent(data=[m.dump_json_compatible() for m in messages])
+            )
+
+            heartbeat_iter = stream_manager.heartbeat()
+            queue_task: asyncio.Task[StreamEvent | None] = asyncio.create_task(
+                subscriber.queue.get()
+            )
+            heartbeat_task: asyncio.Task[StreamEvent] = asyncio.create_task(
+                anext(heartbeat_iter)
+            )
+
+            try:
+                while True:
+                    if await request.is_disconnected():
+                        logger.debug(
+                            "Client disconnected from SSE stream for chat %s",
+                            chat_uuid,
+                        )
+                        break
+
+                    if subscriber.should_disconnect:
+                        logger.debug(
+                            "Subscriber for chat %s marked for disconnect (queue full)",
+                            chat_uuid,
+                        )
+                        break
+
+                    done, _ = await asyncio.wait(
+                        [queue_task, heartbeat_task],
+                        return_when=asyncio.FIRST_COMPLETED,
+                    )
+
+                    if queue_task in done:
+                        try:
+                            queue_event = queue_task.result()
+                        except asyncio.CancelledError:
+                            break
+                        if queue_event is None:
+                            logger.debug(
+                                "Subscriber for chat %s disconnected due to queue full",
+                                chat_uuid,
+                            )
+                            break
+                        yield encode_sse_event(queue_event)
+                        queue_task = asyncio.create_task(subscriber.queue.get())
+
+                    if heartbeat_task in done:
+                        try:
+                            heartbeat_event = heartbeat_task.result()
+                        except asyncio.CancelledError:
+                            break
+                        subscriber.heartbeat_count += 1
+                        if subscriber.heartbeat_count >= subscriber.max_heartbeats:
+                            break
+                        yield encode_sse_event(heartbeat_event)
+                        heartbeat_task = asyncio.create_task(anext(heartbeat_iter))
+            finally:
+                queue_task.cancel()
+                heartbeat_task.cancel()
+                with suppress(Exception):
+                    await heartbeat_iter.aclose()
+                with suppress(Exception):
+                    await queue_task
+                with suppress(Exception):
+                    await heartbeat_task
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
     )
 
 
@@ -503,11 +669,21 @@ async def create_chat(
         ChatCreate(name="New Chat", user_uuid=current_user.uuid)
     )
 
-    [_, response_message] = await _create_new_message_exchange(
+    stream_manager: ChatStreamManager = request.app.state.stream_manager
+
+    created_messages = await _create_new_message_exchange(
         message_repo, new_chat.uuid, model, message
     )
+    for msg in created_messages:
+        if msg.chat_id:
+            stream_manager.publish(
+                msg.chat_id,
+                MessageEvent(data=msg.dump_json_compatible()),
+            )
+
+    response_message = created_messages[1]
     chat_completion_task = _get_safe_completion_task(
-        model, request, response_message.uuid, auth_ctx
+        model, request, response_message.uuid, stream_manager, auth_ctx
     )
     background_tasks.add_task(chat_completion_task)
 
@@ -607,11 +783,21 @@ async def create_chat_messages(
     if not chat:
         raise HTTPException(status_code=404, detail="Chat not found")
 
-    [prompt_message, response_message] = await _create_new_message_exchange(
+    stream_manager: ChatStreamManager = request.app.state.stream_manager
+
+    created_messages = await _create_new_message_exchange(
         message_repo, chat.uuid, model, message
     )
+    for msg in created_messages:
+        if msg.chat_id:
+            stream_manager.publish(
+                msg.chat_id,
+                MessageEvent(data=msg.dump_json_compatible()),
+            )
+
+    prompt_message, response_message = created_messages
     chat_completion_task = _get_safe_completion_task(
-        model, request, response_message.uuid, auth_ctx
+        model, request, response_message.uuid, stream_manager, auth_ctx
     )
     background_tasks.add_task(chat_completion_task)
 

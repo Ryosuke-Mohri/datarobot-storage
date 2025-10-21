@@ -17,14 +17,6 @@ export const AppStateProvider: React.FC<{
         dispatch(actions.setAvailableLlmModels(models));
     };
 
-    const setSelectedKnowledgeBaseId = (id: string | null) => {
-        dispatch(actions.setSelectedKnowledgeBaseId(id));
-    };
-
-    const setSelectedExternalFileId = (id: string | null) => {
-        dispatch(actions.setSelectedExternalFileId(id));
-    };
-
     const setShowRenameChatModalForId = (chatId: string | null) => {
         dispatch(actions.setShowRenameChatModalForId(chatId));
     };
@@ -33,22 +25,10 @@ export const AppStateProvider: React.FC<{
         dispatch(actions.setShowDeleteChatModalForId(chatId));
     };
 
-    const setSelectedLocalFileId = (id: string) => {
-        dispatch(actions.setSelectedLocalFileId(id));
-    };
-
-    const removeSelectedLocalFileId = (id: string | null) => {
-        dispatch(actions.removeSelectedLocalFileId(id));
-    };
-
     const contextValue: AppState = {
         ...state,
         setSelectedLlmModel,
         setAvailableLlmModels,
-        setSelectedLocalFileId,
-        setSelectedKnowledgeBaseId,
-        setSelectedExternalFileId,
-        removeSelectedLocalFileId,
         setShowRenameChatModalForId,
         setShowDeleteChatModalForId,
     };

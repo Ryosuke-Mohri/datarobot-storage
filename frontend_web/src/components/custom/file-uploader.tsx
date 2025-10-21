@@ -10,6 +10,7 @@ import { ConfirmDialog } from '@/components/custom/confirm-dialog';
 import { FileSchema, useFileUploadMutation } from '@/api/knowledge-bases/hooks';
 import { getApiErrorMessage } from '@/api/utils';
 import { FileActionMenu } from '@/components/custom/file-action-menu.tsx';
+import { formatFileSize } from '@/lib/utils';
 
 interface FileUploaderProps {
     maxSize?: number;
@@ -173,8 +174,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
                                                     {file.name}
                                                 </div>
                                                 <div className="text-xs text-gray-400 leading-tight truncate">
-                                                    File size:{' '}
-                                                    {(file.size / 1024 / 1024).toFixed(2)} MB
+                                                    File size: {formatFileSize(file?.size || 0)}
                                                 </div>
                                             </div>
                                             <div className="flex items-center ml-2">
@@ -208,7 +208,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
                                             <div className="text-xs text-gray-400 leading-tight truncate">
                                                 Added: {new Date(file.added).toLocaleDateString()}
                                                 {file.size_bytes &&
-                                                    ` • ${(file.size_bytes / 1024 / 1024).toFixed(2)} MB`}
+                                                    ` • ${formatFileSize(file?.size_bytes || 0)}`}
                                             </div>
                                         </div>
                                         <FileActionMenu file={file} onDelete={setFilesToRemove} />
@@ -247,7 +247,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
             )}
             <ConfirmDialog
                 open={Boolean(filesToRemove)}
-                confirmButtonText="Remove"
+                confirmButtonText="Delete"
                 onOpenChange={open => {
                     if (!open) {
                         if (isConfirmingDelete) {
@@ -256,12 +256,12 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
                         setFilesToRemove(undefined);
                     }
                 }}
-                title={`Remove File: ${filesToRemove?.filename || ''}`}
+                title={`Delete File: ${filesToRemove?.filename || ''}`}
                 confirmLoading={isConfirmingDelete}
                 confirmLoadingText="Deleting..."
                 onConfirm={handleConfirmDelete}
             >
-                <div>Are you sure you want to remove this file?</div>
+                <div>Are you sure you want to delete this file?</div>
             </ConfirmDialog>
         </div>
     );

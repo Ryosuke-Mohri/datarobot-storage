@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { Textarea } from '@/components/ui/textarea';
@@ -9,26 +9,27 @@ import {
     BookOpenText,
     CloudUpload,
     Send,
+    WandSparkles,
     XIcon,
     Plus,
     Info,
 } from 'lucide-react';
-import { useCreateChat, usePostMessage } from '@/api/chat/hooks.ts';
-import { cn } from '@/lib/utils.ts';
+import { cn, formatFileSize } from '@/lib/utils.ts';
 import {
     DropdownMenu,
     DropdownMenuTrigger,
     DropdownMenuContent,
     DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
     useFileUploadMutation,
     useListKnowledgeBases,
-    FileSchema,
     useGetKnowledgeBase,
-    useListFiles,
 } from '@/api/knowledge-bases/hooks';
+import { useChatSession } from '@/hooks';
 import { ConnectedSourcesDialog } from '@/components/custom/connected-sources-dialog';
 import { ExternalFile, useExternalFileUploadMutation } from '@/api/external-files';
 import { useAppState } from '@/state';
@@ -43,32 +44,38 @@ export function ChatPromptInput({
     classNames?: string;
     hasPendingMessage: boolean;
 }) {
-    const { chatId } = useParams<{ chatId: string }>();
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const [message, setMessage] = useState<string>('');
-    const { mutateAsync: sendMessage, isPending: isSendingMessage } = usePostMessage({ chatId });
-    const { mutateAsync: startChat, isPending: isStartingChat } = useCreateChat();
     const navigate = useNavigate();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const { chatId } = useParams<{ chatId: string }>();
+    const { selectedLlmModel } = useAppState();
     const {
-        selectedLlmModel,
         selectedKnowledgeBaseId,
-        setSelectedKnowledgeBaseId,
         selectedExternalFileId,
-        setSelectedExternalFileId,
         selectedLocalFileId,
-        setSelectedLocalFileId,
-        removeSelectedLocalFileId,
-    } = useAppState();
+        messageDraft,
+        selectedFiles,
+        hasPendingChat,
+        actions: {
+            removeSelectedExternalFileId,
+            setSelectedKnowledgeBaseId,
+            setSelectedExternalFileId,
+            removeSelectedLocalFileId,
+            setSelectedLocalFileId,
+            setMessageDraft,
+            handleSubmit,
+        },
+    } = useChatSession(chatId);
+
     const { data: selectedKnowledgeBase } = useGetKnowledgeBase(
         selectedKnowledgeBaseId ?? undefined
     );
     const { data: bases = [], isFetched: isKnowledgeBasesFetched } = useListKnowledgeBases();
-    const { data: uploadedFiles = [] } = useListFiles();
     const [isSelectFileActionMenuOpen, setIsSelectFileActionMenuOpen] = useState(false);
     const [isConnectedSourcesOpen, setIsConnectedSourcesOpen] = useState(false);
     const [isComposing, setIsComposing] = useState(false);
+    const [fileUploadName, setFileUploadName] = useState<string | null>(null);
 
-    const { mutate } = useFileUploadMutation({
+    const { mutate, isPending: isFileUploading } = useFileUploadMutation({
         onSuccess: data => {
             if (data?.[0]?.uuid) {
                 setSelectedLocalFileId(data?.[0]?.uuid);
@@ -78,19 +85,6 @@ export function ChatPromptInput({
             console.error('Error uploading file:', error);
         },
     });
-    const isPromptPending = useMemo(
-        () => hasPendingMessage || isSendingMessage || isStartingChat,
-        [hasPendingMessage, isSendingMessage, isStartingChat]
-    );
-
-    const files = useMemo<FileSchema[]>(() => {
-        return (
-            uploadedFiles.filter(
-                file =>
-                    file.uuid === selectedExternalFileId || selectedLocalFileId.includes(file.uuid)
-            ) || []
-        );
-    }, [uploadedFiles, selectedExternalFileId, selectedLocalFileId]);
 
     // Deselect Knowledge Base when it is no longer found
     useEffect(() => {
@@ -120,6 +114,10 @@ export function ChatPromptInput({
 
     const isAgentModel = selectedLlmModel.model === AGENT_MODEL;
 
+    const showSuggestPromptButton = useMemo(() => {
+        return Boolean((selectedFiles?.length || selectedKnowledgeBase) && !messageDraft);
+    }, [selectedFiles, selectedKnowledgeBase, messageDraft]);
+
     const handleMenuClick = () => {
         fileInputRef.current?.click();
     };
@@ -127,6 +125,7 @@ export function ChatPromptInput({
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const uploadedFile = e.target.files;
         if (uploadedFile && uploadedFile[0]) {
+            setFileUploadName(uploadedFile[0]?.name);
             mutate({ files: [uploadedFile[0]] });
         }
         // Reset the input so the same file can be selected again
@@ -135,6 +134,7 @@ export function ChatPromptInput({
 
     const handleExternalFileSelect = (file: ExternalFile, source: 'google' | 'box') => {
         // Upload the external file using the new API
+        setFileUploadName(file?.name);
         mutateExternalFile({ file, source });
     };
 
@@ -145,7 +145,6 @@ export function ChatPromptInput({
 
     const handleKnowledgeBaseSelect = async (baseUuid: string) => {
         const selectedBase = bases.find(base => base.uuid === baseUuid);
-        console.log('Selecting knowledge base:', selectedBase?.title, 'UUID:', baseUuid);
         setSelectedKnowledgeBaseId(selectedBase?.uuid || null);
     };
 
@@ -154,48 +153,20 @@ export function ChatPromptInput({
         navigate(ROUTES.ADD_KNOWLEDGE_BASE);
     };
 
-    const handleSubmit = useCallback(async () => {
-        if (message) {
-            try {
-                // Send file IDs instead of content
-                const context = files?.length
-                    ? { fileIds: files.map(file => file.uuid) }
-                    : undefined;
-                // Send only knowledge base ID instead of full knowledge base object
-                const knowledgeBaseId = selectedKnowledgeBaseId ?? undefined;
-                if (chatId) {
-                    await sendMessage({
-                        message,
-                        context,
-                        knowledgeBaseId,
-                    });
-                } else {
-                    await startChat({
-                        message,
-                        context,
-                        knowledgeBaseId,
-                    });
-                }
-            } finally {
-                setMessage('');
-            }
-        }
-    }, [sendMessage, startChat, chatId, message, setMessage, files, selectedKnowledgeBaseId]);
-
     const handleEnterPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
             e.preventDefault();
-            handleSubmit();
+            handleSubmit(false, messageDraft, selectedKnowledgeBase, selectedFiles);
         }
     };
 
     function onRemove(fileId: string) {
-        if (!files) return;
+        if (!selectedFiles) return;
         if (selectedLocalFileId.includes(fileId)) {
             removeSelectedLocalFileId(fileId);
         }
-        if (fileId === selectedExternalFileId) {
-            setSelectedExternalFileId(null);
+        if (selectedExternalFileId.includes(fileId)) {
+            removeSelectedExternalFileId(fileId);
         }
     }
 
@@ -203,7 +174,7 @@ export function ChatPromptInput({
         <>
             <div
                 className={cn(
-                    isPromptPending ? 'cursor-wait opacity-70' : '',
+                    hasPendingMessage || hasPendingChat ? 'cursor-wait opacity-70' : '',
                     'transition-all',
                     'justify-items-center p-5 w-2xl',
                     classNames
@@ -211,12 +182,12 @@ export function ChatPromptInput({
                 data-testid="chat-prompt-input"
             >
                 <Textarea
-                    disabled={isPromptPending}
-                    onChange={e => setMessage(e.target.value)}
+                    disabled={hasPendingMessage || hasPendingChat}
+                    onChange={e => setMessageDraft(e.target.value)}
                     placeholder="Ask anything..."
-                    value={message}
+                    value={messageDraft}
                     className={cn(
-                        isPromptPending && 'pointer-events-none',
+                        hasPendingMessage || (hasPendingChat && 'pointer-events-none'),
                         'resize-none rounded-none',
                         'dark:bg-muted border-gray-700'
                     )}
@@ -238,7 +209,7 @@ export function ChatPromptInput({
                                         variant="ghost"
                                         size="icon"
                                         onClick={() => true}
-                                        disabled={isPromptPending}
+                                        disabled={hasPendingMessage || hasPendingChat}
                                     >
                                         <Plus strokeWidth="4" />
                                     </Button>
@@ -330,16 +301,44 @@ export function ChatPromptInput({
                             accept=".txt,.pdf,.docx,.md,.pptx,.csv"
                             onChange={handleFileChange}
                         />
-                        <Button
-                            className="justify-self-end cursor-pointer"
-                            variant="ghost"
-                            size="icon"
-                            onClick={handleSubmit}
-                            data-testid="chat-prompt-input-submit"
-                            disabled={isPromptPending}
-                        >
-                            <Send />
-                        </Button>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        className={cn(
+                                            'justify-self-end cursor-pointer',
+                                            showSuggestPromptButton &&
+                                                !chatId &&
+                                                'animate-[var(--animation-blink-border-and-shadow)]'
+                                        )}
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() =>
+                                            handleSubmit(
+                                                showSuggestPromptButton,
+                                                messageDraft,
+                                                selectedKnowledgeBase,
+                                                selectedFiles
+                                            )
+                                        }
+                                        data-testid="chat-prompt-input-submit"
+                                        disabled={hasPendingMessage || hasPendingChat}
+                                    >
+                                        {showSuggestPromptButton ? <WandSparkles /> : <Send />}
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent
+                                    side="left"
+                                    className="whitespace-normal break-words"
+                                >
+                                    <p>
+                                        {showSuggestPromptButton
+                                            ? 'Ask DataRobot to suggest questions about your documents.'
+                                            : 'Submit prompt'}
+                                    </p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </div>
                     {selectedKnowledgeBase && (
                         <div className="gap-2 mt-2 bg-accent/30 p-2 rounded w-1/2">
@@ -378,7 +377,22 @@ export function ChatPromptInput({
                             </div>
                         </div>
                     )}
-                    {files?.map((file, index) => (
+                    {(isFileUploading || isExternalFileUploading) && (
+                        <Skeleton className="w-full h-10 my-3">
+                            <div className="group flex items-center pt-2 gap-4 w-full ">
+                                <div className="flex justify-center items-center w-8">
+                                    <FileChartColumnIncreasing className="w-6 text-muted-foreground" />
+                                </div>
+                                <div className="flex flex-col flex-1 min-w-0">
+                                    <div className="text-sm font-normal leading-tight truncate">
+                                        {fileUploadName}
+                                    </div>
+                                </div>
+                                <div className="flex items-center mx-2">Uploading...</div>
+                            </div>
+                        </Skeleton>
+                    )}
+                    {selectedFiles?.map((file, index) => (
                         <div
                             key={index}
                             className="group flex items-center pt-6 pb-3 gap-4 w-full "
@@ -391,8 +405,7 @@ export function ChatPromptInput({
                                     {file.filename}
                                 </div>
                                 <div className="text-xs text-gray-400 leading-tight truncate">
-                                    File size: {((file?.size_bytes || 0) / 1024 / 1024).toFixed(2)}{' '}
-                                    MB
+                                    File size: {formatFileSize(file?.size_bytes || 0)}
                                 </div>
                             </div>
                             <div className="flex items-center ml-2">
@@ -400,7 +413,7 @@ export function ChatPromptInput({
                                     className="w-4 h-4 cursor-pointer text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
                                     onClick={event => {
                                         event.stopPropagation();
-                                        if (isPromptPending) {
+                                        if (hasPendingMessage || hasPendingChat) {
                                             return;
                                         }
                                         onRemove(file.uuid);

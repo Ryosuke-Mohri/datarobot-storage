@@ -19,10 +19,9 @@ import { ROUTES } from '@/pages/routes.ts';
 export const useCreateChat = () => {
     const { selectedLlmModel } = useAppState();
     const queryClient = useQueryClient();
-    const navigate = useNavigate();
 
     return useMutation<IChat, Error, IUserMessage, IPostMessageContext>({
-        mutationFn: ({ message, context, knowledgeBase, knowledgeBaseId }) => {
+        mutationFn: ({ message, context, knowledgeBase, knowledgeBaseId, type }) => {
             // Fallback to legacy pages format for backward compatibility
             const pages = Array.isArray(context?.pages)
                 ? context.pages
@@ -40,6 +39,7 @@ export const useCreateChat = () => {
                 knowledgeBase: knowledgeBase || undefined,
                 knowledgeBaseId: knowledgeBaseId || undefined,
                 fileIds,
+                type,
             });
         },
         onError: error => {
@@ -48,7 +48,6 @@ export const useCreateChat = () => {
         onSuccess: data => {
             queryClient.setQueryData<IChat[]>(chatKeys.all, (oldData = []) => [...oldData, data]);
             queryClient.invalidateQueries({ queryKey: chatKeys.chatList() });
-            navigate(`/chat/${data.uuid}`);
         },
     });
 };
@@ -57,7 +56,7 @@ export const usePostMessage = ({ chatId }: { chatId?: string }) => {
     const { selectedLlmModel } = useAppState();
     const queryClient = useQueryClient();
     return useMutation<IChatMessage[], Error, IUserMessage, IPostMessageContext>({
-        mutationFn: ({ message, context, knowledgeBase, knowledgeBaseId }) => {
+        mutationFn: ({ message, context, knowledgeBase, knowledgeBaseId, type }) => {
             if (!chatId) {
                 throw new Error('chatId is required');
             }
@@ -79,6 +78,7 @@ export const usePostMessage = ({ chatId }: { chatId?: string }) => {
                 knowledgeBase: knowledgeBase || undefined,
                 knowledgeBaseId: knowledgeBaseId || undefined,
                 fileIds,
+                type,
             });
         },
         onError: (error, _variables, context) => {
@@ -89,11 +89,21 @@ export const usePostMessage = ({ chatId }: { chatId?: string }) => {
             toast.error(error?.message || 'Failed to send message');
         },
         onSuccess: data => {
-            // Set the chat messages data directly in the cache to avoid loading state
-            queryClient.setQueryData<IChatMessage[]>(chatKeys.messages(chatId), (oldData = []) => [
-                ...oldData,
-                ...data,
-            ]);
+            // Merge without duplicating entries that may already exist via SSE
+            queryClient.setQueryData<IChatMessage[]>(chatKeys.messages(chatId), (oldData = []) => {
+                const next = [...oldData];
+                data.forEach(message => {
+                    const existingIndex = next.findIndex(
+                        existing => existing.uuid === message.uuid
+                    );
+                    if (existingIndex >= 0) {
+                        next[existingIndex] = message;
+                    } else {
+                        next.push(message);
+                    }
+                });
+                return next;
+            });
             queryClient.setQueryData<IChat[]>(chatKeys.chatList(), (oldData = []) => {
                 return oldData.map(chat =>
                     chat.uuid === chatId
@@ -118,7 +128,7 @@ export const useChatMessages = ({
             return await getMessages({ chatId: chatId!, signal });
         },
         enabled: !!chatId,
-        refetchInterval: shouldRefetch || false,
+        refetchInterval: shouldRefetch,
     });
 };
 
@@ -152,7 +162,13 @@ export const useChatsRename = () => {
     const queryClient = useQueryClient();
     return useMutation<void, Error, { chatId: string; chatName: string }>({
         mutationFn: ({ chatId, chatName }) => renameChatById({ chatId, chatName }),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: chatKeys.chatList() }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: chatKeys.chatList() });
+            toast.success('Chat renamed successfully');
+        },
+        onError: error => {
+            toast.error(error?.message || 'Failed to rename chat');
+        },
     });
 };
 

@@ -43,7 +43,7 @@ export const DeleteChatModal = () => {
                 </DialogHeader>
                 <DialogDescription>
                     Are you sure you want to delete this chat?
-                    <p className="font-bold mt-2">{name}</p>
+                    <span className="block font-bold mt-2">{name}</span>
                 </DialogDescription>
                 <DialogFooter>
                     <Button
@@ -55,7 +55,7 @@ export const DeleteChatModal = () => {
                         Cancel
                     </Button>
                     <Button
-                        variant='destructive'
+                        variant="destructive"
                         onClick={() => {
                             deleteChat(
                                 { chatId: chat!.uuid },

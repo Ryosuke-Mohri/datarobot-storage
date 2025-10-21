@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 
 import { KnowledgeBaseForm } from '@/components/custom/knowledge-base-form';
-import { TFormData } from '@/types/knowledge-base';
+import { TFormData } from '@/types';
 import { ROUTES } from './routes';
 import { FileUploader } from '@/components/custom/file-uploader';
 import {

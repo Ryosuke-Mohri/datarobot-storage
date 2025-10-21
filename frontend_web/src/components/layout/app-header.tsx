@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Search, ChevronLeft } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks';
 
 export function AppHeader() {
     const { selectedLlmModel, setSelectedLlmModel, availableLlmModels } = useAppState();

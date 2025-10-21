@@ -5,7 +5,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { DATA_VISIBILITY } from '@/state/constants';
 import { Input } from '@/components/ui/input';
-import { TFormData } from '@/types/knowledge-base';
+import { TFormData } from '@/types';
 
 type INewBaseForm = {
     formValues?: TFormData;
@@ -152,7 +152,7 @@ export function KnowledgeBaseForm({
                     data-testid="create-button"
                     className="cursor-pointer"
                     type="submit"
-                    disabled={!name.trim() || isLoading}
+                    disabled={!name.trim() || !description.trim() || isLoading}
                 >
                     {isLoading
                         ? 'Saving...'

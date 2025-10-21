@@ -7,6 +7,8 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@plugin "tailwindcss-animate";
+
 @theme inline {
     --sidebar: hsl(var(--background));
     --color-sidebar: var(--sidebar);
@@ -117,6 +119,18 @@
     --shadow-blue: 227 83% 73%;
 
     --animation-blink-border-and-shadow: blinkBorderAndShadow 1.5s ease-in-out infinite;
+}
+
+@keyframes blinkBorderAndShadow {
+    0%,
+    100% {
+        border-color: hsl(var(--border));
+        box-shadow: 0 0 0 0 transparent;
+    }
+    50% {
+        border-color: hsl(var(--primary));
+        box-shadow: 0 0 0 2px hsl(var(--primary) / 0.3);
+    }
 }
 
 @layer base {

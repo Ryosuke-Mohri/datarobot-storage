@@ -8,6 +8,7 @@ requires-python = ">=3.10"
 dependencies = [
     "core",
     "pydantic>=2.11.4",
+    "datarobot[auth-authlib,core]>=3.9.1",
     "datarobot-asgi-middleware>=0.2.0",
     "fastapi[standard]>=0.115.11",
     "httpx>=0.28.1",
@@ -22,9 +23,9 @@ dependencies = [
     "aiogoogle>=5.15.0",
     "box-sdk-gen>=1.14.0",
     "asyncpg>=0.30.0",
-    "datarobot[auth-authlib]>=3.8.2,<=3.9.0",
+    "datarobot[auth-authlib,core]==3.9.1",
     "litellm>=1.76.0",
-    "alembic>=1.16.5"
+    "alembic>=1.16.5",
 ]
 
 

@@ -29,6 +29,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.api import router as api_router
 from app.config import Config
 from app.deps import Deps, create_deps
+from app.streams import ChatStreamManager
 
 base_router = APIRouter()
 
@@ -113,6 +114,8 @@ def create_app(
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+        stream_manager = ChatStreamManager()
+        app.state.stream_manager = stream_manager
         async with create_deps(config, deps) as dependencies:
             app.state.deps = dependencies
             yield

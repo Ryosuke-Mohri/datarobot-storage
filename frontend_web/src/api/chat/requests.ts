@@ -14,6 +14,7 @@ export async function startNewChat({
     knowledgeBase,
     knowledgeBaseId,
     fileIds,
+    type,
     signal,
 }: IPostMessageParams): Promise<IChat> {
     const payload = {
@@ -24,6 +25,7 @@ export async function startNewChat({
             ? { knowledge_base_id: knowledgeBaseId }
             : knowledgeBase && { knowledge_base: knowledgeBase }),
         ...(fileIds && fileIds.length > 0 && { file_ids: fileIds }),
+        ...(type && { type }),
     };
 
     // To try the agents, change to: `/v1/chat/agent/completions`
@@ -41,6 +43,7 @@ export async function postMessage({
     knowledgeBase,
     knowledgeBaseId,
     fileIds,
+    type,
     signal,
 }: IPostMessageParams): Promise<IChatMessage[]> {
     const payload = {
@@ -52,6 +55,7 @@ export async function postMessage({
             ? { knowledge_base_id: knowledgeBaseId }
             : knowledgeBase && { knowledge_base: knowledgeBase }),
         ...(fileIds && fileIds.length > 0 && { file_ids: fileIds }),
+        ...(type && { type }),
     };
 
     // To try the agents, change to: `/v1/chat/agent/completions`

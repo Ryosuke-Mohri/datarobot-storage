@@ -399,12 +399,32 @@ local development environment as well.
 
 ---
 
+## Using DR cli
+
+Instead of editing `.env` file you can use wizard provided by `dr` cli command to set or update environment variables.
+
+It is preinstalled in DataRobot Codespaces.
+For other environments you can get it [here](https://github.com/datarobot-oss/cli/releases).
+
+To start a wizard, run:
+
+```sh
+dr dotenv setup
+```
+
+It will provide DataRobot credentials automatically and ask for additional info like pulumi passphrase, data source and respective API keys and secrets, etc.
+
+At the end you can review all env variables and edit them or restart wizard with answered questions already filled in.
+
+---
+
 ## Additional Resources
 
 - [Taskfile.dev Documentation](https://taskfile.dev/#/)
 - [Pulumi Documentation](https://www.pulumi.com/docs/)
 - [Vite Documentation](https://vitejs.dev/)
 - [FastAPI Documentation](https://fastapi.tiangolo.com/)
+- [DR cli](https://github.com/datarobot-oss/cli)
 
 ---
 
