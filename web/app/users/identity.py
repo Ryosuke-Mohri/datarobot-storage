@@ -17,7 +17,7 @@ from enum import Enum
 from typing import Final
 
 from datarobot.auth.identity import Identity as IdentityData
-from sqlalchemy import Column, DateTime
+from sqlalchemy import Column, DateTime, UniqueConstraint
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Field, Relationship, SQLModel, select
 
@@ -44,6 +44,14 @@ class ProviderType(str, Enum):
 class Identity(SQLModel, table=True):
     """The sign-in identity of the application user for a given provider."""
 
+    __table_args__ = (
+        UniqueConstraint(
+            "provider_user_id",
+            "provider_type",
+            name="uq_identity_provider_user_id_type",
+        ),
+    )
+
     id: int | None = Field(default=None, primary_key=True, unique=True)
     uuid: uuidpkg.UUID = Field(default_factory=uuidpkg.uuid4, index=True, unique=True)
     created_at: datetime = Field(
@@ -64,7 +72,7 @@ class Identity(SQLModel, table=True):
         description="The name of the provider"
     )  # keep it str to make extensible
     provider_user_id: str = Field(
-        unique=True, description="The external user ID on the provider side"
+        description="The external user ID on the provider side"
     )
     provider_identity_id: str | None = Field(
         None,
@@ -240,7 +248,8 @@ class IdentityRepository:
             async with self._db.session(writable=True) as sess:
                 query = await sess.exec(
                     select(Identity).where(
-                        Identity.provider_user_id == provider_user_id
+                        (Identity.provider_user_id == provider_user_id)
+                        & (Identity.provider_type == provider_type_str)
                     )
                 )
                 identity = query.first()

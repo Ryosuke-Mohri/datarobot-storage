@@ -1,0 +1,55 @@
+# Copyright 2025 DataRobot, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""change_identity_unique_constraint_to_composite
+
+Revision ID: d5c7f18c5b9f
+Revises: 5ca01aa4bdac
+Create Date: 2025-10-21 23:40:27.127969
+
+"""
+
+from typing import Sequence, Union
+
+from alembic import op
+
+# revision identifiers, used by Alembic.
+revision: str = "d5c7f18c5b9f"
+down_revision: Union[str, Sequence[str], None] = "5ca01aa4bdac"
+branch_labels: Union[str, Sequence[str], None] = None
+depends_on: Union[str, Sequence[str], None] = None
+
+
+def upgrade() -> None:
+    """Upgrade schema."""
+    # Drop the old single-column unique constraint
+    op.drop_constraint("uq_identity_provider_user_id", "identity", type_="unique")
+
+    # Create the new composite unique constraint
+    op.create_unique_constraint(
+        "uq_identity_provider_user_id_type",
+        "identity",
+        ["provider_user_id", "provider_type"],
+    )
+
+
+def downgrade() -> None:
+    """Downgrade schema."""
+    # Drop the composite unique constraint
+    op.drop_constraint("uq_identity_provider_user_id_type", "identity", type_="unique")
+
+    # Recreate the old single-column unique constraint
+    op.create_unique_constraint(
+        "uq_identity_provider_user_id", "identity", ["provider_user_id"]
+    )
