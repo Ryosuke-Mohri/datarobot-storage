@@ -23,7 +23,7 @@ export const SettingsChats: React.FC = () => {
                             <div className="flex items-center justify-between">
                                 <TruncatedWithTooltip
                                     text={getChatNameOrDefaultWithTimestamp(chat)}
-                                    maxWidthClass="max-w-[400px]"
+                                    triggerClasses="cursor-default max-w-[400px]"
                                 />
                             </div>
                             <ChatActionMenu chat={chat} />

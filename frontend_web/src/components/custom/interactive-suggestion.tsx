@@ -1,21 +1,18 @@
 import { useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { useChatSession } from '@/hooks';
-import { useParams } from 'react-router-dom';
 import { Send } from 'lucide-react';
 import { useGetKnowledgeBase } from '@/api/knowledge-bases/hooks.ts';
+import { useChatSessionContext } from '@/state/ChatSessionContext';
 
 export function InteractiveSuggestion({ question }: { question: string }) {
-    const { chatId } = useParams<{ chatId: string }>();
-
     const {
         selectedKnowledgeBaseId,
-        hasPendingMessage,
+        isLoading,
         selectedFiles,
         actions: { handleSubmit },
-    } = useChatSession(chatId);
+    } = useChatSessionContext();
 
-    const actionTooltip = hasPendingMessage ? 'Wait for agent to finish responding' : 'Send';
+    const actionTooltip = isLoading ? 'Wait for agent to finish responding' : 'Send';
 
     const { data: selectedKnowledgeBase } = useGetKnowledgeBase(
         selectedKnowledgeBaseId ?? undefined
@@ -36,7 +33,7 @@ export function InteractiveSuggestion({ question }: { question: string }) {
                         {isActionShown && (
                             <Button
                                 variant="ghost"
-                                disabled={hasPendingMessage}
+                                disabled={isLoading}
                                 title={actionTooltip}
                                 onClick={() => {
                                     handleSubmit(

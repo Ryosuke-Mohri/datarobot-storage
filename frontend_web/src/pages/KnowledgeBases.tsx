@@ -20,12 +20,9 @@ import {
 
 export const KnowledgeBases = () => {
     const navigate = useNavigate();
-    const { data: bases = [], isLoading, error } = useListKnowledgeBases();
+    const { data: knowledgeBase = [], isLoading, error } = useListKnowledgeBases();
     const deleteBaseMutation = useDeleteKnowledgeBase();
     const [deletingBaseId, setDeletingBaseId] = useState<string | null>(null);
-
-    // Only show bases the user can edit on this page
-    const editableBases = bases.filter(base => base.can_edit);
 
     const handleDeleteBase = async (baseUuid: string) => {
         if (
@@ -74,7 +71,7 @@ export const KnowledgeBases = () => {
         );
     }
 
-    if (editableBases.length === 0) {
+    if (knowledgeBase.length === 0) {
         return (
             <div data-testid="knowledge-empty-state" className="flex justify-center max-h-screen">
                 <div className="p-6 pt-48 max-w-2xl w-full items-center flex-col justify-center flex max-h-screen">
@@ -115,7 +112,7 @@ export const KnowledgeBases = () => {
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {editableBases.map((base: KnowledgeBaseSchema) => (
+                {knowledgeBase.map((base: KnowledgeBaseSchema) => (
                     <div
                         data-testid="knowledge-base-card"
                         key={base.uuid}
@@ -155,23 +152,35 @@ export const KnowledgeBases = () => {
                                 </TooltipProvider>
                             </div>
                             <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button
-                                        data-testid="knowledge-base-menu-button"
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-gray-700"
-                                    >
-                                        <span className="sr-only">Open menu</span>
-                                        <svg
-                                            className="h-4 w-4"
-                                            fill="currentColor"
-                                            viewBox="0 0 20 20"
-                                        >
-                                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                                        </svg>
-                                    </Button>
-                                </DropdownMenuTrigger>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button
+                                                    disabled={!base.can_edit}
+                                                    data-testid="knowledge-base-menu-button"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-gray-700"
+                                                >
+                                                    <span className="sr-only">Open menu</span>
+                                                    <svg
+                                                        className="h-4 w-4"
+                                                        fill="currentColor"
+                                                        viewBox="0 0 20 20"
+                                                    >
+                                                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                                                    </svg>
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                        </TooltipTrigger>
+                                        {!base.can_edit && (
+                                            <TooltipContent className="max-w-xs whitespace-normal break-words">
+                                                This knowledge base is public and cannot be edited.
+                                            </TooltipContent>
+                                        )}
+                                    </Tooltip>
+                                </TooltipProvider>
                                 <DropdownMenuContent
                                     align="end"
                                     className="bg-gray-800 border-gray-700"
@@ -212,19 +221,20 @@ export const KnowledgeBases = () => {
                                 <span>Created {formatDate(base.created_at)}</span>
                             </div>
                         </div>
-
-                        <div className="mt-4 pt-4 border-t border-gray-700">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="w-full border-gray-600 text-gray-300 hover:text-white hover:bg-gray-700 hover:border-gray-500"
-                                onClick={() =>
-                                    navigate(`${ROUTES.MANAGE_KNOWLEDGE_BASE}/${base.uuid}`)
-                                }
-                            >
-                                Manage Files
-                            </Button>
-                        </div>
+                        {base.can_edit && (
+                            <div className="mt-4 pt-4 border-t border-gray-700">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="w-full border-gray-600 text-gray-300 hover:text-white hover:bg-gray-700 hover:border-gray-500"
+                                    onClick={() =>
+                                        navigate(`${ROUTES.MANAGE_KNOWLEDGE_BASE}/${base.uuid}`)
+                                    }
+                                >
+                                    Manage Files
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>

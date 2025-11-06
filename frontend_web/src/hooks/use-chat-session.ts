@@ -24,26 +24,28 @@ const STORAGE_KEYS = {
     SELECTED_EXTERNAL_FILE_ID: 'SELECTED_EXTERNAL_FILE_ID',
     SELECTED_LOCAL_FILE_ID: 'SELECTED_LOCAL_FILE_ID',
     MESSAGE_DRAFT: 'MESSAGE_DRAFT',
-    PENDING_MESSAGE: 'PENDING_MESSAGE',
+    IS_LOADING: 'IS_LOADING',
 } as const;
 
-type ChatDraft = {
+export type ChatDraft = {
     [STORAGE_KEYS.SELECTED_EXTERNAL_FILE_ID]?: string[];
     [STORAGE_KEYS.SELECTED_KNOWLEDGE_BASE_ID]?: string;
     [STORAGE_KEYS.SELECTED_LOCAL_FILE_ID]?: string[];
     [STORAGE_KEYS.MESSAGE_DRAFT]?: string;
-    [STORAGE_KEYS.PENDING_MESSAGE]?: boolean;
+    [STORAGE_KEYS.IS_LOADING]?: boolean;
 };
 
 export function useChatSession(chatId: string = NEWCHAT_ID) {
     const [chatDraft, setChatDraft] = useState<ChatDraft | null>(null);
     const navigate = useNavigate();
     const { mutateAsync: sendMessage } = usePostMessage({ chatId });
-    const { mutateAsync: startChat, isPending: isCreatingChat } = useCreateChat();
+    const { mutateAsync: startChat } = useCreateChat();
     const { data: uploadedFiles = [] } = useListFiles();
 
     const loadDraft = useCallback(() => {
-        if (chatId !== NEWCHAT_ID) {
+        if (chatId === NEWCHAT_ID) {
+            setChatDraft(null);
+        } else {
             const draft = getStorageItem(CHAT_DRAFT_PREFIX_KEY);
             const parsedDraft = draft ? JSON.parse(draft) : {};
             setChatDraft(parsedDraft[chatId] || null);
@@ -99,16 +101,16 @@ export function useChatSession(chatId: string = NEWCHAT_ID) {
             setChatDraft(draft);
             if (chatId !== NEWCHAT_ID) {
                 setStorageItem(CHAT_DRAFT_PREFIX_KEY, JSON.stringify(allDrafts));
-            }
 
-            // Dispatch custom event to notify other components
-            window.dispatchEvent(new CustomEvent('chatDraftUpdated'));
+                // Dispatch custom event to notify other components
+                window.dispatchEvent(new CustomEvent('chatDraftUpdated'));
+            }
         },
         [setChatDraft, chatDraft, chatId]
     );
 
     const setSelectedLocalFileId = (id: string) => {
-        // For the first relase we only allow one selected local file ID at a time
+        // For the first release we only allow one selected local file ID at a time
         const selectedIds = [id];
 
         updateChatInStorage(STORAGE_KEYS.SELECTED_LOCAL_FILE_ID, selectedIds);
@@ -124,7 +126,7 @@ export function useChatSession(chatId: string = NEWCHAT_ID) {
     };
 
     const setSelectedExternalFileId = (id: string) => {
-        // For the first relase we only allow one selected external file ID at a time
+        // For the first release we only allow one selected external file ID at a time
         const selectedIds = [id];
 
         updateChatInStorage(STORAGE_KEYS.SELECTED_EXTERNAL_FILE_ID, selectedIds);
@@ -144,16 +146,19 @@ export function useChatSession(chatId: string = NEWCHAT_ID) {
         updateChatInStorage(STORAGE_KEYS.SELECTED_KNOWLEDGE_BASE_ID, knowledgeBaseId);
     };
 
+    const setIsLoading = useCallback(
+        (isLoading: boolean) => {
+            updateChatInStorage(STORAGE_KEYS.IS_LOADING, isLoading);
+        },
+        [updateChatInStorage]
+    );
+
     const setMessageDraft = useCallback(
         (message: string) => {
             updateChatInStorage(STORAGE_KEYS.MESSAGE_DRAFT, message);
         },
         [updateChatInStorage]
     );
-
-    const setHasPendingMessage = (isPending: boolean) => {
-        updateChatInStorage(STORAGE_KEYS.PENDING_MESSAGE, isPending);
-    };
 
     const setUpNewChatDraft = useCallback(
         (newChatId: string) => {
@@ -197,6 +202,7 @@ export function useChatSession(chatId: string = NEWCHAT_ID) {
                     const knowledgeBaseId =
                         chatDraft?.[STORAGE_KEYS.SELECTED_KNOWLEDGE_BASE_ID] ?? undefined;
 
+                    setIsLoading(true);
                     if (chatId && chatId !== NEWCHAT_ID) {
                         await sendMessage({
                             message: messageToSend,
@@ -224,10 +230,20 @@ export function useChatSession(chatId: string = NEWCHAT_ID) {
                     if (!isSuggestion) {
                         setMessageDraft('');
                     }
+                    setIsLoading(false);
                 }
             }
         },
-        [sendMessage, startChat, navigate, setUpNewChatDraft, chatId, chatDraft, setMessageDraft]
+        [
+            sendMessage,
+            startChat,
+            navigate,
+            setUpNewChatDraft,
+            setMessageDraft,
+            setIsLoading,
+            chatId,
+            chatDraft,
+        ]
     );
 
     return {
@@ -235,8 +251,7 @@ export function useChatSession(chatId: string = NEWCHAT_ID) {
         selectedExternalFileId: chatDraft?.[STORAGE_KEYS.SELECTED_EXTERNAL_FILE_ID] || [],
         selectedLocalFileId: chatDraft?.[STORAGE_KEYS.SELECTED_LOCAL_FILE_ID] || [],
         messageDraft: chatDraft?.[STORAGE_KEYS.MESSAGE_DRAFT] || '',
-        hasPendingMessage: chatDraft?.[STORAGE_KEYS.PENDING_MESSAGE] || false,
-        hasPendingChat: isCreatingChat,
+        isLoading: chatDraft?.[STORAGE_KEYS.IS_LOADING] || false,
         selectedFiles,
         actions: {
             removeSelectedExternalFileId,
@@ -246,7 +261,6 @@ export function useChatSession(chatId: string = NEWCHAT_ID) {
             setUpNewChatDraft,
             setMessageDraft,
             setSelectedLocalFileId,
-            setHasPendingMessage,
             removeDraft,
             handleSubmit,
         },

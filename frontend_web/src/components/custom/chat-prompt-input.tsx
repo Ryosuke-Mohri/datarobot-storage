@@ -29,7 +29,7 @@ import {
     useListKnowledgeBases,
     useGetKnowledgeBase,
 } from '@/api/knowledge-bases/hooks';
-import { useChatSession } from '@/hooks';
+import { useChatSessionContext } from '@/state/ChatSessionContext';
 import { ConnectedSourcesDialog } from '@/components/custom/connected-sources-dialog';
 import { ExternalFile, useExternalFileUploadMutation } from '@/api/external-files';
 import { useAppState } from '@/state';
@@ -39,10 +39,10 @@ import { ROUTES } from '@/pages/routes.ts';
 
 export function ChatPromptInput({
     classNames,
-    hasPendingMessage,
+    isDisabled,
 }: {
     classNames?: string;
-    hasPendingMessage: boolean;
+    isDisabled: boolean;
 }) {
     const navigate = useNavigate();
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -54,7 +54,6 @@ export function ChatPromptInput({
         selectedLocalFileId,
         messageDraft,
         selectedFiles,
-        hasPendingChat,
         actions: {
             removeSelectedExternalFileId,
             setSelectedKnowledgeBaseId,
@@ -64,7 +63,7 @@ export function ChatPromptInput({
             setMessageDraft,
             handleSubmit,
         },
-    } = useChatSession(chatId);
+    } = useChatSessionContext();
 
     const { data: selectedKnowledgeBase } = useGetKnowledgeBase(
         selectedKnowledgeBaseId ?? undefined
@@ -174,7 +173,7 @@ export function ChatPromptInput({
         <>
             <div
                 className={cn(
-                    hasPendingMessage || hasPendingChat ? 'cursor-wait opacity-70' : '',
+                    isDisabled ? 'cursor-wait opacity-70' : '',
                     'transition-all',
                     'justify-items-center p-5 w-2xl',
                     classNames
@@ -182,12 +181,12 @@ export function ChatPromptInput({
                 data-testid="chat-prompt-input"
             >
                 <Textarea
-                    disabled={hasPendingMessage || hasPendingChat}
+                    disabled={isDisabled}
                     onChange={e => setMessageDraft(e.target.value)}
                     placeholder="Ask anything..."
                     value={messageDraft}
                     className={cn(
-                        hasPendingMessage || (hasPendingChat && 'pointer-events-none'),
+                        isDisabled && 'pointer-events-none',
                         'resize-none rounded-none',
                         'dark:bg-muted border-gray-700'
                     )}
@@ -209,7 +208,7 @@ export function ChatPromptInput({
                                         variant="ghost"
                                         size="icon"
                                         onClick={() => true}
-                                        disabled={hasPendingMessage || hasPendingChat}
+                                        disabled={isDisabled}
                                     >
                                         <Plus strokeWidth="4" />
                                     </Button>
@@ -322,7 +321,7 @@ export function ChatPromptInput({
                                             )
                                         }
                                         data-testid="chat-prompt-input-submit"
-                                        disabled={hasPendingMessage || hasPendingChat}
+                                        disabled={isDisabled}
                                     >
                                         {showSuggestPromptButton ? <WandSparkles /> : <Send />}
                                     </Button>
@@ -413,7 +412,7 @@ export function ChatPromptInput({
                                     className="w-4 h-4 cursor-pointer text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
                                     onClick={event => {
                                         event.stopPropagation();
-                                        if (hasPendingMessage || hasPendingChat) {
+                                        if (isDisabled) {
                                             return;
                                         }
                                         onRemove(file.uuid);

@@ -3,16 +3,16 @@ import { cn } from '@/lib/utils.ts';
 
 export function TruncatedWithTooltip({
     text,
-    maxWidthClass = 'max-w-xs',
+    triggerClasses = 'max-w-xs',
 }: {
     text: string;
-    maxWidthClass: string;
+    triggerClasses: string;
 }) {
     return (
         <TooltipProvider>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <p className={cn('cursor-default truncate', maxWidthClass)}>{text}</p>
+                    <p className={cn('truncate', triggerClasses)}>{text}</p>
                 </TooltipTrigger>
                 <TooltipContent className="max-w-xs whitespace-normal break-words">
                     <p>{text}</p>

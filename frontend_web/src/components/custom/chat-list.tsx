@@ -30,7 +30,7 @@ export const ChatList: React.FC = () => {
                 <SidebarMenuItem
                     key={chat.uuid}
                     className={cn(
-                        'flex gap-2 pr-0 py-2 items-center rounded border-l-2 border-transparent overflow-hidden transition-colors cursor-pointer hover:bg-card',
+                        'flex gap-2 pr-0 py-2 items-center rounded border-l-2 border-transparent overflow-hidden transition-colors cursor-pointer [&_*]:cursor-inherit hover:bg-card',
                         {
                             'rounded-l-none dark:bg-card border-l-2 border-white':
                                 location.pathname === `/chat/${chat.uuid}`,
@@ -51,7 +51,7 @@ export const ChatList: React.FC = () => {
                             >
                                 <TruncatedWithTooltip
                                     text={getChatNameOrDefaultWithTimestamp(chat)}
-                                    maxWidthClass="max-w-[180px]"
+                                    triggerClasses="max-w-[180px]"
                                 />
                             </Link>
                             <ChatActionMenu chat={chat} />

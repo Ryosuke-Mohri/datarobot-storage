@@ -93,10 +93,18 @@ export const usePostMessage = ({ chatId }: { chatId?: string }) => {
             queryClient.setQueryData<IChatMessage[]>(chatKeys.messages(chatId), (oldData = []) => {
                 const next = [...oldData];
                 data.forEach(message => {
+                    if (chatId !== message.chat_id) {
+                        // Chat ID mismatch can happen when user submits a prompt and changes to a different chat
+                        return;
+                    }
                     const existingIndex = next.findIndex(
                         existing => existing.uuid === message.uuid
                     );
                     if (existingIndex >= 0) {
+                        // Do not replace a final message with an older incomplete message
+                        if (!next[existingIndex].in_progress && message.in_progress) {
+                            return;
+                        }
                         next[existingIndex] = message;
                     } else {
                         next.push(message);
@@ -106,7 +114,7 @@ export const usePostMessage = ({ chatId }: { chatId?: string }) => {
             });
             queryClient.setQueryData<IChat[]>(chatKeys.chatList(), (oldData = []) => {
                 return oldData.map(chat =>
-                    chat.uuid === chatId
+                    chat.uuid === data[data.length - 1].chat_id
                         ? ({ ...chat, updated_at: data[data.length - 1].created_at } as IChat)
                         : chat
                 );

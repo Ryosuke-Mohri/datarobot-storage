@@ -671,17 +671,9 @@ async def create_chat(
 
     stream_manager: ChatStreamManager = request.app.state.stream_manager
 
-    created_messages = await _create_new_message_exchange(
+    [_, response_message] = await _create_new_message_exchange(
         message_repo, new_chat.uuid, model, message
     )
-    for msg in created_messages:
-        if msg.chat_id:
-            stream_manager.publish(
-                msg.chat_id,
-                MessageEvent(data=msg.dump_json_compatible()),
-            )
-
-    response_message = created_messages[1]
     chat_completion_task = _get_safe_completion_task(
         model, request, response_message.uuid, stream_manager, auth_ctx
     )

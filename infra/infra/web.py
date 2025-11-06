@@ -205,6 +205,7 @@ web_app = pulumi_datarobot.CustomApplication(
     source_version_id=web_app_source.version_id,
     use_case_ids=[use_case.id],
     allow_auto_stopping=True,
+    resources=web_app_source.resources,  # type: ignore
 )
 
 pulumi.export(web_app_env_name, web_app.id)
