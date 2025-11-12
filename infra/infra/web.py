@@ -104,6 +104,7 @@ def get_web_app_files(
         pulumi_datarobot.ApplicationSourceRuntimeParameterValueArgs
         | pulumi_datarobot.CustomModelRuntimeParameterValueArgs,
     ],
+    exclude_build_script: bool = False,
 ) -> list[tuple[str, str]]:
     _prep_metadata_yaml(runtime_parameter_values)
     # Get all files from application path, following symlinks
@@ -113,6 +114,10 @@ def get_web_app_files(
     for dirpath, dirnames, filenames in os.walk(web_application_path, followlinks=True):
         for filename in filenames:
             if filename == "metadata.yaml":
+                continue
+            # Skip build-app.sh when using pre-bundled execution environment
+            # DataRobot doesn't allow build scripts with pre-built images
+            if exclude_build_script and filename == "build-app.sh":
                 continue
             file_path = os.path.join(dirpath, filename)
             rel_path = os.path.relpath(file_path, web_application_path)
@@ -138,10 +143,34 @@ def get_web_app_files(
 web_app_env_name: str = "DATAROBOT_APPLICATION_ID"
 web_application_path = project_dir.parent / "web"
 
-web_app_source_args = ApplicationSourceArgs(
-    resource_name=f"Talk to My Docs [{PROJECT_NAME}]",
-    base_environment_id=RuntimeEnvironments.PYTHON_312_APPLICATION_BASE.value.id,
-).model_dump(mode="json", exclude_none=True)
+# Allow overriding the execution environment for air-gapped deployments
+# Set DATAROBOT_WEB_APP_EXECUTION_ENVIRONMENT_ID to use a pre-bundled environment
+web_app_execution_environment_id = os.environ.get(
+    "DATAROBOT_WEB_APP_EXECUTION_ENVIRONMENT_ID"
+)
+
+if web_app_execution_environment_id:
+    pulumi.info(
+        f"Using custom execution environment: {web_app_execution_environment_id}"
+    )
+    # Use the specified execution environment (e.g., pre-bundled for air-gapped)
+    web_app_base_environment = pulumi_datarobot.ExecutionEnvironment.get(
+        id=web_app_execution_environment_id,
+        resource_name=f"Talk to My Docs Web App Execution Environment [PRE-EXISTING] [{PROJECT_NAME}]",
+    )
+    # Don't use model_dump with Pulumi Outputs - pass directly
+    web_app_source_args = {
+        "resource_name": f"Talk to My Docs [{PROJECT_NAME}]",
+        "base_environment_id": web_app_base_environment.id,
+        "base_environment_version_id": web_app_base_environment.version_id,
+    }
+else:
+    pulumi.info("Using default Python 3.12 application base environment")
+    # Use default DataRobot application environment
+    web_app_source_args = ApplicationSourceArgs(
+        resource_name=f"Talk to My Docs [{PROJECT_NAME}]",
+        base_environment_id=RuntimeEnvironments.PYTHON_312_APPLICATION_BASE.value.id,
+    ).model_dump(mode="json", exclude_none=True)
 
 web_app_resource_name: str = f"Talk to My Docs [{PROJECT_NAME}]"
 
@@ -191,13 +220,16 @@ web_app_runtime_parameters: list[
 
 web_app_source = pulumi_datarobot.ApplicationSource(
     files=frontend_web.stdout.apply(
-        lambda _: get_web_app_files(runtime_parameter_values=web_app_runtime_parameters)
+        lambda _: get_web_app_files(
+            runtime_parameter_values=web_app_runtime_parameters,
+            exclude_build_script=bool(web_app_execution_environment_id),
+        )
     ),
     runtime_parameter_values=web_app_runtime_parameters,
     resources=pulumi_datarobot.ApplicationSourceResourcesArgs(
         resource_label=CustomAppResourceBundles.CPU_XL.value.id,
     ),
-    **web_app_source_args,
+    **web_app_source_args,  # type: ignore[call-overload]
 )
 
 web_app = pulumi_datarobot.CustomApplication(
@@ -206,6 +238,7 @@ web_app = pulumi_datarobot.CustomApplication(
     use_case_ids=[use_case.id],
     allow_auto_stopping=True,
     resources=web_app_source.resources,  # type: ignore
+    opts=pulumi.ResourceOptions(depends_on=[web_app_source]),
 )
 
 pulumi.export(web_app_env_name, web_app.id)
@@ -213,3 +246,10 @@ pulumi.export(
     web_app_resource_name,
     web_app.application_url,
 )
+
+# Export execution environment info for troubleshooting
+if web_app_execution_environment_id:
+    pulumi.export("Web App Execution Environment ID", web_app_execution_environment_id)
+    pulumi.export("Web App Using Pre-Bundled Environment", True)
+else:
+    pulumi.export("Web App Using Pre-Bundled Environment", False)

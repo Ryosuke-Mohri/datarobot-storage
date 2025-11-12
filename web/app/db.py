@@ -11,14 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from asyncio import Lock
-from contextlib import asynccontextmanager, nullcontext
+from contextlib import asynccontextmanager
 from typing import AsyncGenerator, cast
 
 from core.persistent_fs.dr_file_system import (
     DRFileSystem,
     all_env_variables_present,
     calculate_checksum,
+)
+from core.utils.rw_lock import (
+    AbstractReadWriteLock,
+    MockReadWriteLock,
+    ThreadReadWriteLock,
 )
 from sqlalchemy import event, text
 from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
@@ -43,7 +47,7 @@ def _prepare_persistence_storage(
 
 
 class DBCtx:
-    def __init__(self, engine: AsyncEngine):
+    def __init__(self, engine: AsyncEngine) -> None:
         self.engine = engine
 
         self._session = async_sessionmaker(
@@ -57,9 +61,9 @@ class DBCtx:
         self._db_path: str | None
         self._persistence_fs, self._db_path = _prepare_persistence_storage(engine)
 
-        self._lock: Lock | nullcontext = nullcontext()  # type: ignore[type-arg]
+        self._rw_lock: AbstractReadWriteLock = MockReadWriteLock()
         if self._persistence_fs:
-            self._lock = Lock()
+            self._lock = ThreadReadWriteLock()
 
     @asynccontextmanager
     async def _read_session(self) -> AsyncGenerator[AsyncSession, None]:
@@ -71,19 +75,24 @@ class DBCtx:
                     "This session is read-only and cannot perform writes."
                 )
 
-        if self._persistence_fs and self._persistence_fs.exists(self._db_path):
-            self._persistence_fs.get(self._db_path, self._db_path)
+        async with self._rw_lock.async_read_lock():
+            if self._persistence_fs and self._persistence_fs.exists(self._db_path):
+                self._persistence_fs.safe_get_file(
+                    cast(str, self._db_path), cast(str, self._db_path)
+                )
 
-        async with self._session() as session:
-            event.listen(session.sync_session, "before_flush", prevent_writes)
-            yield session
+            async with self._session() as session:
+                event.listen(session.sync_session, "before_flush", prevent_writes)
+                yield session
 
     @asynccontextmanager
     async def _write_session(self) -> AsyncGenerator[AsyncSession, None]:
-        async with self._lock:
+        async with self._rw_lock.async_write_lock():
             checksum: bytes | None = None
             if self._persistence_fs and self._persistence_fs.exists(self._db_path):
-                self._persistence_fs.get(self._db_path, self._db_path)
+                self._persistence_fs.safe_get_file(
+                    cast(str, self._db_path), cast(str, self._db_path)
+                )
                 checksum = calculate_checksum(cast(str, self._db_path))
 
             async with self._session() as session:
@@ -92,7 +101,7 @@ class DBCtx:
             if self._persistence_fs:
                 new_checksum = calculate_checksum(cast(str, self._db_path))
                 if new_checksum != checksum:
-                    self._persistence_fs.put(self._db_path, self._db_path)
+                    self._persistence_fs.put_file(self._db_path, self._db_path)
 
     @asynccontextmanager
     async def session(

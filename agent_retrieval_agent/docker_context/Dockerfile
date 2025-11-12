@@ -137,7 +137,7 @@ ARG VENV_PATH
 COPY ./requirements.txt ${WORKDIR}/
 COPY ./agent/requirements-agent.txt ${WORKDIR}/
 
-# hadolint ignore=DL3013, SC1091
+# hadolint ignore=DL3013,SC1091,SC3046
 RUN source ${VENV_PATH}/bin/activate && \
     uv pip install --no-cache-dir -r ${WORKDIR}/requirements.txt && rm ${WORKDIR}/requirements.txt && \
     # Shared core

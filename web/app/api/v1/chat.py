@@ -16,7 +16,7 @@ import json
 import logging
 import uuid as uuidpkg
 from contextlib import asynccontextmanager, suppress
-from typing import TYPE_CHECKING, Any, AsyncIterator, Callable, Coroutine, List
+from typing import TYPE_CHECKING, Any, AsyncIterator, Callable, Coroutine, List, Tuple
 
 import datarobot as dr
 import litellm
@@ -231,7 +231,7 @@ async def _create_new_message_exchange(
     chat_id: uuidpkg.UUID,
     model: str,
     user_message: str,
-) -> List[Message]:
+) -> Tuple[Message, Message]:
     prompt_message = await message_repo.create_message(
         MessageCreate(
             chat_id=chat_id,
@@ -256,7 +256,7 @@ async def _create_new_message_exchange(
         )
     )
 
-    return [prompt_message, response_message]
+    return prompt_message, response_message
 
 
 @asynccontextmanager
@@ -671,7 +671,7 @@ async def create_chat(
 
     stream_manager: ChatStreamManager = request.app.state.stream_manager
 
-    [_, response_message] = await _create_new_message_exchange(
+    _, response_message = await _create_new_message_exchange(
         message_repo, new_chat.uuid, model, message
     )
     chat_completion_task = _get_safe_completion_task(

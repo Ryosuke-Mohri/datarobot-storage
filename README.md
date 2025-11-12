@@ -12,13 +12,14 @@ A modular, application template for building, developing, and deploying an AI-po
 1. [Quick Start](#quick-start)
 2. [Development Workflow](#development-workflow)
 3. [Deployment](#deployment)
-4. [Architecture Overview](#architecture-overview)
-5. [Change the LLM](#change-the-llm)
-6. [Web Configuration](#web-configuration)
-7. [OAuth Applications](#oauth-applications)
-8. [Subproject Documentation](#subproject-documentation)
-9. [Advanced Usage](#advanced-usage)
-10. [Additional Resources](#additional-resources)
+4. [Air-Gapped Deployment](#air-gapped-deployment)
+5. [Architecture Overview](#architecture-overview)
+6. [Change the LLM](#change-the-llm)
+7. [Web Configuration](#web-configuration)
+8. [OAuth Applications](#oauth-applications)
+9. [Subproject Documentation](#subproject-documentation)
+10. [Advanced Usage](#advanced-usage)
+11. [Additional Resources](#additional-resources)
 
 ---
 
@@ -223,6 +224,44 @@ uv run pulumi up
 
 There are also several shortcut tasks in that `task infra:` component such as only
 deploying the backing LLM, getting stack info, or changing your stack if you have multiple stacks.
+
+---
+
+## Air-Gapped Deployment
+
+This template supports using pre-configured execution environments (e.g., for deploying in air-gapped (offline) environments without internet access). Contact your DataRobot administrator or field engineering team for guidance on deploying in restricted network environments.
+
+### Custom Execution Environment Support
+
+The application supports deployment with custom execution environments for both the web application and agent components:
+
+**Web Application Environment:**
+- Set `DATAROBOT_WEB_APP_EXECUTION_ENVIRONMENT_ID` in your `.env` file
+- When configured, the application will use your specified execution environment instead of the default
+
+**Agent Environment:**
+- Set `DATAROBOT_AGENT_EXECUTION_ENVIRONMENT_ID` in your `.env` file
+- Alternatively, Pulumi can automatically handle agent environment creation if `docker_context.tar.gz` is present
+
+**Configuration:**
+
+```bash
+# In your .env file
+DATAROBOT_WEB_APP_EXECUTION_ENVIRONMENT_ID=<your-web-env-id>
+DATAROBOT_AGENT_EXECUTION_ENVIRONMENT_ID=<your-agent-env-id>
+```
+
+**Deployment:**
+
+```bash
+# Deploy with custom execution environments
+task infra:deploy
+```
+
+When using custom execution environments, Pulumi will:
+- Use your specified environments instead of defaults
+- Skip build script execution (dependencies already in environment)
+- Upload application code directly for deployment
 
 ---
 

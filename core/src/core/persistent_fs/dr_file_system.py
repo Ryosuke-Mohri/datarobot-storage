@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import datetime
 import hashlib
 import io
 import json
@@ -32,11 +33,6 @@ from typing import (
 import datarobot as dr
 from fsspec import AbstractFileSystem
 from fsspec.implementations.local import LocalFileSystem
-
-from core.persistent_fs.kv_custom_app_implementattion import (
-    KeyValue,
-    KeyValueEntityType,
-)
 
 Path = str
 NodeInfo = dict[str, str | int | float]
@@ -126,8 +122,8 @@ class DRFileSystem(AbstractFileSystem):  # type: ignore[misc]
         self._fs_metadata: Metadata = {}
         self._fs_metadata_timestamp: float = 0.0  # timestamp of when we have data
 
-        self._fs_metadata_stored: KeyValue | None = None  # remotely stored metadata
-        self._fs_metadata_timestamp_stored: KeyValue | None = (
+        self._fs_metadata_stored: dr.KeyValue | None = None  # remotely stored metadata
+        self._fs_metadata_timestamp_stored: dr.KeyValue | None = (
             None  # remotely stored timestamp
         )
 
@@ -147,9 +143,9 @@ class DRFileSystem(AbstractFileSystem):  # type: ignore[misc]
             if self._fs_metadata_timestamp_stored:
                 self._fs_metadata_timestamp_stored.refresh()
             else:
-                self._fs_metadata_timestamp_stored = KeyValue.find(
+                self._fs_metadata_timestamp_stored = dr.KeyValue.find(
                     self.app_id,
-                    KeyValueEntityType.CUSTOM_APPLICATION,
+                    dr.KeyValueEntityType.CUSTOM_APPLICATION,
                     TIMESTAMP_STORAGE_NAME,
                 )
 
@@ -158,9 +154,9 @@ class DRFileSystem(AbstractFileSystem):  # type: ignore[misc]
             if self._fs_metadata_stored:
                 self._fs_metadata_stored.refresh()
             else:
-                self._fs_metadata_stored = KeyValue.find(
+                self._fs_metadata_stored = dr.KeyValue.find(
                     self.app_id,
-                    KeyValueEntityType.CUSTOM_APPLICATION,
+                    dr.KeyValueEntityType.CUSTOM_APPLICATION,
                     METADATA_STORAGE_NAME,
                 )
 
@@ -191,9 +187,9 @@ class DRFileSystem(AbstractFileSystem):  # type: ignore[misc]
                     value=self._fs_metadata_timestamp
                 )
             else:
-                self._fs_metadata_timestamp_stored = KeyValue.create(
+                self._fs_metadata_timestamp_stored = dr.KeyValue.create(
                     entity_id=self.app_id,
-                    entity_type=KeyValueEntityType.CUSTOM_APPLICATION,
+                    entity_type=dr.KeyValueEntityType.CUSTOM_APPLICATION,
                     name=TIMESTAMP_STORAGE_NAME,
                     category=dr.KeyValueCategory.ARTIFACT,
                     value_type=dr.KeyValueType.NUMERIC,
@@ -203,9 +199,9 @@ class DRFileSystem(AbstractFileSystem):  # type: ignore[misc]
             if self._fs_metadata_stored:
                 self._fs_metadata_stored.update(value=json.dumps(self._fs_metadata))
             else:
-                self._fs_metadata_stored = KeyValue.create(
+                self._fs_metadata_stored = dr.KeyValue.create(
                     entity_id=self.app_id,
-                    entity_type=KeyValueEntityType.CUSTOM_APPLICATION,
+                    entity_type=dr.KeyValueEntityType.CUSTOM_APPLICATION,
                     name=METADATA_STORAGE_NAME,
                     category=dr.KeyValueCategory.ARTIFACT,
                     value_type=dr.KeyValueType.JSON,
@@ -299,10 +295,10 @@ class DRFileSystem(AbstractFileSystem):  # type: ignore[misc]
         return ordered_children
 
     @_keep_metadata_in_sync
-    def modified(self, path: str) -> float:
+    def modified(self, path: str) -> datetime.datetime:
         if not self.exists(path):
             raise FileNotFoundError()
-        return cast(float, self.info(path).get("modified_at", 0.0))
+        return datetime.datetime.fromtimestamp(self.info(path).get("modified_at", 0.0))
 
     @_keep_metadata_in_sync
     def _open(self, path: str, mode: str = "rb", **kwargs: Any) -> BinaryIO:
@@ -448,6 +444,44 @@ class DRFileSystem(AbstractFileSystem):  # type: ignore[misc]
             self._upload_to_catalog(self._strip_protocol(path2).rstrip("/"), local_path)
             return
         raise NotImplementedError(f"No copy logic for node: {path1}")
+
+    @_keep_metadata_in_sync
+    def safe_get_file(self, rpath: str, lpath: str, **kwargs: Any) -> bool:
+        """Replace local file with file from DR if local file is older. Return True if replacement happened."""
+        logger.debug(
+            "Safe copy file to local FS.", extra={"rpath": rpath, "lpath": lpath}
+        )
+        if not self.exists(rpath):
+            raise FileNotFoundError()
+        if not self.isfile(rpath):
+            raise ValueError(f"{rpath} is not a file")
+        local_fs = LocalFileSystem(auto_mkdir=True)
+
+        if not local_fs.exists(lpath):
+            logger.debug(
+                "Local file does not exist. It's save to copy",
+                extra={"rpath": rpath, "lpath": lpath},
+            )
+            self.get_file(rpath, lpath, **kwargs)
+            return True
+
+        local_path = self._get_local_path(self.info(rpath))
+        source_timestamp = local_fs.modified(local_path)
+        replaced_timestamp = local_fs.modified(lpath)
+        if replaced_timestamp >= source_timestamp:
+            logger.debug(
+                "Local may be more updated",
+                extra={
+                    "rpath": rpath,
+                    "rpath_timestamp": source_timestamp.isoformat(),
+                    "lpath": lpath,
+                    "lpath_timestamp": replaced_timestamp.isoformat(),
+                },
+            )
+            return False
+
+        self.get_file(rpath, lpath, **kwargs)
+        return True
 
 
 def calculate_checksum(path: str) -> bytes:

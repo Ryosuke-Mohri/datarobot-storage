@@ -21,10 +21,6 @@ import datarobot as dr
 from alembic import command
 from alembic.config import Config
 from core.persistent_fs.dr_file_system import all_env_variables_present
-from core.persistent_fs.kv_custom_app_implementattion import (
-    KeyValue,
-    KeyValueEntityType,
-)
 
 MIGRATION_LOCK_NAME = "alembic_migration_lock"
 
@@ -35,7 +31,7 @@ class MigrationLock:
     ):
         self.environment_is_set = all_env_variables_present()
         self.client = client
-        self.lock: KeyValue | None = None
+        self.lock: dr.KeyValue | None = None
         self.ignore_lock = ignore_lock
 
         if self.environment_is_set and not self.client:
@@ -67,9 +63,9 @@ class MigrationLock:
             if self.lock:
                 self.lock.refresh()
             else:
-                self.lock = KeyValue.find(
+                self.lock = dr.KeyValue.find(
                     os.environ["APPLICATION_ID"],
-                    KeyValueEntityType.CUSTOM_APPLICATION,
+                    dr.KeyValueEntityType.CUSTOM_APPLICATION,
                     MIGRATION_LOCK_NAME,
                 )
 
@@ -84,9 +80,9 @@ class MigrationLock:
             if self.lock:
                 self.lock.update(value=value)
             else:
-                self.lock = KeyValue.create(
+                self.lock = dr.KeyValue.create(
                     entity_id=os.environ["APPLICATION_ID"],
-                    entity_type=KeyValueEntityType.CUSTOM_APPLICATION,
+                    entity_type=dr.KeyValueEntityType.CUSTOM_APPLICATION,
                     name=MIGRATION_LOCK_NAME,
                     category=dr.KeyValueCategory.ARTIFACT,
                     value_type=dr.KeyValueType.BOOLEAN,

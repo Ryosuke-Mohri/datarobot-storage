@@ -30,7 +30,19 @@ from datarobot_pulumi_utils.schema.exec_envs import RuntimeEnvironments
 from . import project_dir, use_case
 
 try:
-    from .llm import prediction_environment
+    from .llm import prediction_environment as llm_prediction_environment
+
+    if (
+        llm_prediction_environment.platform
+        == datarobot.enums.PredictionEnvironmentPlatform.DATAROBOT_SERVERLESS
+    ):
+        prediction_environment = llm_prediction_environment
+    else:
+        # Non-default name to ensure this gets created as a distinct prediction environment.
+        prediction_environment = pulumi_datarobot.PredictionEnvironment(
+            resource_name=f"Talk to My Docs Agent Prediction Environment [{PROJECT_NAME}]",
+            platform=datarobot.enums.PredictionEnvironmentPlatform.DATAROBOT_SERVERLESS,
+        )
 except ImportError:
     prediction_environment = pulumi_datarobot.PredictionEnvironment(
         resource_name=f"Talk to My Docs Prediction Environment [{PROJECT_NAME}]",
@@ -100,9 +112,9 @@ def get_custom_model_files(custom_model_folder: str) -> list[tuple[str, str]]:
 
 
 # Start of Pulumi settings and application infrastructure
-if len(os.environ.get("DATAROBOT_DEFAULT_EXECUTION_ENVIRONMENT", "")) > 0:
+if len(os.environ.get("DATAROBOT_AGENT_EXECUTION_ENVIRONMENT_ID", "")) > 0:
     agent_retrieval_agent_execution_environment_id = os.environ[
-        "DATAROBOT_DEFAULT_EXECUTION_ENVIRONMENT"
+        "DATAROBOT_AGENT_EXECUTION_ENVIRONMENT_ID"
     ]
 
     if agent_retrieval_agent_execution_environment_id == DEFAULT_EXECUTION_ENVIRONMENT:
