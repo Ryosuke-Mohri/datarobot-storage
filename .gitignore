@@ -139,6 +139,9 @@ venv.bak/
 # Don't ignore template env file
 !.env.template
 
+# Node
+node_modules/
+
 # Spyder project settings
 .spyderproject
 .spyproject

@@ -167,6 +167,12 @@ RUN chown -R $UNAME:$UNAME ${WORKDIR} /home/notebooks
 
 COPY --from=builder --chown=$UNAME $WORKDIR $WORKDIR
 
+# Create marker file to indicate this is a pre-bundled environment
+# This allows DataRobot to recognize this as a pre-built execution environment
+USER root
+RUN touch /.datarobot-pre-bundled
+USER $UNAME
+
 # This is required for custom models to work with this image
 COPY ./start_server_drum.sh /opt/code/start_server.sh
 ENV HOME=/opt CODE_DIR=/opt/code ADDRESS=0.0.0.0:8080

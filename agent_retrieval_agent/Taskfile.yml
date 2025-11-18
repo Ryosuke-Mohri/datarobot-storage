@@ -73,7 +73,8 @@ tasks:
       - cd docker_context && uv pip compile --python-version 3.11 --universal --no-annotate --no-emit-index-url --output-file=requirements.txt
         requirements.in
       - echo "Building Docker image"
-      - cd docker_context && tar -czh . | docker build --platform linux/amd64 -t agent_retrieval_agent:latest -
+      - cd docker_context && tar -czh . | docker build --platform linux/amd64 --target kernel -t agent_retrieval_agent:latest
+        -
       - echo "Saving Docker image"
       - docker save agent_retrieval_agent:latest | gzip > docker_context.tar.gz
     silent: true

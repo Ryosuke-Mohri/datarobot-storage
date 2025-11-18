@@ -11,6 +11,9 @@ includes:
   core:
     taskfile: ./core/Taskfile.yaml
     dir: ./core
+  exec-env:
+    taskfile: ./execution_environments/Taskfile.yaml
+    dir: ./execution_environments
   frontend:
     taskfile: ./frontend_web/Taskfile.yaml
     dir: ./frontend_web
@@ -72,23 +75,3 @@ tasks:
     desc: "🚀 Deploy the infrastructure"
     cmds:
       - task infra:deploy
-
-  build-exec-env:web:
-    desc: "🐳 Build pre-bundled web app execution environment for air-gapped deployment"
-    dir: ./execution_environments/web_app
-    cmds:
-      - ./build-execution-environment.sh
-
-  build-exec-env:agent:
-    desc: "🐳 Build pre-bundled agent execution environment for air-gapped deployment"
-    cmds:
-      - task: agent:build-docker
-      - mkdir -p execution_environments/artifacts
-      - cp agent_retrieval_agent/docker_context.tar.gz execution_environments/artifacts/talk-to-my-docs-agent-execution-environment.tar.gz
-      - echo "Artifact saved to execution_environments/artifacts/talk-to-my-docs-agent-execution-environment.tar.gz"
-
-  build-exec-env:all:
-    desc: "🐳 Build all pre-bundled execution environments for air-gapped deployment"
-    deps:
-      - build-exec-env:web
-      - build-exec-env:agent
