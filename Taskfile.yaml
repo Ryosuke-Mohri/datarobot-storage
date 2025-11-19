@@ -14,6 +14,7 @@ includes:
   exec-env:
     taskfile: ./execution_environments/Taskfile.yaml
     dir: ./execution_environments
+    optional: true
   frontend:
     taskfile: ./frontend_web/Taskfile.yaml
     dir: ./frontend_web
