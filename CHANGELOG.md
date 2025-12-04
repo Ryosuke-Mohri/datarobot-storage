@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.9] - 2025-12-04
+
+- Bump litellm version to 1.79.3 with retry-after header support for errors 502, 503, 504
+
+### Fixed
+
+- Fixed an issue where the LLM Gateway dependency was incorrectly required for all LLM configurations.
+
 ## [0.2.8] - 2025-11-25
 
 ### Changed
