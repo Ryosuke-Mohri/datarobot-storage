@@ -1,0 +1,2240 @@
+{
+    "version": 3,
+    "checkpoint": {
+        "stack": "organization/talk-to-my-docs/dev_mori_20251216",
+        "latest": {
+            "manifest": {
+                "time": "2025-12-16T08:35:34.52989766Z",
+                "magic": "8ef908d5c16a773b74afbf60e20d5cd9b4b27443e091b5a836119759afdc3519",
+                "version": "v3.212.0"
+            },
+            "secrets_providers": {
+                "type": "passphrase",
+                "state": {
+                    "salt": "v1:matMmTI+X8w=:v1:yJs9wMaRI64JIRxA:z77OXeZ2tNAFlPI5TS3iUgv2uThZZw=="
+                }
+            },
+            "resources": [
+                {
+                    "urn": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:pulumi:Stack::talk-to-my-docs-dev_mori_20251216",
+                    "custom": false,
+                    "type": "pulumi:pulumi:Stack",
+                    "created": "2025-12-16T08:14:36.052265028Z",
+                    "modified": "2025-12-16T08:14:36.052265028Z",
+                    "sourcePosition": "project:///.venv/lib/python3.11/site-packages/pulumi/runtime/stack.py#169"
+                },
+                {
+                    "urn": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::custom:datarobot:CustomModelDeployment::Talk to My Docs Agent Chat Deployment [agent_retrieval_agent]",
+                    "custom": false,
+                    "type": "custom:datarobot:CustomModelDeployment",
+                    "outputs": {
+                        "custom_model_version_id": "6941172b0cf0b8ac5dcb651a",
+                        "deployment_id": "6941173b7a9a980649be742f",
+                        "registered_model_id": "6941172c862454bf28c0b699",
+                        "registered_model_version_id": "6941172d862454bf28c0b69d"
+                    },
+                    "parent": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:pulumi:Stack::talk-to-my-docs-dev_mori_20251216",
+                    "created": "2025-12-16T08:14:36.138967299Z",
+                    "modified": "2025-12-16T08:14:36.138967299Z",
+                    "sourcePosition": "project:///infra/agent_retrieval_agent.py#243"
+                },
+                {
+                    "urn": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:providers:datarobot::default_0_10_22_github_/api.github.com/datarobot-community/pulumi-datarobot",
+                    "custom": true,
+                    "id": "a5acf804-27a0-4e4f-93a8-7864755856b3",
+                    "type": "pulumi:providers:datarobot",
+                    "inputs": {
+                        "__internal": {
+                            "pluginDownloadURL": "github://api.github.com/datarobot-community/pulumi-datarobot"
+                        },
+                        "tracecontext": {
+                            "4dabf18193072939515e22adb298388d": "1b47061264138c4ac30d75fd1eb44270",
+                            "ciphertext": "v1:/QqljfHikB2J3MgC:weQQll7dOXJc7Rrfad20Ws73LhxueG4UshLy4/U708Bb"
+                        },
+                        "version": "0.10.22"
+                    },
+                    "outputs": {
+                        "tracecontext": {
+                            "4dabf18193072939515e22adb298388d": "1b47061264138c4ac30d75fd1eb44270",
+                            "ciphertext": "v1:/QqljfHikB2J3MgC:weQQll7dOXJc7Rrfad20Ws73LhxueG4UshLy4/U708Bb"
+                        },
+                        "version": "0.10.22"
+                    },
+                    "created": "2025-12-16T08:14:36.140127191Z",
+                    "modified": "2025-12-16T08:14:36.140127191Z"
+                },
+                {
+                    "urn": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:providers:command::default_1_1_3",
+                    "custom": true,
+                    "id": "78520cda-06db-4df8-b6bc-110423ecb1ed",
+                    "type": "pulumi:providers:command",
+                    "inputs": {
+                        "__internal": {},
+                        "__pulumi-go-provider-version": "1.1.0",
+                        "version": "1.1.3"
+                    },
+                    "outputs": {
+                        "__pulumi-go-provider-version": "1.1.0",
+                        "version": "1.1.3"
+                    },
+                    "created": "2025-12-16T08:14:36.223776193Z",
+                    "modified": "2025-12-16T08:14:36.223776193Z"
+                },
+                {
+                    "urn": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/apiTokenCredential:ApiTokenCredential::Talk to My Docs Database URI [dev_mori_20251216]",
+                    "custom": true,
+                    "id": "694114ecefcf3e7a54894cfc",
+                    "type": "datarobot:index/apiTokenCredential:ApiTokenCredential",
+                    "inputs": {
+                        "apiToken": {
+                            "4dabf18193072939515e22adb298388d": "1b47061264138c4ac30d75fd1eb44270",
+                            "ciphertext": "v1:XqxiJzh2i6Sd4t9g:La384sCbXAnG9JYe/TZ+4IFP9PUU+uSolSPNadThnbu5QmQ6SyetyXkp2OkAN8XhwSkrr6yJAI6ovWMqOmGjBWnC1uBpwcvf2xmt"
+                        },
+                        "name": "Talk to My Docs Database URI [dev_mori_20251216]-29d4c95"
+                    },
+                    "outputs": {
+                        "apiToken": {
+                            "4dabf18193072939515e22adb298388d": "1b47061264138c4ac30d75fd1eb44270",
+                            "ciphertext": "v1:sk8OmfTcO3SLda63:8QRA1Kt23EckQ0iKdfCI7K54YAZzVrMMWTLKXDZOqa4mx1Wn4Ov2fSz1lRIXGQz9rfUxNrfV06/awbM7gGWi3rFUEWagvEydaJbZ"
+                        },
+                        "id": "694114ecefcf3e7a54894cfc",
+                        "name": "Talk to My Docs Database URI [dev_mori_20251216]-29d4c95"
+                    },
+                    "parent": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:pulumi:Stack::talk-to-my-docs-dev_mori_20251216",
+                    "provider": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:providers:datarobot::default_0_10_22_github_/api.github.com/datarobot-community/pulumi-datarobot::a5acf804-27a0-4e4f-93a8-7864755856b3",
+                    "propertyDependencies": {
+                        "apiToken": []
+                    },
+                    "additionalSecretOutputs": [
+                        "apiToken"
+                    ],
+                    "created": "2025-12-16T08:14:36.39968204Z",
+                    "modified": "2025-12-16T08:14:36.39968204Z",
+                    "sourcePosition": "project:///infra/web.py#187"
+                },
+                {
+                    "urn": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/apiTokenCredential:ApiTokenCredential::Talk to My Docs Session Secret Key [dev_mori_20251216]",
+                    "custom": true,
+                    "id": "694114ecb9b8392cd0894b6e",
+                    "type": "datarobot:index/apiTokenCredential:ApiTokenCredential",
+                    "inputs": {
+                        "apiToken": {
+                            "4dabf18193072939515e22adb298388d": "1b47061264138c4ac30d75fd1eb44270",
+                            "ciphertext": "v1:lovUDd0vpdGtOoIK:/OjVDIp5cFpgSoUdzAPFSfV2MuH5vn3Iq4L6+CwPLJL9a65miIja9CQpz3QG5y/zB9YlESc6yf3XZQem2pMuvVe7oFmQBvwuZ18a1MJ42eQ6M+Za0DiAp8H/6FfcdhPov2ZezFzi9BaW/jBGQT8tY6W8J5kCrnVspz5KDH+Xcq+BkIOn5UQWJnCNTH9VcXWGm+s="
+                        },
+                        "name": "Talk to My Docs Session Secret Key [dev_mori_20251216]-b78f81c"
+                    },
+                    "outputs": {
+                        "apiToken": {
+                            "4dabf18193072939515e22adb298388d": "1b47061264138c4ac30d75fd1eb44270",
+                            "ciphertext": "v1:gC+f433gDQuh2HVr:hXjR9cRLZanjpabzrcRWuvMl1aSKXLmGDUKGkvsnKiqjIPCzsPsW+UycGk2C4scZyJDMw1eY8cNKpstXCiQORSiP1so87xFCo4zxKhsymNNf60KzdJ1hhtM98r6qy0hLVlZAWty0pNml35kQo8TsHOk57ipXafH1aHdB1LbwNA04hI6qbk47KtNV756KUbh4xvo="
+                        },
+                        "id": "694114ecb9b8392cd0894b6e",
+                        "name": "Talk to My Docs Session Secret Key [dev_mori_20251216]-b78f81c"
+                    },
+                    "parent": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:pulumi:Stack::talk-to-my-docs-dev_mori_20251216",
+                    "provider": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:providers:datarobot::default_0_10_22_github_/api.github.com/datarobot-community/pulumi-datarobot::a5acf804-27a0-4e4f-93a8-7864755856b3",
+                    "propertyDependencies": {
+                        "apiToken": []
+                    },
+                    "additionalSecretOutputs": [
+                        "apiToken"
+                    ],
+                    "created": "2025-12-16T08:14:36.427888981Z",
+                    "modified": "2025-12-16T08:14:36.427888981Z",
+                    "sourcePosition": "project:///infra/web.py#180"
+                },
+                {
+                    "urn": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/useCase:UseCase::Talk to My Docs [PRE-EXISTING]",
+                    "custom": true,
+                    "id": "69410db7b327ab2a14c0b1b0",
+                    "type": "datarobot:index/useCase:UseCase",
+                    "outputs": {
+                        "id": "69410db7b327ab2a14c0b1b0",
+                        "name": "Use Case from Talk to My Docs created at 2025-12-16 07:43:51.382349"
+                    },
+                    "parent": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:pulumi:Stack::talk-to-my-docs-dev_mori_20251216",
+                    "external": true,
+                    "provider": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:providers:datarobot::default_0_10_22_github_/api.github.com/datarobot-community/pulumi-datarobot::a5acf804-27a0-4e4f-93a8-7864755856b3",
+                    "sourcePosition": "project:///.venv/lib/python3.11/site-packages/pulumi_datarobot/use_case.py#201"
+                },
+                {
+                    "urn": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/predictionEnvironment:PredictionEnvironment::Talk to My Docs Prediction Environment [dev_mori_20251216]",
+                    "custom": true,
+                    "id": "694114ecefcf3e7a54894cfd",
+                    "type": "datarobot:index/predictionEnvironment:PredictionEnvironment",
+                    "inputs": {
+                        "name": "Talk to My Docs Prediction Environment [dev_mori_20251216]-37cd8c2",
+                        "platform": "datarobotServerless"
+                    },
+                    "outputs": {
+                        "id": "694114ecefcf3e7a54894cfd",
+                        "managedBy": "selfManaged",
+                        "name": "Talk to My Docs Prediction Environment [dev_mori_20251216]-37cd8c2",
+                        "platform": "datarobotServerless"
+                    },
+                    "parent": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:pulumi:Stack::talk-to-my-docs-dev_mori_20251216",
+                    "provider": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:providers:datarobot::default_0_10_22_github_/api.github.com/datarobot-community/pulumi-datarobot::a5acf804-27a0-4e4f-93a8-7864755856b3",
+                    "propertyDependencies": {
+                        "platform": []
+                    },
+                    "created": "2025-12-16T08:14:36.637376751Z",
+                    "modified": "2025-12-16T08:14:36.637376751Z",
+                    "sourcePosition": "project:///infra/llm.py#124"
+                },
+                {
+                    "urn": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/predictionEnvironment:PredictionEnvironment::Talk to My Docs Agent Prediction Environment [dev_mori_20251216]",
+                    "custom": true,
+                    "id": "694114ec0751911e0089488b",
+                    "type": "datarobot:index/predictionEnvironment:PredictionEnvironment",
+                    "inputs": {
+                        "name": "Talk to My Docs Agent Prediction Environment [dev_mori_20251216]-ad8ef76",
+                        "platform": "datarobotServerless"
+                    },
+                    "outputs": {
+                        "id": "694114ec0751911e0089488b",
+                        "managedBy": "selfManaged",
+                        "name": "Talk to My Docs Agent Prediction Environment [dev_mori_20251216]-ad8ef76",
+                        "platform": "datarobotServerless"
+                    },
+                    "parent": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:pulumi:Stack::talk-to-my-docs-dev_mori_20251216",
+                    "provider": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:providers:datarobot::default_0_10_22_github_/api.github.com/datarobot-community/pulumi-datarobot::a5acf804-27a0-4e4f-93a8-7864755856b3",
+                    "propertyDependencies": {
+                        "platform": []
+                    },
+                    "created": "2025-12-16T08:14:36.683970448Z",
+                    "modified": "2025-12-16T08:14:36.683970448Z",
+                    "sourcePosition": "project:///infra/agent_retrieval_agent.py#42"
+                },
+                {
+                    "urn": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/playground:Playground::Talk to My Docs Playground [dev_mori_20251216]",
+                    "custom": true,
+                    "id": "694114ede93c6186ab1750b5",
+                    "type": "datarobot:index/playground:Playground",
+                    "inputs": {
+                        "name": "Talk to My Docs Playground [dev_mori_20251216]-7787136",
+                        "useCaseId": "69410db7b327ab2a14c0b1b0"
+                    },
+                    "outputs": {
+                        "id": "694114ede93c6186ab1750b5",
+                        "name": "Talk to My Docs Playground [dev_mori_20251216]-7787136",
+                        "playgroundType": "rag",
+                        "useCaseId": "69410db7b327ab2a14c0b1b0"
+                    },
+                    "parent": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:pulumi:Stack::talk-to-my-docs-dev_mori_20251216",
+                    "dependencies": [
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/useCase:UseCase::Talk to My Docs [PRE-EXISTING]"
+                    ],
+                    "provider": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:providers:datarobot::default_0_10_22_github_/api.github.com/datarobot-community/pulumi-datarobot::a5acf804-27a0-4e4f-93a8-7864755856b3",
+                    "propertyDependencies": {
+                        "useCaseId": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/useCase:UseCase::Talk to My Docs [PRE-EXISTING]"
+                        ]
+                    },
+                    "created": "2025-12-16T08:14:38.045331077Z",
+                    "modified": "2025-12-16T08:14:38.045331077Z",
+                    "sourcePosition": "project:///infra/llm.py#97"
+                },
+                {
+                    "urn": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/llmBlueprint:LlmBlueprint::Talk to My Docs LLM Blueprint [dev_mori_20251216]",
+                    "custom": true,
+                    "id": "694114eeedf2d20e9768f844",
+                    "type": "datarobot:index/llmBlueprint:LlmBlueprint",
+                    "inputs": {
+                        "llmId": "amazon-anthropic-claude-3-7-sonnet-v1",
+                        "llmSettings": {
+                            "maxCompletionLength": 2048,
+                            "temperature": 0.1
+                        },
+                        "name": "Talk to My Docs LLM Blueprint [dev_mori_20251216]-0f146b9",
+                        "playgroundId": "694114ede93c6186ab1750b5"
+                    },
+                    "outputs": {
+                        "id": "694114eeedf2d20e9768f844",
+                        "llmId": "amazon-anthropic-claude-3-7-sonnet-v1",
+                        "llmSettings": {
+                            "maxCompletionLength": 2048,
+                            "temperature": 0.1
+                        },
+                        "name": "Talk to My Docs LLM Blueprint [dev_mori_20251216]-0f146b9",
+                        "playgroundId": "694114ede93c6186ab1750b5",
+                        "promptType": "CHAT_HISTORY_AWARE"
+                    },
+                    "parent": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:pulumi:Stack::talk-to-my-docs-dev_mori_20251216",
+                    "dependencies": [
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/playground:Playground::Talk to My Docs Playground [dev_mori_20251216]"
+                    ],
+                    "provider": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:providers:datarobot::default_0_10_22_github_/api.github.com/datarobot-community/pulumi-datarobot::a5acf804-27a0-4e4f-93a8-7864755856b3",
+                    "propertyDependencies": {
+                        "llmId": [],
+                        "llmSettings": [],
+                        "playgroundId": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/playground:Playground::Talk to My Docs Playground [dev_mori_20251216]"
+                        ]
+                    },
+                    "created": "2025-12-16T08:14:38.702492502Z",
+                    "modified": "2025-12-16T08:14:38.702492502Z",
+                    "sourcePosition": "project:///infra/llm.py#102"
+                },
+                {
+                    "urn": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/customModel:CustomModel::Talk to My Docs LLM Blueprint Model [dev_mori_20251216]",
+                    "custom": true,
+                    "id": "694114efbd988b293dcb5d69",
+                    "type": "datarobot:index/customModel:CustomModel",
+                    "inputs": {
+                        "baseEnvironmentId": "67ab469cecdca772287de644",
+                        "name": "Talk to My Docs LLM Blueprint Model [dev_mori_20251216]",
+                        "replicas": 1,
+                        "sourceLlmBlueprintId": "694114eeedf2d20e9768f844",
+                        "targetName": "resultText",
+                        "targetType": "TextGeneration",
+                        "useCaseIds": [
+                            "69410db7b327ab2a14c0b1b0"
+                        ]
+                    },
+                    "outputs": {
+                        "baseEnvironmentId": "67ab469cecdca772287de644",
+                        "baseEnvironmentVersionId": "69215b1745c0dba6699534fb",
+                        "deploymentsCount": 0,
+                        "description": "このカスタムモデルは、DataRobotによってTalk to My Docs LLM Blueprint [dev_mori_20251216]-0f146b9から自動生成されました",
+                        "filesHashes": [],
+                        "id": "694114efbd988b293dcb5d69",
+                        "isProxy": false,
+                        "name": "Talk to My Docs LLM Blueprint Model [dev_mori_20251216]",
+                        "negativeClassLabel": "0",
+                        "networkAccess": "PUBLIC",
+                        "positiveClassLabel": "1",
+                        "predictionThreshold": 0.5,
+                        "replicas": 1,
+                        "runtimeParameterValues": [],
+                        "sourceLlmBlueprintId": "694114eeedf2d20e9768f844",
+                        "targetName": "resultText",
+                        "targetType": "TextGeneration",
+                        "useCaseIds": [
+                            "69410db7b327ab2a14c0b1b0"
+                        ],
+                        "versionId": "694114ffbd988b293dcb5e01"
+                    },
+                    "parent": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:pulumi:Stack::talk-to-my-docs-dev_mori_20251216",
+                    "dependencies": [
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/llmBlueprint:LlmBlueprint::Talk to My Docs LLM Blueprint [dev_mori_20251216]",
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/useCase:UseCase::Talk to My Docs [PRE-EXISTING]"
+                    ],
+                    "provider": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:providers:datarobot::default_0_10_22_github_/api.github.com/datarobot-community/pulumi-datarobot::a5acf804-27a0-4e4f-93a8-7864755856b3",
+                    "propertyDependencies": {
+                        "baseEnvironmentId": [],
+                        "name": [],
+                        "replicas": [],
+                        "sourceLlmBlueprintId": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/llmBlueprint:LlmBlueprint::Talk to My Docs LLM Blueprint [dev_mori_20251216]"
+                        ],
+                        "targetName": [],
+                        "targetType": [],
+                        "useCaseIds": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/useCase:UseCase::Talk to My Docs [PRE-EXISTING]"
+                        ]
+                    },
+                    "created": "2025-12-16T08:14:56.960703511Z",
+                    "modified": "2025-12-16T08:14:56.960703511Z",
+                    "sourcePosition": "project:///infra/llm.py#113"
+                },
+                {
+                    "urn": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/registeredModel:RegisteredModel::Talk to My Docs LLM Registered Model [dev_mori_20251216]",
+                    "custom": true,
+                    "id": "694115010751911e00894912",
+                    "type": "datarobot:index/registeredModel:RegisteredModel",
+                    "inputs": {
+                        "customModelVersionId": "694114ffbd988b293dcb5e01",
+                        "name": "Talk to My Docs LLM Registered Model [dev_mori_20251216]",
+                        "useCaseIds": [
+                            "69410db7b327ab2a14c0b1b0"
+                        ]
+                    },
+                    "outputs": {
+                        "customModelVersionId": "694114ffbd988b293dcb5e01",
+                        "id": "694115010751911e00894912",
+                        "name": "Talk to My Docs LLM Registered Model [dev_mori_20251216]",
+                        "useCaseIds": [
+                            "69410db7b327ab2a14c0b1b0"
+                        ],
+                        "versionId": "694115010751911e00894916",
+                        "versionName": "Talk to My Docs LLM Registered Model [dev_mori_20251216] (v1)"
+                    },
+                    "parent": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:pulumi:Stack::talk-to-my-docs-dev_mori_20251216",
+                    "dependencies": [
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/customModel:CustomModel::Talk to My Docs LLM Blueprint Model [dev_mori_20251216]",
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/useCase:UseCase::Talk to My Docs [PRE-EXISTING]"
+                    ],
+                    "provider": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:providers:datarobot::default_0_10_22_github_/api.github.com/datarobot-community/pulumi-datarobot::a5acf804-27a0-4e4f-93a8-7864755856b3",
+                    "propertyDependencies": {
+                        "customModelVersionId": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/customModel:CustomModel::Talk to My Docs LLM Blueprint Model [dev_mori_20251216]"
+                        ],
+                        "name": [],
+                        "useCaseIds": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/useCase:UseCase::Talk to My Docs [PRE-EXISTING]"
+                        ]
+                    },
+                    "created": "2025-12-16T08:15:14.553162792Z",
+                    "modified": "2025-12-16T08:15:14.553162792Z",
+                    "sourcePosition": "project:///infra/llm.py#130"
+                },
+                {
+                    "urn": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/deployment:Deployment::Talk to My Docs LLM Blueprint Deployment [dev_mori_20251216]",
+                    "custom": true,
+                    "id": "6941151215f9337068be7599",
+                    "type": "datarobot:index/deployment:Deployment",
+                    "inputs": {
+                        "associationIdSettings": {
+                            "autoGenerateId": false,
+                            "columnNames": [
+                                "association_id"
+                            ],
+                            "requiredInPredictionRequests": true
+                        },
+                        "label": "Talk to My Docs LLM Blueprint Deployment [dev_mori_20251216] [llm]",
+                        "predictionEnvironmentId": "694114ecefcf3e7a54894cfd",
+                        "predictionsDataCollectionSettings": {
+                            "enabled": true
+                        },
+                        "predictionsSettings": {
+                            "maxComputes": 2,
+                            "minComputes": 0
+                        },
+                        "registeredModelVersionId": "694115010751911e00894916",
+                        "useCaseIds": [
+                            "69410db7b327ab2a14c0b1b0"
+                        ]
+                    },
+                    "outputs": {
+                        "associationIdSettings": {
+                            "autoGenerateId": false,
+                            "columnNames": [
+                                "association_id"
+                            ],
+                            "requiredInPredictionRequests": true
+                        },
+                        "id": "6941151215f9337068be7599",
+                        "importance": "LOW",
+                        "label": "Talk to My Docs LLM Blueprint Deployment [dev_mori_20251216] [llm]",
+                        "predictionEnvironmentId": "694114ecefcf3e7a54894cfd",
+                        "predictionsDataCollectionSettings": {
+                            "enabled": true
+                        },
+                        "predictionsSettings": {
+                            "maxComputes": 2,
+                            "minComputes": 0
+                        },
+                        "registeredModelVersionId": "694115010751911e00894916",
+                        "useCaseIds": [
+                            "69410db7b327ab2a14c0b1b0"
+                        ]
+                    },
+                    "parent": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:pulumi:Stack::talk-to-my-docs-dev_mori_20251216",
+                    "dependencies": [
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/registeredModel:RegisteredModel::Talk to My Docs LLM Registered Model [dev_mori_20251216]",
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/useCase:UseCase::Talk to My Docs [PRE-EXISTING]",
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/predictionEnvironment:PredictionEnvironment::Talk to My Docs Prediction Environment [dev_mori_20251216]"
+                    ],
+                    "provider": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:providers:datarobot::default_0_10_22_github_/api.github.com/datarobot-community/pulumi-datarobot::a5acf804-27a0-4e4f-93a8-7864755856b3",
+                    "propertyDependencies": {
+                        "associationIdSettings": [],
+                        "label": [],
+                        "predictionEnvironmentId": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/predictionEnvironment:PredictionEnvironment::Talk to My Docs Prediction Environment [dev_mori_20251216]"
+                        ],
+                        "predictionsDataCollectionSettings": [],
+                        "predictionsSettings": [],
+                        "registeredModelVersionId": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/registeredModel:RegisteredModel::Talk to My Docs LLM Registered Model [dev_mori_20251216]"
+                        ],
+                        "useCaseIds": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/useCase:UseCase::Talk to My Docs [PRE-EXISTING]"
+                        ]
+                    },
+                    "created": "2025-12-16T08:18:25.913556311Z",
+                    "modified": "2025-12-16T08:18:25.913556311Z",
+                    "sourcePosition": "project:///infra/llm.py#138",
+                    "replaceOnChanges": [
+                        "registeredModelVersionId"
+                    ]
+                },
+                {
+                    "urn": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::command:local:Command::Talk to My Docs [dev_mori_20251216] Build Frontend",
+                    "custom": true,
+                    "id": "Talk to My Docs [dev_mori_20251216] Build Frontend9342311b",
+                    "type": "command:local:Command",
+                    "inputs": {
+                        "create": "cd /home/notebooks/storage/frontend_web && npm ci && npm run build",
+                        "triggers": [
+                            "07970ba48d848f072ee5b0a81774612273b521a44848468fcd1a2a2d1bc57ee3"
+                        ]
+                    },
+                    "outputs": {
+                        "create": "cd /home/notebooks/storage/frontend_web && npm ci && npm run build",
+                        "stderr": "npm warn Unknown builtin config \"globalignorefile\". This will stop working in the next major version of npm.\nnpm warn Unknown builtin config \"python\". This will stop working in the next major version of npm.\nnpm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.\nnpm warn deprecated rimraf@2.7.1: Rimraf versions prior to v4 are no longer supported\nnpm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported\nnpm warn Unknown builtin config \"globalignorefile\". This will stop working in the next major version of npm.\nnpm warn Unknown builtin config \"python\". This will stop working in the next major version of npm.\n\n(!) outDir /home/notebooks/storage/web/static is not inside project root and will not be emptied.\nUse --emptyOutDir to override.\n\n\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.",
+                        "stdout": "\nadded 778 packages, and audited 779 packages in 7m\n\n205 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n\n> frontend_web@0.0.0 prebuild\n> rimraf ../web/static/assets\n\n\n> frontend_web@0.0.0 build\n> tsc -b && cross-env NODE_OPTIONS='--max-old-space-size=4096' vite build\n\nvite v6.4.1 building for production...\ntransforming...\n✓ 3982 modules transformed.\nrendering chunks...\ncomputing gzip size...\n../web/static/index.html                                         0.54 kB │ gzip:   0.33 kB\n../web/static/assets/DataRobot_white-C2JrcVRN.svg                6.39 kB │ gzip:   2.48 kB\n../web/static/.vite/manifest.json                               20.41 kB │ gzip:   2.36 kB\n../web/static/assets/index-B0ZWxGXj.css                         68.52 kB │ gzip:  12.18 kB\n../web/static/assets/clone-Cs3NbQuV.js                           0.10 kB │ gzip:   0.11 kB\n../web/static/assets/channel-BFxjNG4M.js                         0.11 kB │ gzip:   0.12 kB\n../web/static/assets/init-Gi6I4Gst.js                            0.15 kB │ gzip:   0.13 kB\n../web/static/assets/chunk-QZHKN3VN-fV4-YspI.js                  0.19 kB │ gzip:   0.16 kB\n../web/static/assets/chunk-55IACEB6-03EBIq4n.js                  0.23 kB │ gzip:   0.21 kB\n../web/static/assets/chunk-4BX2VUAB-83EdJtlF.js                  0.29 kB │ gzip:   0.20 kB\n../web/static/assets/chunk-FMBD7UC4-DN0Z6oFX.js                  0.36 kB │ gzip:   0.27 kB\n../web/static/assets/stateDiagram-v2-4FDKWEC3-ObeO4AXe.js        0.38 kB │ gzip:   0.28 kB\n../web/static/assets/classDiagram-2ON5EDUG-DCLCjbC6.js           0.42 kB │ gzip:   0.30 kB\n../web/static/assets/classDiagram-v2-WZHVMYZB-DCLCjbC6.js        0.42 kB │ gzip:   0.30 kB\n../web/static/assets/chunk-QN33PNHL-BdT5f9p8.js                  0.52 kB │ gzip:   0.37 kB\n../web/static/assets/infoDiagram-ER5ION4S-Dr1ShR18.js            0.68 kB │ gzip:   0.45 kB\n../web/static/assets/OAuthCallback-Dvw88hP3.js                   1.00 kB │ gzip:   0.61 kB\n../web/static/assets/ordinal-Cboi1Yqb.js                         1.19 kB │ gzip:   0.57 kB\n../web/static/assets/chunk-TZMSLE5B-B-Mmw58c.js                  1.43 kB │ gzip:   0.63 kB\n../web/static/assets/_basePickBy-CpGrCPVg.js                     2.58 kB │ gzip:   1.29 kB\n../web/static/assets/arc-BPeu5V9O.js                             3.43 kB │ gzip:   1.46 kB\n../web/static/assets/diagram-S2PKOQOG-Ceyo8S-_.js                4.33 kB │ gzip:   1.89 kB\n../web/static/assets/defaultLocale-C4B-KCzX.js                   4.55 kB │ gzip:   2.11 kB\n../web/static/assets/pieDiagram-ADFJNKIX-BgnphNi1.js             5.26 kB │ gzip:   2.33 kB\n../web/static/assets/linear-CZh2bjGq.js                          5.65 kB │ gzip:   2.31 kB\n../web/static/assets/graph-l6ZGkb53.js                           5.91 kB │ gzip:   1.87 kB\n../web/static/assets/diagram-QEK2KX5R-Fc6pRqU6.js                6.05 kB │ gzip:   2.53 kB\n../web/static/assets/stateDiagram-FKZM4ZOC-CuIV-5Fi.js          10.38 kB │ gzip:   3.63 kB\n../web/static/assets/dagre-6UL2VRFP-BQVnRK-Y.js                 11.26 kB │ gzip:   4.20 kB\n../web/static/assets/_baseUniq-BaECDjmH.js                      11.90 kB │ gzip:   4.62 kB\n../web/static/assets/diagram-PSM6KHXK--iu18LuI.js               15.98 kB │ gzip:   5.70 kB\n../web/static/assets/kanban-definition-3W4ZIXB7-DMHGD9sv.js     20.60 kB │ gzip:   7.18 kB\n../web/static/assets/mindmap-definition-VGOIOE7T-BBXXOqug.js    21.03 kB │ gzip:   7.26 kB\n../web/static/assets/sankeyDiagram-TZEHDZUN-Dyp9RKUT.js         22.23 kB │ gzip:   8.11 kB\n../web/static/assets/journeyDiagram-XKPGCS4Q-CJfdpto6.js        23.53 kB │ gzip:   8.27 kB\n../web/static/assets/timeline-definition-IT6M3QCI-DUwQY8Ic.js   23.70 kB │ gzip:   8.23 kB\n../web/static/assets/gitGraphDiagram-NY62KEGX-DgsLvoeO.js       24.72 kB │ gzip:   7.58 kB\n../web/static/assets/erDiagram-Q2GNP2WA-usVdRKGG.js             25.33 kB │ gzip:   8.76 kB\n../web/static/assets/layout-rRjsn9ZK.js                         27.38 kB │ gzip:   9.72 kB\n../web/static/assets/requirementDiagram-UZGBJVZJ-DhxMq5z-.js    30.26 kB │ gzip:   9.37 kB\n../web/static/assets/quadrantDiagram-AYHSOK5B-DyQb7ZXQ.js       34.32 kB │ gzip:   9.99 kB\n../web/static/assets/chunk-DI55MBZ5-BQYer2So.js                 36.79 kB │ gzip:  11.84 kB\n../web/static/assets/xychartDiagram-PRI3JC2R-1Tzbmbzx.js        40.20 kB │ gzip:  11.35 kB\n../web/static/assets/chunk-B4BG7PRW-DXvd17vs.js                 45.40 kB │ gzip:  14.55 kB\n../web/static/assets/flowDiagram-NV44I4VS-sXLxxUL7.js           61.11 kB │ gzip:  19.31 kB\n../web/static/assets/ganttDiagram-LVOFAZNH-BM_cH_mg.js          62.76 kB │ gzip:  21.06 kB\n../web/static/assets/c4Diagram-YG6GDRKO-BCJQfUaF.js             70.15 kB │ gzip:  19.54 kB\n../web/static/assets/blockDiagram-VD42YOAC-CTOqU0Gm.js          73.15 kB │ gzip:  20.67 kB\n../web/static/assets/cose-bilkent-S5V4N54A-DXum1JQQ.js          81.71 kB │ gzip:  22.38 kB\n../web/static/assets/sequenceDiagram-WL72ISMW-DHenYdaH.js       98.12 kB │ gzip:  26.78 kB\n../web/static/assets/architectureDiagram-VXUJARFQ-Hel7fIFx.js  148.96 kB │ gzip:  41.91 kB\n../web/static/assets/katex-BbEIqZs1.js                         265.38 kB │ gzip:  77.33 kB\n../web/static/assets/treemap-KMMF4GRG-B2pxTFGz.js              330.91 kB │ gzip:  80.68 kB\n../web/static/assets/cytoscape.esm-BQaXIfA_.js                 442.44 kB │ gzip: 141.29 kB\n../web/static/assets/index-6wplcZq2.js                         650.57 kB │ gzip: 196.89 kB\n../web/static/assets/Chat-CHBK_Su8.js                          707.62 kB │ gzip: 203.66 kB\n✓ built in 23.43s",
+                        "triggers": [
+                            "07970ba48d848f072ee5b0a81774612273b521a44848468fcd1a2a2d1bc57ee3"
+                        ]
+                    },
+                    "parent": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:pulumi:Stack::talk-to-my-docs-dev_mori_20251216",
+                    "provider": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:providers:command::default_1_1_3::78520cda-06db-4df8-b6bc-110423ecb1ed",
+                    "propertyDependencies": {
+                        "create": [],
+                        "triggers": []
+                    },
+                    "created": "2025-12-16T08:22:37.556689425Z",
+                    "modified": "2025-12-16T08:22:37.556689425Z",
+                    "sourcePosition": "project:///infra/frontend_web.py#88",
+                    "replaceOnChanges": [
+                        "triggers[*]"
+                    ]
+                },
+                {
+                    "urn": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/executionEnvironment:ExecutionEnvironment::Talk to My Docs Agent Execution Environment [docker_context] [agent_retrieval_agent]",
+                    "custom": true,
+                    "id": "694114ec1ca4130446c0b1e5",
+                    "type": "datarobot:index/executionEnvironment:ExecutionEnvironment",
+                    "inputs": {
+                        "description": "Talk to My Docs Execution Environment [agent docker_context]",
+                        "dockerContextPath": "/home/notebooks/storage/agent_retrieval_agent/docker_context",
+                        "name": "Talk to My Docs Agent Execution Environment [docker_context] [agent_retrieval_agent]-72fd421",
+                        "programmingLanguage": "python",
+                        "useCases": [
+                            "customModel",
+                            "notebook"
+                        ]
+                    },
+                    "outputs": {
+                        "buildStatus": "success",
+                        "description": "Talk to My Docs Execution Environment [agent docker_context]",
+                        "dockerContextHash": "ed5b4a1c5542cc629dbf1f6d4eb0b8b1f866f25166f42ee11e60c5acbaef7beb",
+                        "dockerContextPath": "/home/notebooks/storage/agent_retrieval_agent/docker_context",
+                        "dockerImageHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "id": "694114ec1ca4130446c0b1e5",
+                        "name": "Talk to My Docs Agent Execution Environment [docker_context] [agent_retrieval_agent]-72fd421",
+                        "programmingLanguage": "python",
+                        "useCases": [
+                            "customModel",
+                            "notebook"
+                        ],
+                        "versionId": "694114ec3257830503a5efb5"
+                    },
+                    "parent": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:pulumi:Stack::talk-to-my-docs-dev_mori_20251216",
+                    "provider": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:providers:datarobot::default_0_10_22_github_/api.github.com/datarobot-community/pulumi-datarobot::a5acf804-27a0-4e4f-93a8-7864755856b3",
+                    "propertyDependencies": {
+                        "description": [],
+                        "dockerContextPath": [],
+                        "programmingLanguage": [],
+                        "useCases": []
+                    },
+                    "created": "2025-12-16T08:24:00.500714342Z",
+                    "modified": "2025-12-16T08:24:00.500714342Z",
+                    "sourcePosition": "project:///infra/agent_retrieval_agent.py#161"
+                },
+                {
+                    "urn": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/customModel:CustomModel::Talk to My Docs Agent Custom Model [agent_retrieval_agent]",
+                    "custom": true,
+                    "id": "69411721169d2b2982cb591c",
+                    "type": "datarobot:index/customModel:CustomModel",
+                    "inputs": {
+                        "baseEnvironmentId": "694114ec1ca4130446c0b1e5",
+                        "baseEnvironmentVersionId": "694114ec3257830503a5efb5",
+                        "files": [
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/custom.py",
+                                "custom.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/models.py",
+                                "models.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/model-metadata.yaml",
+                                "model-metadata.yaml"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/helpers.py",
+                                "helpers.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/tool.py",
+                                "tool.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/agent.py",
+                                "agent.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/config.py",
+                                "config.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/train.py",
+                                "train.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/auth.py",
+                                "auth.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/helpers_telemetry.py",
+                                "helpers_telemetry.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/tools_client.py",
+                                "tools_client.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/__init__.py",
+                                "__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/sample_documents/developer/sample_dev_preso.pdf",
+                                "sample_documents/developer/sample_dev_preso.pdf"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/sample_documents/developer/sample_dev_preso.pptx",
+                                "sample_documents/developer/sample_dev_preso.pptx"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/sample_documents/developer/sample_tech_spec.pdf",
+                                "sample_documents/developer/sample_tech_spec.pdf"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/sample_documents/developer/sample_project_readme.txt",
+                                "sample_documents/developer/sample_project_readme.txt"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/sample_documents/developer/sample_yaml_spec.md",
+                                "sample_documents/developer/sample_yaml_spec.md"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/sample_documents/developer/sample_tech_spec.docx",
+                                "sample_documents/developer/sample_tech_spec.docx"
+                            ]
+                        ],
+                        "language": "python",
+                        "name": "Talk to My Docs Agent Custom Model [agent_retrieval_agent]-1f70998",
+                        "runtimeParameterValues": [
+                            {
+                                "key": "LLM_DEPLOYMENT_ID",
+                                "type": "string",
+                                "value": "6941151215f9337068be7599"
+                            },
+                            {
+                                "key": "LLM_DEFAULT_MODEL",
+                                "type": "string",
+                                "value": "bedrock/anthropic.claude-3-7-sonnet-20250219-v1:0"
+                            }
+                        ],
+                        "targetName": "response",
+                        "targetType": "AgenticWorkflow",
+                        "useCaseIds": [
+                            "69410db7b327ab2a14c0b1b0"
+                        ]
+                    },
+                    "outputs": {
+                        "baseEnvironmentId": "694114ec1ca4130446c0b1e5",
+                        "baseEnvironmentVersionId": "694114ec3257830503a5efb5",
+                        "deploymentsCount": 0,
+                        "description": "",
+                        "files": [
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/custom.py",
+                                "custom.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/models.py",
+                                "models.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/model-metadata.yaml",
+                                "model-metadata.yaml"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/helpers.py",
+                                "helpers.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/tool.py",
+                                "tool.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/agent.py",
+                                "agent.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/config.py",
+                                "config.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/train.py",
+                                "train.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/auth.py",
+                                "auth.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/helpers_telemetry.py",
+                                "helpers_telemetry.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/tools_client.py",
+                                "tools_client.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/__init__.py",
+                                "__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/sample_documents/developer/sample_dev_preso.pdf",
+                                "sample_documents/developer/sample_dev_preso.pdf"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/sample_documents/developer/sample_dev_preso.pptx",
+                                "sample_documents/developer/sample_dev_preso.pptx"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/sample_documents/developer/sample_tech_spec.pdf",
+                                "sample_documents/developer/sample_tech_spec.pdf"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/sample_documents/developer/sample_project_readme.txt",
+                                "sample_documents/developer/sample_project_readme.txt"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/sample_documents/developer/sample_yaml_spec.md",
+                                "sample_documents/developer/sample_yaml_spec.md"
+                            ],
+                            [
+                                "/home/notebooks/storage/agent_retrieval_agent/custom_model/sample_documents/developer/sample_tech_spec.docx",
+                                "sample_documents/developer/sample_tech_spec.docx"
+                            ]
+                        ],
+                        "filesHashes": [
+                            "821bb58b412fd1f06b8f1c7a6c4d6c00d24bd8566cec049f923f6eb0554872cf",
+                            "a73c5869f08f21e56bd18ba8f25f2ad7cd5821c2114787e5cbee34d097d7710c",
+                            "5f4f0a102170d2f5ca2b8dce0f55a2819a8d79718a971611b69f3c040ce71505",
+                            "48d7315a25bc720c10d887950375708c1a35b13124e02ae50ef160563e762f0a",
+                            "58ba04a4d6dbebc0f539e49c27968760e9bf083f5edc98663575c7cbfda6efca",
+                            "c1ad03645816dde36213b72fbdc2f43a3bf6a64ab2b71790ce52c5ac8b44cf84",
+                            "f8c340c4a8f7f95ba38b34b1233332551b29c0ed22a26fe339fbbae60c646268",
+                            "0aac1605e63b8fd941b01190420337fb8bfc40c97c3999d69e6809f4dec0b4d4",
+                            "4b9953908102974556246b864fb616fa17ea79a301daa365b0c148fd5385a404",
+                            "41cae5dc666857d281e66cf5aa5c1d22553e60544ce70565ee65779dbd02dd3d",
+                            "b5de5ede94b4482313325a1dd45dc8078eb9f6149bd4236dca126aa57384dff0",
+                            "cb8c9aa73a772a714ccd247a1e53434b8b92bb2353ec8d623c1bda08bb12d2c5",
+                            "dcc4baba31d2ebd3255e619d519049592cd5875eb5302706d8b37f1c248e10e3",
+                            "84ac6b5cf14caf0c38a3b52705552d2be190a4d0a9933708bc297ee69bde9ea6",
+                            "4f31615f64965bab1da5adac0ae6234b856351f1f72a7bdd4e1d2359ab25fab9",
+                            "a3c89ec8ad5324fcfb845221c70e39b75e6bfbc11c1ef9ee41096350cdd9e6b1",
+                            "e843acf046c3ae75e3ccd582b8d6ccf1ae19a140cab18d9a9d753655f88dda06",
+                            "f06d864d04bd86894ef4ae9f88bb0e2dbae9597259c7648e4f0c7964ca2b97c4"
+                        ],
+                        "id": "69411721169d2b2982cb591c",
+                        "isProxy": false,
+                        "language": "python",
+                        "name": "Talk to My Docs Agent Custom Model [agent_retrieval_agent]-1f70998",
+                        "negativeClassLabel": "0",
+                        "networkAccess": "PUBLIC",
+                        "positiveClassLabel": "1",
+                        "predictionThreshold": 0.5,
+                        "replicas": 1,
+                        "runtimeParameterValues": [
+                            {
+                                "key": "LLM_DEPLOYMENT_ID",
+                                "type": "string",
+                                "value": "6941151215f9337068be7599"
+                            },
+                            {
+                                "key": "LLM_DEFAULT_MODEL",
+                                "type": "string",
+                                "value": "bedrock/anthropic.claude-3-7-sonnet-20250219-v1:0"
+                            }
+                        ],
+                        "targetName": "response",
+                        "targetType": "AgenticWorkflow",
+                        "useCaseIds": [
+                            "69410db7b327ab2a14c0b1b0"
+                        ],
+                        "versionId": "6941172b0cf0b8ac5dcb651a"
+                    },
+                    "parent": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:pulumi:Stack::talk-to-my-docs-dev_mori_20251216",
+                    "dependencies": [
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/useCase:UseCase::Talk to My Docs [PRE-EXISTING]",
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/deployment:Deployment::Talk to My Docs LLM Blueprint Deployment [dev_mori_20251216]",
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/executionEnvironment:ExecutionEnvironment::Talk to My Docs Agent Execution Environment [docker_context] [agent_retrieval_agent]"
+                    ],
+                    "provider": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:providers:datarobot::default_0_10_22_github_/api.github.com/datarobot-community/pulumi-datarobot::a5acf804-27a0-4e4f-93a8-7864755856b3",
+                    "propertyDependencies": {
+                        "baseEnvironmentId": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/executionEnvironment:ExecutionEnvironment::Talk to My Docs Agent Execution Environment [docker_context] [agent_retrieval_agent]"
+                        ],
+                        "baseEnvironmentVersionId": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/executionEnvironment:ExecutionEnvironment::Talk to My Docs Agent Execution Environment [docker_context] [agent_retrieval_agent]"
+                        ],
+                        "files": [],
+                        "language": [],
+                        "runtimeParameterValues": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/deployment:Deployment::Talk to My Docs LLM Blueprint Deployment [dev_mori_20251216]"
+                        ],
+                        "targetName": [],
+                        "targetType": [],
+                        "useCaseIds": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/useCase:UseCase::Talk to My Docs [PRE-EXISTING]"
+                        ]
+                    },
+                    "created": "2025-12-16T08:24:12.570651878Z",
+                    "modified": "2025-12-16T08:24:12.570651878Z",
+                    "sourcePosition": "project:///infra/agent_retrieval_agent.py#176"
+                },
+                {
+                    "urn": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::custom:datarobot:CustomModelDeployment$datarobot:index/registeredModel:RegisteredModel::Talk to My Docs Agent Registered Model [agent_retrieval_agent]",
+                    "custom": true,
+                    "id": "6941172c862454bf28c0b699",
+                    "type": "datarobot:index/registeredModel:RegisteredModel",
+                    "inputs": {
+                        "customModelVersionId": "6941172b0cf0b8ac5dcb651a",
+                        "name": "Talk to My Docs Agent Registered Model [agent_retrieval_agent]-ab2cb34",
+                        "useCaseIds": [
+                            "69410db7b327ab2a14c0b1b0"
+                        ]
+                    },
+                    "outputs": {
+                        "customModelVersionId": "6941172b0cf0b8ac5dcb651a",
+                        "id": "6941172c862454bf28c0b699",
+                        "name": "Talk to My Docs Agent Registered Model [agent_retrieval_agent]-ab2cb34",
+                        "useCaseIds": [
+                            "69410db7b327ab2a14c0b1b0"
+                        ],
+                        "versionId": "6941172d862454bf28c0b69d",
+                        "versionName": "Talk to My Docs Agent Registered Model [agent_retrieval_agent]-ab2cb34 (v1)"
+                    },
+                    "parent": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::custom:datarobot:CustomModelDeployment::Talk to My Docs Agent Chat Deployment [agent_retrieval_agent]",
+                    "dependencies": [
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/useCase:UseCase::Talk to My Docs [PRE-EXISTING]",
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/customModel:CustomModel::Talk to My Docs Agent Custom Model [agent_retrieval_agent]"
+                    ],
+                    "provider": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:providers:datarobot::default_0_10_22_github_/api.github.com/datarobot-community/pulumi-datarobot::a5acf804-27a0-4e4f-93a8-7864755856b3",
+                    "propertyDependencies": {
+                        "customModelVersionId": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/customModel:CustomModel::Talk to My Docs Agent Custom Model [agent_retrieval_agent]"
+                        ],
+                        "useCaseIds": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/useCase:UseCase::Talk to My Docs [PRE-EXISTING]"
+                        ]
+                    },
+                    "created": "2025-12-16T08:24:27.777859128Z",
+                    "modified": "2025-12-16T08:24:27.777859128Z",
+                    "sourcePosition": "project:///.venv/lib/python3.11/site-packages/datarobot_pulumi_utils/pulumi/custom_model_deployment.py#73"
+                },
+                {
+                    "urn": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::custom:datarobot:CustomModelDeployment$datarobot:index/deployment:Deployment::Talk to My Docs Agent Deployment [agent_retrieval_agent]",
+                    "custom": true,
+                    "id": "6941173b7a9a980649be742f",
+                    "type": "datarobot:index/deployment:Deployment",
+                    "inputs": {
+                        "associationIdSettings": {
+                            "autoGenerateId": false,
+                            "columnNames": [
+                                "association_id"
+                            ],
+                            "requiredInPredictionRequests": true
+                        },
+                        "label": "Deployment [dev_mori_20251216] [agent_retrieval_agent]",
+                        "predictionEnvironmentId": "694114ec0751911e0089488b",
+                        "predictionsDataCollectionSettings": {
+                            "enabled": true
+                        },
+                        "predictionsSettings": {
+                            "maxComputes": 2,
+                            "minComputes": 0
+                        },
+                        "registeredModelVersionId": "6941172d862454bf28c0b69d",
+                        "useCaseIds": [
+                            "69410db7b327ab2a14c0b1b0"
+                        ]
+                    },
+                    "outputs": {
+                        "associationIdSettings": {
+                            "autoGenerateId": false,
+                            "columnNames": [
+                                "association_id"
+                            ],
+                            "requiredInPredictionRequests": true
+                        },
+                        "id": "6941173b7a9a980649be742f",
+                        "importance": "LOW",
+                        "label": "Deployment [dev_mori_20251216] [agent_retrieval_agent]",
+                        "predictionEnvironmentId": "694114ec0751911e0089488b",
+                        "predictionsDataCollectionSettings": {
+                            "enabled": true
+                        },
+                        "predictionsSettings": {
+                            "maxComputes": 2,
+                            "minComputes": 0
+                        },
+                        "registeredModelVersionId": "6941172d862454bf28c0b69d",
+                        "useCaseIds": [
+                            "69410db7b327ab2a14c0b1b0"
+                        ]
+                    },
+                    "parent": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::custom:datarobot:CustomModelDeployment::Talk to My Docs Agent Chat Deployment [agent_retrieval_agent]",
+                    "dependencies": [
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::custom:datarobot:CustomModelDeployment$datarobot:index/registeredModel:RegisteredModel::Talk to My Docs Agent Registered Model [agent_retrieval_agent]",
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/predictionEnvironment:PredictionEnvironment::Talk to My Docs Agent Prediction Environment [dev_mori_20251216]",
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/useCase:UseCase::Talk to My Docs [PRE-EXISTING]"
+                    ],
+                    "provider": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:providers:datarobot::default_0_10_22_github_/api.github.com/datarobot-community/pulumi-datarobot::a5acf804-27a0-4e4f-93a8-7864755856b3",
+                    "propertyDependencies": {
+                        "associationIdSettings": [],
+                        "label": [],
+                        "predictionEnvironmentId": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/predictionEnvironment:PredictionEnvironment::Talk to My Docs Agent Prediction Environment [dev_mori_20251216]"
+                        ],
+                        "predictionsDataCollectionSettings": [],
+                        "predictionsSettings": [],
+                        "registeredModelVersionId": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::custom:datarobot:CustomModelDeployment$datarobot:index/registeredModel:RegisteredModel::Talk to My Docs Agent Registered Model [agent_retrieval_agent]"
+                        ],
+                        "useCaseIds": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/useCase:UseCase::Talk to My Docs [PRE-EXISTING]"
+                        ]
+                    },
+                    "created": "2025-12-16T08:27:37.313232124Z",
+                    "modified": "2025-12-16T08:27:37.313232124Z",
+                    "sourcePosition": "project:///.venv/lib/python3.11/site-packages/datarobot_pulumi_utils/pulumi/custom_model_deployment.py#80"
+                },
+                {
+                    "urn": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/applicationSource:ApplicationSource::Talk to My Docs [dev_mori_20251216]",
+                    "custom": true,
+                    "id": "694117f9c683c947aec0b3e5",
+                    "type": "datarobot:index/applicationSource:ApplicationSource",
+                    "inputs": {
+                        "baseEnvironmentId": "66d07fae0513a1edf18595bb",
+                        "files": [
+                            [
+                                "/home/notebooks/storage/web/pyproject.toml",
+                                "pyproject.toml"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/build-app.sh",
+                                "build-app.sh"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/start-app.sh",
+                                "start-app.sh"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/.gitignore",
+                                ".gitignore"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/Taskfile.yaml",
+                                "Taskfile.yaml"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/.licenserc.yaml",
+                                ".licenserc.yaml"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/uv.lock",
+                                "uv.lock"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/metadata.yaml.jinja",
+                                "metadata.yaml.jinja"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/alembic.ini",
+                                "alembic.ini"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/README.md",
+                                "README.md"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/alembic_migration.py",
+                                "alembic_migration.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/deps.py",
+                                "app/deps.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/streams.py",
+                                "app/streams.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/db.py",
+                                "app/db.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/main.py",
+                                "app/main.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/config.py",
+                                "app/config.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/__init__.py",
+                                "app/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/knowledge_bases/__init__.py",
+                                "app/knowledge_bases/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/users/identity.py",
+                                "app/users/identity.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/users/tokens.py",
+                                "app/users/tokens.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/users/auth.py",
+                                "app/users/auth.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/users/user.py",
+                                "app/users/user.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/users/__init__.py",
+                                "app/users/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/files/contents.py",
+                                "app/files/contents.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/files/models.py",
+                                "app/files/models.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/files/__init__.py",
+                                "app/files/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/auth/ctx.py",
+                                "app/auth/ctx.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/auth/api_key.py",
+                                "app/auth/api_key.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/auth/session.py",
+                                "app/auth/session.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/auth/oauth.py",
+                                "app/auth/oauth.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/auth/__init__.py",
+                                "app/auth/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/chats/__init__.py",
+                                "app/chats/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/api/__init__.py",
+                                "app/api/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/api/v1/files.py",
+                                "app/api/v1/files.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/api/v1/knowledge_bases.py",
+                                "app/api/v1/knowledge_bases.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/api/v1/chat.py",
+                                "app/api/v1/chat.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/api/v1/auth.py",
+                                "app/api/v1/auth.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/api/v1/__init__.py",
+                                "app/api/v1/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/api/v1/schema.py",
+                                "app/api/v1/schema.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/messages/__init__.py",
+                                "app/messages/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/scripts/load_knowledgebase.py",
+                                "scripts/load_knowledgebase.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/migrations/env.py",
+                                "migrations/env.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/migrations/script.py.mako",
+                                "migrations/script.py.mako"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/migrations/README.md",
+                                "migrations/README.md"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/migrations/versions/5ca01aa4bdac_init.py",
+                                "migrations/versions/5ca01aa4bdac_init.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/migrations/versions/d5c7f18c5b9f_change_identity_unique_constraint_to_.py",
+                                "migrations/versions/d5c7f18c5b9f_change_identity_unique_constraint_to_.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/index.html",
+                                "static/index.html"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/.vite/manifest.json",
+                                "static/.vite/manifest.json"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/OAuthCallback-Dvw88hP3.js",
+                                "static/assets/OAuthCallback-Dvw88hP3.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/timeline-definition-IT6M3QCI-DUwQY8Ic.js",
+                                "static/assets/timeline-definition-IT6M3QCI-DUwQY8Ic.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/diagram-PSM6KHXK--iu18LuI.js",
+                                "static/assets/diagram-PSM6KHXK--iu18LuI.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/mindmap-definition-VGOIOE7T-BBXXOqug.js",
+                                "static/assets/mindmap-definition-VGOIOE7T-BBXXOqug.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/init-Gi6I4Gst.js",
+                                "static/assets/init-Gi6I4Gst.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/chunk-TZMSLE5B-B-Mmw58c.js",
+                                "static/assets/chunk-TZMSLE5B-B-Mmw58c.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/_baseUniq-BaECDjmH.js",
+                                "static/assets/_baseUniq-BaECDjmH.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/linear-CZh2bjGq.js",
+                                "static/assets/linear-CZh2bjGq.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/diagram-S2PKOQOG-Ceyo8S-_.js",
+                                "static/assets/diagram-S2PKOQOG-Ceyo8S-_.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/chunk-4BX2VUAB-83EdJtlF.js",
+                                "static/assets/chunk-4BX2VUAB-83EdJtlF.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/quadrantDiagram-AYHSOK5B-DyQb7ZXQ.js",
+                                "static/assets/quadrantDiagram-AYHSOK5B-DyQb7ZXQ.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/arc-BPeu5V9O.js",
+                                "static/assets/arc-BPeu5V9O.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/requirementDiagram-UZGBJVZJ-DhxMq5z-.js",
+                                "static/assets/requirementDiagram-UZGBJVZJ-DhxMq5z-.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/gitGraphDiagram-NY62KEGX-DgsLvoeO.js",
+                                "static/assets/gitGraphDiagram-NY62KEGX-DgsLvoeO.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/pieDiagram-ADFJNKIX-BgnphNi1.js",
+                                "static/assets/pieDiagram-ADFJNKIX-BgnphNi1.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/clone-Cs3NbQuV.js",
+                                "static/assets/clone-Cs3NbQuV.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/stateDiagram-FKZM4ZOC-CuIV-5Fi.js",
+                                "static/assets/stateDiagram-FKZM4ZOC-CuIV-5Fi.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/sequenceDiagram-WL72ISMW-DHenYdaH.js",
+                                "static/assets/sequenceDiagram-WL72ISMW-DHenYdaH.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/cose-bilkent-S5V4N54A-DXum1JQQ.js",
+                                "static/assets/cose-bilkent-S5V4N54A-DXum1JQQ.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/index-B0ZWxGXj.css",
+                                "static/assets/index-B0ZWxGXj.css"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/classDiagram-2ON5EDUG-DCLCjbC6.js",
+                                "static/assets/classDiagram-2ON5EDUG-DCLCjbC6.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/classDiagram-v2-WZHVMYZB-DCLCjbC6.js",
+                                "static/assets/classDiagram-v2-WZHVMYZB-DCLCjbC6.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/_basePickBy-CpGrCPVg.js",
+                                "static/assets/_basePickBy-CpGrCPVg.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/chunk-B4BG7PRW-DXvd17vs.js",
+                                "static/assets/chunk-B4BG7PRW-DXvd17vs.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/journeyDiagram-XKPGCS4Q-CJfdpto6.js",
+                                "static/assets/journeyDiagram-XKPGCS4Q-CJfdpto6.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/layout-rRjsn9ZK.js",
+                                "static/assets/layout-rRjsn9ZK.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/graph-l6ZGkb53.js",
+                                "static/assets/graph-l6ZGkb53.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/chunk-QN33PNHL-BdT5f9p8.js",
+                                "static/assets/chunk-QN33PNHL-BdT5f9p8.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/index-6wplcZq2.js",
+                                "static/assets/index-6wplcZq2.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/blockDiagram-VD42YOAC-CTOqU0Gm.js",
+                                "static/assets/blockDiagram-VD42YOAC-CTOqU0Gm.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/chunk-FMBD7UC4-DN0Z6oFX.js",
+                                "static/assets/chunk-FMBD7UC4-DN0Z6oFX.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/DataRobot_white-C2JrcVRN.svg",
+                                "static/assets/DataRobot_white-C2JrcVRN.svg"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/chunk-QZHKN3VN-fV4-YspI.js",
+                                "static/assets/chunk-QZHKN3VN-fV4-YspI.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/ordinal-Cboi1Yqb.js",
+                                "static/assets/ordinal-Cboi1Yqb.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/ganttDiagram-LVOFAZNH-BM_cH_mg.js",
+                                "static/assets/ganttDiagram-LVOFAZNH-BM_cH_mg.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/channel-BFxjNG4M.js",
+                                "static/assets/channel-BFxjNG4M.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/stateDiagram-v2-4FDKWEC3-ObeO4AXe.js",
+                                "static/assets/stateDiagram-v2-4FDKWEC3-ObeO4AXe.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/architectureDiagram-VXUJARFQ-Hel7fIFx.js",
+                                "static/assets/architectureDiagram-VXUJARFQ-Hel7fIFx.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/defaultLocale-C4B-KCzX.js",
+                                "static/assets/defaultLocale-C4B-KCzX.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/sankeyDiagram-TZEHDZUN-Dyp9RKUT.js",
+                                "static/assets/sankeyDiagram-TZEHDZUN-Dyp9RKUT.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/chunk-DI55MBZ5-BQYer2So.js",
+                                "static/assets/chunk-DI55MBZ5-BQYer2So.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/erDiagram-Q2GNP2WA-usVdRKGG.js",
+                                "static/assets/erDiagram-Q2GNP2WA-usVdRKGG.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/kanban-definition-3W4ZIXB7-DMHGD9sv.js",
+                                "static/assets/kanban-definition-3W4ZIXB7-DMHGD9sv.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/cytoscape.esm-BQaXIfA_.js",
+                                "static/assets/cytoscape.esm-BQaXIfA_.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/xychartDiagram-PRI3JC2R-1Tzbmbzx.js",
+                                "static/assets/xychartDiagram-PRI3JC2R-1Tzbmbzx.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/diagram-QEK2KX5R-Fc6pRqU6.js",
+                                "static/assets/diagram-QEK2KX5R-Fc6pRqU6.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/c4Diagram-YG6GDRKO-BCJQfUaF.js",
+                                "static/assets/c4Diagram-YG6GDRKO-BCJQfUaF.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/Chat-CHBK_Su8.js",
+                                "static/assets/Chat-CHBK_Su8.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/datarobot_favicon.png",
+                                "static/assets/datarobot_favicon.png"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/dagre-6UL2VRFP-BQVnRK-Y.js",
+                                "static/assets/dagre-6UL2VRFP-BQVnRK-Y.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/chunk-55IACEB6-03EBIq4n.js",
+                                "static/assets/chunk-55IACEB6-03EBIq4n.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/katex-BbEIqZs1.js",
+                                "static/assets/katex-BbEIqZs1.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/treemap-KMMF4GRG-B2pxTFGz.js",
+                                "static/assets/treemap-KMMF4GRG-B2pxTFGz.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/flowDiagram-NV44I4VS-sXLxxUL7.js",
+                                "static/assets/flowDiagram-NV44I4VS-sXLxxUL7.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/infoDiagram-ER5ION4S-Dr1ShR18.js",
+                                "static/assets/infoDiagram-ER5ION4S-Dr1ShR18.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/templates/index.html",
+                                "templates/index.html"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/pyproject.toml",
+                                "core/pyproject.toml"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/Taskfile.yaml",
+                                "core/Taskfile.yaml"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/uv.lock",
+                                "core/uv.lock"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/README.md",
+                                "core/README.md"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/py.typed",
+                                "core/src/core/py.typed"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/__init__.py",
+                                "core/src/core/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/persistent_fs/sqlite_extension.py",
+                                "core/src/core/persistent_fs/sqlite_extension.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/persistent_fs/dr_file_system.py",
+                                "core/src/core/persistent_fs/dr_file_system.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/persistent_fs/duckdb_extension.py",
+                                "core/src/core/persistent_fs/duckdb_extension.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/document_loader/constants.py",
+                                "core/src/core/document_loader/constants.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/document_loader/image_loader.py",
+                                "core/src/core/document_loader/image_loader.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/document_loader/exceptions.py",
+                                "core/src/core/document_loader/exceptions.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/document_loader/__init__.py",
+                                "core/src/core/document_loader/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/document_loader/document_loader.py",
+                                "core/src/core/document_loader/document_loader.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/telemetry/logging.py",
+                                "core/src/core/telemetry/logging.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/telemetry/uvicorn_filter.py",
+                                "core/src/core/telemetry/uvicorn_filter.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/telemetry/__init__.py",
+                                "core/src/core/telemetry/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/utils/rw_lock.py",
+                                "core/src/core/utils/rw_lock.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/.vscode/settings.json",
+                                ".vscode/settings.json"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/.vscode/launch.json",
+                                ".vscode/launch.json"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/metadata.yaml",
+                                "metadata.yaml"
+                            ]
+                        ],
+                        "name": "Talk to My Docs [dev_mori_20251216]-219d615",
+                        "resources": {
+                            "resourceLabel": "cpu.xlarge"
+                        },
+                        "runtimeParameterValues": [
+                            {
+                                "key": "LLM_DEPLOYMENT_ID",
+                                "type": "string",
+                                "value": "6941151215f9337068be7599"
+                            },
+                            {
+                                "key": "USE_DATAROBOT_LLM_GATEWAY",
+                                "type": "string",
+                                "value": "1"
+                            },
+                            {
+                                "key": "LLM_DEFAULT_MODEL",
+                                "type": "string",
+                                "value": "bedrock/anthropic.claude-3-7-sonnet-20250219-v1:0"
+                            },
+                            {
+                                "key": "DATAROBOT_OAUTH_PROVIDERS",
+                                "type": "string",
+                                "value": "[]"
+                            },
+                            {
+                                "key": "AGENT_RETRIEVAL_AGENT_DEPLOYMENT_ID",
+                                "type": "string",
+                                "value": "6941173b7a9a980649be742f"
+                            },
+                            {
+                                "key": "SESSION_SECRET_KEY",
+                                "type": "credential",
+                                "value": "694114ecb9b8392cd0894b6e"
+                            },
+                            {
+                                "key": "DATABASE_URI",
+                                "type": "credential",
+                                "value": "694114ecefcf3e7a54894cfc"
+                            },
+                            {
+                                "key": "STORAGE_PATH",
+                                "type": "string",
+                                "value": "/tmp/ttmdocs/.data/storage"
+                            }
+                        ]
+                    },
+                    "outputs": {
+                        "baseEnvironmentId": "66d07fae0513a1edf18595bb",
+                        "baseEnvironmentVersionId": "6908fe9a110963bd6a1dde00",
+                        "files": [
+                            [
+                                "/home/notebooks/storage/web/pyproject.toml",
+                                "pyproject.toml"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/build-app.sh",
+                                "build-app.sh"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/start-app.sh",
+                                "start-app.sh"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/.gitignore",
+                                ".gitignore"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/Taskfile.yaml",
+                                "Taskfile.yaml"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/.licenserc.yaml",
+                                ".licenserc.yaml"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/uv.lock",
+                                "uv.lock"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/metadata.yaml.jinja",
+                                "metadata.yaml.jinja"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/alembic.ini",
+                                "alembic.ini"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/README.md",
+                                "README.md"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/alembic_migration.py",
+                                "alembic_migration.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/deps.py",
+                                "app/deps.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/streams.py",
+                                "app/streams.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/db.py",
+                                "app/db.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/main.py",
+                                "app/main.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/config.py",
+                                "app/config.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/__init__.py",
+                                "app/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/knowledge_bases/__init__.py",
+                                "app/knowledge_bases/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/users/identity.py",
+                                "app/users/identity.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/users/tokens.py",
+                                "app/users/tokens.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/users/auth.py",
+                                "app/users/auth.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/users/user.py",
+                                "app/users/user.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/users/__init__.py",
+                                "app/users/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/files/contents.py",
+                                "app/files/contents.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/files/models.py",
+                                "app/files/models.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/files/__init__.py",
+                                "app/files/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/auth/ctx.py",
+                                "app/auth/ctx.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/auth/api_key.py",
+                                "app/auth/api_key.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/auth/session.py",
+                                "app/auth/session.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/auth/oauth.py",
+                                "app/auth/oauth.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/auth/__init__.py",
+                                "app/auth/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/chats/__init__.py",
+                                "app/chats/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/api/__init__.py",
+                                "app/api/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/api/v1/files.py",
+                                "app/api/v1/files.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/api/v1/knowledge_bases.py",
+                                "app/api/v1/knowledge_bases.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/api/v1/chat.py",
+                                "app/api/v1/chat.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/api/v1/auth.py",
+                                "app/api/v1/auth.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/api/v1/__init__.py",
+                                "app/api/v1/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/api/v1/schema.py",
+                                "app/api/v1/schema.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/app/messages/__init__.py",
+                                "app/messages/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/scripts/load_knowledgebase.py",
+                                "scripts/load_knowledgebase.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/migrations/env.py",
+                                "migrations/env.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/migrations/script.py.mako",
+                                "migrations/script.py.mako"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/migrations/README.md",
+                                "migrations/README.md"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/migrations/versions/5ca01aa4bdac_init.py",
+                                "migrations/versions/5ca01aa4bdac_init.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/migrations/versions/d5c7f18c5b9f_change_identity_unique_constraint_to_.py",
+                                "migrations/versions/d5c7f18c5b9f_change_identity_unique_constraint_to_.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/index.html",
+                                "static/index.html"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/.vite/manifest.json",
+                                "static/.vite/manifest.json"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/OAuthCallback-Dvw88hP3.js",
+                                "static/assets/OAuthCallback-Dvw88hP3.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/timeline-definition-IT6M3QCI-DUwQY8Ic.js",
+                                "static/assets/timeline-definition-IT6M3QCI-DUwQY8Ic.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/diagram-PSM6KHXK--iu18LuI.js",
+                                "static/assets/diagram-PSM6KHXK--iu18LuI.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/mindmap-definition-VGOIOE7T-BBXXOqug.js",
+                                "static/assets/mindmap-definition-VGOIOE7T-BBXXOqug.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/init-Gi6I4Gst.js",
+                                "static/assets/init-Gi6I4Gst.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/chunk-TZMSLE5B-B-Mmw58c.js",
+                                "static/assets/chunk-TZMSLE5B-B-Mmw58c.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/_baseUniq-BaECDjmH.js",
+                                "static/assets/_baseUniq-BaECDjmH.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/linear-CZh2bjGq.js",
+                                "static/assets/linear-CZh2bjGq.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/diagram-S2PKOQOG-Ceyo8S-_.js",
+                                "static/assets/diagram-S2PKOQOG-Ceyo8S-_.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/chunk-4BX2VUAB-83EdJtlF.js",
+                                "static/assets/chunk-4BX2VUAB-83EdJtlF.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/quadrantDiagram-AYHSOK5B-DyQb7ZXQ.js",
+                                "static/assets/quadrantDiagram-AYHSOK5B-DyQb7ZXQ.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/arc-BPeu5V9O.js",
+                                "static/assets/arc-BPeu5V9O.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/requirementDiagram-UZGBJVZJ-DhxMq5z-.js",
+                                "static/assets/requirementDiagram-UZGBJVZJ-DhxMq5z-.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/gitGraphDiagram-NY62KEGX-DgsLvoeO.js",
+                                "static/assets/gitGraphDiagram-NY62KEGX-DgsLvoeO.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/pieDiagram-ADFJNKIX-BgnphNi1.js",
+                                "static/assets/pieDiagram-ADFJNKIX-BgnphNi1.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/clone-Cs3NbQuV.js",
+                                "static/assets/clone-Cs3NbQuV.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/stateDiagram-FKZM4ZOC-CuIV-5Fi.js",
+                                "static/assets/stateDiagram-FKZM4ZOC-CuIV-5Fi.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/sequenceDiagram-WL72ISMW-DHenYdaH.js",
+                                "static/assets/sequenceDiagram-WL72ISMW-DHenYdaH.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/cose-bilkent-S5V4N54A-DXum1JQQ.js",
+                                "static/assets/cose-bilkent-S5V4N54A-DXum1JQQ.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/index-B0ZWxGXj.css",
+                                "static/assets/index-B0ZWxGXj.css"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/classDiagram-2ON5EDUG-DCLCjbC6.js",
+                                "static/assets/classDiagram-2ON5EDUG-DCLCjbC6.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/classDiagram-v2-WZHVMYZB-DCLCjbC6.js",
+                                "static/assets/classDiagram-v2-WZHVMYZB-DCLCjbC6.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/_basePickBy-CpGrCPVg.js",
+                                "static/assets/_basePickBy-CpGrCPVg.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/chunk-B4BG7PRW-DXvd17vs.js",
+                                "static/assets/chunk-B4BG7PRW-DXvd17vs.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/journeyDiagram-XKPGCS4Q-CJfdpto6.js",
+                                "static/assets/journeyDiagram-XKPGCS4Q-CJfdpto6.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/layout-rRjsn9ZK.js",
+                                "static/assets/layout-rRjsn9ZK.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/graph-l6ZGkb53.js",
+                                "static/assets/graph-l6ZGkb53.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/chunk-QN33PNHL-BdT5f9p8.js",
+                                "static/assets/chunk-QN33PNHL-BdT5f9p8.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/index-6wplcZq2.js",
+                                "static/assets/index-6wplcZq2.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/blockDiagram-VD42YOAC-CTOqU0Gm.js",
+                                "static/assets/blockDiagram-VD42YOAC-CTOqU0Gm.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/chunk-FMBD7UC4-DN0Z6oFX.js",
+                                "static/assets/chunk-FMBD7UC4-DN0Z6oFX.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/DataRobot_white-C2JrcVRN.svg",
+                                "static/assets/DataRobot_white-C2JrcVRN.svg"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/chunk-QZHKN3VN-fV4-YspI.js",
+                                "static/assets/chunk-QZHKN3VN-fV4-YspI.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/ordinal-Cboi1Yqb.js",
+                                "static/assets/ordinal-Cboi1Yqb.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/ganttDiagram-LVOFAZNH-BM_cH_mg.js",
+                                "static/assets/ganttDiagram-LVOFAZNH-BM_cH_mg.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/channel-BFxjNG4M.js",
+                                "static/assets/channel-BFxjNG4M.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/stateDiagram-v2-4FDKWEC3-ObeO4AXe.js",
+                                "static/assets/stateDiagram-v2-4FDKWEC3-ObeO4AXe.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/architectureDiagram-VXUJARFQ-Hel7fIFx.js",
+                                "static/assets/architectureDiagram-VXUJARFQ-Hel7fIFx.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/defaultLocale-C4B-KCzX.js",
+                                "static/assets/defaultLocale-C4B-KCzX.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/sankeyDiagram-TZEHDZUN-Dyp9RKUT.js",
+                                "static/assets/sankeyDiagram-TZEHDZUN-Dyp9RKUT.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/chunk-DI55MBZ5-BQYer2So.js",
+                                "static/assets/chunk-DI55MBZ5-BQYer2So.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/erDiagram-Q2GNP2WA-usVdRKGG.js",
+                                "static/assets/erDiagram-Q2GNP2WA-usVdRKGG.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/kanban-definition-3W4ZIXB7-DMHGD9sv.js",
+                                "static/assets/kanban-definition-3W4ZIXB7-DMHGD9sv.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/cytoscape.esm-BQaXIfA_.js",
+                                "static/assets/cytoscape.esm-BQaXIfA_.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/xychartDiagram-PRI3JC2R-1Tzbmbzx.js",
+                                "static/assets/xychartDiagram-PRI3JC2R-1Tzbmbzx.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/diagram-QEK2KX5R-Fc6pRqU6.js",
+                                "static/assets/diagram-QEK2KX5R-Fc6pRqU6.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/c4Diagram-YG6GDRKO-BCJQfUaF.js",
+                                "static/assets/c4Diagram-YG6GDRKO-BCJQfUaF.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/Chat-CHBK_Su8.js",
+                                "static/assets/Chat-CHBK_Su8.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/datarobot_favicon.png",
+                                "static/assets/datarobot_favicon.png"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/dagre-6UL2VRFP-BQVnRK-Y.js",
+                                "static/assets/dagre-6UL2VRFP-BQVnRK-Y.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/chunk-55IACEB6-03EBIq4n.js",
+                                "static/assets/chunk-55IACEB6-03EBIq4n.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/katex-BbEIqZs1.js",
+                                "static/assets/katex-BbEIqZs1.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/treemap-KMMF4GRG-B2pxTFGz.js",
+                                "static/assets/treemap-KMMF4GRG-B2pxTFGz.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/flowDiagram-NV44I4VS-sXLxxUL7.js",
+                                "static/assets/flowDiagram-NV44I4VS-sXLxxUL7.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/static/assets/infoDiagram-ER5ION4S-Dr1ShR18.js",
+                                "static/assets/infoDiagram-ER5ION4S-Dr1ShR18.js"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/templates/index.html",
+                                "templates/index.html"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/pyproject.toml",
+                                "core/pyproject.toml"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/Taskfile.yaml",
+                                "core/Taskfile.yaml"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/uv.lock",
+                                "core/uv.lock"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/README.md",
+                                "core/README.md"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/py.typed",
+                                "core/src/core/py.typed"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/__init__.py",
+                                "core/src/core/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/persistent_fs/sqlite_extension.py",
+                                "core/src/core/persistent_fs/sqlite_extension.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/persistent_fs/dr_file_system.py",
+                                "core/src/core/persistent_fs/dr_file_system.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/persistent_fs/duckdb_extension.py",
+                                "core/src/core/persistent_fs/duckdb_extension.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/document_loader/constants.py",
+                                "core/src/core/document_loader/constants.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/document_loader/image_loader.py",
+                                "core/src/core/document_loader/image_loader.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/document_loader/exceptions.py",
+                                "core/src/core/document_loader/exceptions.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/document_loader/__init__.py",
+                                "core/src/core/document_loader/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/document_loader/document_loader.py",
+                                "core/src/core/document_loader/document_loader.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/telemetry/logging.py",
+                                "core/src/core/telemetry/logging.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/telemetry/uvicorn_filter.py",
+                                "core/src/core/telemetry/uvicorn_filter.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/telemetry/__init__.py",
+                                "core/src/core/telemetry/__init__.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/core/src/core/utils/rw_lock.py",
+                                "core/src/core/utils/rw_lock.py"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/.vscode/settings.json",
+                                ".vscode/settings.json"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/.vscode/launch.json",
+                                ".vscode/launch.json"
+                            ],
+                            [
+                                "/home/notebooks/storage/web/metadata.yaml",
+                                "metadata.yaml"
+                            ]
+                        ],
+                        "filesHashes": [
+                            "0d2f360fbd6e44266573a3515a5c67425783d8e484a4c5fc2f5f4f506f4c52c2",
+                            "91b52b91862599cf693a74d07bb04ef935aaf7bd18c4fb7dd150cc476fbefd2b",
+                            "091d3cba29dea531bbcb8214af052f73bc7bbf15fe900384237c68006bf00dbe",
+                            "c8e3be38f21690be699c2c7b54022c676d0a9aceae3ba9e6bdd73860b2ebc413",
+                            "8b23fdf811c44258cb2c6d14f71cac86267fed1163c9e2635cb3b3f4b6b962f8",
+                            "1044c8b2618c678b6b299d477c0198400dd4c51740a0eb8740474f875b6d66ac",
+                            "211a918ea9c65c5be6db18f6e9c1f7e400fb81c429d9ccb3288d0c02b04908fb",
+                            "b4046cbe28965fe62249d9a3c5a5958e2a3c1aa7b6e1b6c92c180588de57a042",
+                            "7e05a5bc47439762a12c245a7c4b67ce4f9a41d1fd4abc160158b40d10ac1362",
+                            "9c7126371c657325fffeaf35b95b6dce94c694eb0c12bb7129c1a60b51b1c2d0",
+                            "c67c554adbe885d83d5d8ec9ce093cfe5a8d764fdd2f1744cf0e6d3477774bab",
+                            "554dc50cdd48fdb0b1db8e1c40b1e7323df3146b58f454c774a78c437eaf5500",
+                            "c247b75a72e8608cdee26d6a9079702153ba303dbd7ebad2f664e17903eb31e8",
+                            "5ffa06be8580ab01a2533714a70212c6347860ad010767d91560720876225f1a",
+                            "1aa3c2597ee20e4297c538b7e157adb7c0243a185d72a38d90015a5b05facc16",
+                            "d266d65f01dfa14e570876b624c75a108f78f34c1609afb75960713e609def7a",
+                            "7a3e41299a7dbf3276543070b818771ed4d47e927d3a1ebf2eba33d392a87a84",
+                            "e134275d202f2265c955de78349844a7eb9839f6204d50711c99c4d6882964fe",
+                            "69d591ea7b2fd97f7d9189cfae367c73a810bb96603c3a05ed8eb383b96a5557",
+                            "11dd79b347ed87a1c12839da31c93d6b1d768b66f8371aaf664a2be819b0fbf1",
+                            "83c92d545641390eb3b2bcab7141966c1a9499f7b4d978ed185938b7591f42f5",
+                            "28e7187b93716fa905b75ebf21487ddec5b68099fd8be929a3a0182ee4ed3825",
+                            "cb8c9aa73a772a714ccd247a1e53434b8b92bb2353ec8d623c1bda08bb12d2c5",
+                            "c9cb6d429d23fbaa442982899d6702061a98cd8e874946cc7275c1225321bd35",
+                            "8961c863a534db50e215e205187a68e8485f7aa5e3a6279654317c04c4e7d313",
+                            "038e735f761c77b0c94cfb1ec61a9b82c6f8f2b6ad837d9cf2e87ece4eb61e65",
+                            "973c70d05ed6d79770ae7a4104983db395ff170c489930fc8c9a03e47e5c6d18",
+                            "ece5bcb3aeccf46ed203f25f3e00c6e38d4efb8eea306f7cf95e1a11869f018c",
+                            "e69821b6423c1de8b3c390e10ff7d722a4e35238883ea3195529b7072e97d3d0",
+                            "95d3d8715dea3f5d93fad678ea536bb483579e694fd3c44fb667a4c89bead184",
+                            "cb8c9aa73a772a714ccd247a1e53434b8b92bb2353ec8d623c1bda08bb12d2c5",
+                            "6556ed75c38af165a179b076d8ead4436bf580748a1b7140dafcd5ae48702e1e",
+                            "c5767a53660e9949b75d03a453d9bd8cb129b6ff70a6f172186aaeae80748e78",
+                            "2c703ae99e2f0595b211addac73f593cc2cbc5af5dad8a2f8b95e92f44c7c4b7",
+                            "77152d0d0b264dd8417efdeb65699b2faa26f1849656ea1ef0bbe96d7c663a8e",
+                            "6b5fcfee17d215a7f8bc984ddf6abdb4d0af78ea0cd2eb8f92e4d0b60e93d904",
+                            "cbedecc75bc502280d1cca6b81b518ea2069391a00e9ea3ec917c9e8319c1d9d",
+                            "a7026dfd0584220e1363f8e2a9faf0b446ab43badcdec5484c09254d2439c061",
+                            "5fcc4e88b6520fbeebaa9266e2c646bdb7d4050da31c959ab332e4b86b61da5e",
+                            "53054feadf9e5c62d0c4533f6bc6b658877dc9594330435bef68000cd1d7c6fc",
+                            "be10c633860cc57dc2f0625d394f52b5202bdd2a2cdb1249a9886cba85605b2d",
+                            "162cedcab851d60b964ac259976e30e8a8f5ece744bac250d4f6878932b22199",
+                            "4449c77f352403ef93eb7ddf64b85bcc141fb956a4fe9761a71f5e5242dc322d",
+                            "ed8fc05aa3eb9a1a3ff6b44c4d7eea02c263b4b058c93fa8e54ec6565273dab1",
+                            "e547b8dd4b537fbf1fcdfab659b28c5c9b96fb0927895738e82669972fe2f9a7",
+                            "6933461aba894f1ed0730c794aad8368fbf267c3f386b6fc342919d96d78b7e0",
+                            "b1100bbd98570f999bddc9c981aa9e01c74399358353704a7fdc67727fd1a7a8",
+                            "b060a178554ad40dc04cf2d7e11b2452663a4f3898fac530dc85c3a93b1312d7",
+                            "ad5ba7f03b18577c5fd10ea2f373a8c78f35516a23886ea3b42a05f653d3778b",
+                            "f59250c51ebd8a8c079f7d7661ab2aef2c86ae9c96108d6c5358ffc71c62ec0b",
+                            "35291a3c4931aea6328c5a4910aee2feb928305744f663228f2542577a35dae5",
+                            "fd4ff8a6caedd7ed02f30786a0d96d6156309fd353e719651afd294b39280c00",
+                            "379fa880c14ad48f43b0c23ff56b30b2b808e8460fd9f9cad8bf7cb278c5b814",
+                            "c58b2bbe835d3960c07c1e94b38e0f81bde7d1d9de3f237e513a45931d279952",
+                            "7a7d002aada9c58d349cc17c9569097d0a3cb17a5e2785b28741e43afe523562",
+                            "7f2f3c1f1a392d7e008d7f058b14a06de237a866588c71b3767c54cf7fd8faab",
+                            "c8e5fe6c1d8858cccbe597d12d014b5da6b869dfe99a2f07dc3b2038cdfe423b",
+                            "bc598fbcabc74787ab7663ff5e3954635abf3ebbe32de1bec13ca31fb6436cbb",
+                            "8cdc20275640f6bce74ee883c111437d44979b7ad399e68bc1d90fddc13fc087",
+                            "63e9ab01dce1b9b20095852faf2d6de03bc3389dd9496b2d93051bd13082a653",
+                            "16463dfa6f03b6ebca00b8dfec422ce689021c6518fcaf4b3b112fe87b6793f8",
+                            "6dc503bbb2fd69a4ab2cce319acf5606586bf650b4740fc213107460417d97d4",
+                            "900f1bad30803440135c95cc6126ed4ce6e92c877ceb1fec67bc7a2df45fdee6",
+                            "95fb330190936665aa523b7b24aed47b15072aeaf9709edaab5cbb2b0c21b5d5",
+                            "4fd092f44698ebbc463602d5a60c57a3fb5b744fa8ac501ca505a316de57579a",
+                            "6e2a0eca75e8bb90daa6cb143b4db03b0b590b9015fbac966fbe5677c8307dbb",
+                            "cf314c774ca5c356488fc53ee90451c8a8b7226de3d886369945158491a2a678",
+                            "5aade40dd23cd9a6e6fa932cb185f610183bd0fa21c425e35cf31778a4e3d03d",
+                            "179094070798d543f726ade356d3125d8be3cd5b37a376eaeb8824b2b5ecd058",
+                            "179094070798d543f726ade356d3125d8be3cd5b37a376eaeb8824b2b5ecd058",
+                            "60a81c433c4f75feae27823d255cd23493a77f98440cfa05a4168b6e97b8097e",
+                            "e6580f609bb952378090305a48a8e06d59bc965379e7e177c0788df6b786d922",
+                            "47bf0dc3b47a4efafd38ae25c8443c20ae93f5a26c88e4b82ed3ff385a99a484",
+                            "58af859f73d8e26728ece5ca2a355fd04e72d102e05055eacea35b5b7232804e",
+                            "af6bdd618717640268b043f6e271f85ad80545126590a3e08487ba0a92c20d79",
+                            "1c79c69a83afcbe12a21f57619179c23d677109b2204c04a23b6eccf19458c63",
+                            "11d3e7c32768dba415016aee09dc774a006641d19271ae03c6de8097a4d2cedd",
+                            "fb9f43008791928a6f40c65af1a3a85e0dfbd6a0d1e17938813649fbae960fd7",
+                            "17dc5e6c69ac3c99ae74f14ba2c2be1b3bf513dc28744a752540fa8704d7bbf6",
+                            "b9537809233d3be26aeef9c0a6cdcc90145a8cff177437a71f6062938db63e05",
+                            "408456f8b6a7cd4397dd564fd9e2b1abe61b12584a25139087eaca76a16abb4d",
+                            "71be569ce2355b7f256a834b3a4c11668fe80a880b3587c1b3b14e9e5dedf478",
+                            "5de0b4ef90327e42c52ad70bcff98f45a63ebd77cab64b8e1015716d57f01166",
+                            "b11a5ed22a4512c20786e3ef8f96f9bff29f45297546ed6ff7cd72ec84217d28",
+                            "355454f94ad2c1473c63cf48eee19b2724c5c05be88214c1442588962d90c987",
+                            "9bc786da1bc07391fece5cf400118d085fc99855532517c7d3652dcf107a192a",
+                            "4445565968bb01f0b2101c45c95105015486efe97da43fa7b0918ea0b7dbd730",
+                            "c1452933a728e969013d75dea058689ed26490e793de8197f0966cee02e7d97d",
+                            "9c75114953a56591faa49d69bd17ee86d3815801451d26638b85c723d1abec3a",
+                            "55c407d640a12fd5c061fd2af9314aa5d08d9a79ccf75842b5999f45d765c834",
+                            "9cdcc78eb4789e941678f1fcef208907eecf8da98ba103495ce13da3ef18c421",
+                            "dd501ec29acbc9cdbbc9e3a42a1d7a037629be222167f650af6a70d0a7eced1b",
+                            "9d83691de1b1930f02640800099a944e0514e000b8926b2cbc074d140ef43cf6",
+                            "cf2d3cb7535f94c0c1b69f2207206d909e4877ed6d3481c6b7994e7181bb30c0",
+                            "ff5b547145a35479cf9a74f44294ab85db02c2b8cb271a2c4f7704f32aaf6f29",
+                            "a2e5d7f2b4dc06df5c7ad35a3f71d3049c3b895a419db7c3915eb34ec108ba9b",
+                            "53e1aeb22b0103278c624c4f9feca7e8d115659e254ef7bc0d8229935fc63820",
+                            "d4c4613adfd0d18ca9ac1071fce3c42593adbc97fa2c6b7a9daae8c1e60f51dc",
+                            "fbf016edda7749839cb5a0d2a6db2ea2e8ebd442bd523b3b00f1102bc17d5cd2",
+                            "8a6135703a2dc17bb1f3d0bd5f3e8004a452545287eb99998fb8a80916d9c2d2",
+                            "c49c555941ff14ddbe44878eb91ebe23af3e7ef3a5db22d4591335499a390dbc",
+                            "f8577b6d8aceeb25946863c00c0be1010f2ff322482f5809fed30743775996bf",
+                            "267ca2a43f43c0424fb3c234c80624b3f82791de826b4fa0f6d07e5cb2dac1ee",
+                            "87ecbdb57bf228f4c9aa5f7deff11f428984ecf65ce7a152b43d38609468d398",
+                            "96bde389f2294ce9d781f55bce436e164de4f22714861e74bed0a4cc6674c691",
+                            "c31f7d4342661974cfc440db7725288384322dbd6fde8bc9ea3289959d837a56",
+                            "4afc8d105e1ae7bcf6d47c0b361324504487ca8314197a67c38f822c7a6464df",
+                            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                            "cb8c9aa73a772a714ccd247a1e53434b8b92bb2353ec8d623c1bda08bb12d2c5",
+                            "1e2c5333c18e38da4028e4eacbaf479873564dd738fc7db53c82c78e3b7f8170",
+                            "7edb444aee795ddd10a653100a03721caab3f260b07eb9038e2945ed67881a04",
+                            "e0305eea3d391049b74a9f7d01773b67dcdfef2a063c463e01565c64f3ad33ec",
+                            "6ef40fe133d291ff1aa6d087795888d1246520de0da94cbc34d7694a19b0a48c",
+                            "5c4f07e4153b8cfc4ef52363bed1b1d0c6f9e27380a18c70a413e4451604e3ec",
+                            "162ce7fad237003821dfa05068f1943293a592d1b92e1a70a8e75644e90df60d",
+                            "44d4cc94f7b9ccc70089e737b87eea0814f3ce217edf333cdee8bc2ae1dc5c21",
+                            "486e3a55caabbc3da23e718e3df10476b0a0df3419e7893e7bda1abe6d1061e3",
+                            "a1e11272fd404af29b551bdea44911b659ed77d8b67d03427970823b6f86733f",
+                            "d6dae2f9828d305faa1c0f30ca332e3fbd1c7efab95bd0ef2feb2a9b34ade3bc",
+                            "ae5a66b95feba25b4181108c6ea66427995b19e8976dfa98c5272a3e6d81c249",
+                            "7d65ec219ff258868c5e3ff92541b16326c0eb175c5dfb320083e74820413cf2",
+                            "9f7880af9b5e366a795622e916c6e3acc3dafc39bcbcbd6ed0eed3e3917e4f3f",
+                            "9d3b15aa044e824934aaa580a9c76dc7c7759fd87661cdcb8683b1f7b5ae9452",
+                            "4366bf9bfea6983146923d0739da0a1c94586345c5b4c83e886ed76a002d1fcc"
+                        ],
+                        "id": "694117f9c683c947aec0b3e5",
+                        "name": "Talk to My Docs [dev_mori_20251216]-219d615",
+                        "resources": {
+                            "replicas": 1,
+                            "resourceLabel": "cpu.xlarge",
+                            "serviceWebRequestsOnRootPath": true,
+                            "sessionAffinity": false
+                        },
+                        "runtimeParameterValues": [
+                            {
+                                "key": "LLM_DEPLOYMENT_ID",
+                                "type": "string",
+                                "value": "6941151215f9337068be7599"
+                            },
+                            {
+                                "key": "USE_DATAROBOT_LLM_GATEWAY",
+                                "type": "string",
+                                "value": "1"
+                            },
+                            {
+                                "key": "LLM_DEFAULT_MODEL",
+                                "type": "string",
+                                "value": "bedrock/anthropic.claude-3-7-sonnet-20250219-v1:0"
+                            },
+                            {
+                                "key": "DATAROBOT_OAUTH_PROVIDERS",
+                                "type": "string",
+                                "value": "[]"
+                            },
+                            {
+                                "key": "AGENT_RETRIEVAL_AGENT_DEPLOYMENT_ID",
+                                "type": "string",
+                                "value": "6941173b7a9a980649be742f"
+                            },
+                            {
+                                "key": "SESSION_SECRET_KEY",
+                                "type": "credential",
+                                "value": "694114ecb9b8392cd0894b6e"
+                            },
+                            {
+                                "key": "DATABASE_URI",
+                                "type": "credential",
+                                "value": "694114ecefcf3e7a54894cfc"
+                            },
+                            {
+                                "key": "STORAGE_PATH",
+                                "type": "string",
+                                "value": "/tmp/ttmdocs/.data/storage"
+                            }
+                        ],
+                        "versionId": "694117f9c683c947aec0b3e7"
+                    },
+                    "parent": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:pulumi:Stack::talk-to-my-docs-dev_mori_20251216",
+                    "dependencies": [
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/deployment:Deployment::Talk to My Docs LLM Blueprint Deployment [dev_mori_20251216]",
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/apiTokenCredential:ApiTokenCredential::Talk to My Docs Session Secret Key [dev_mori_20251216]",
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/apiTokenCredential:ApiTokenCredential::Talk to My Docs Database URI [dev_mori_20251216]",
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::custom:datarobot:CustomModelDeployment$datarobot:index/deployment:Deployment::Talk to My Docs Agent Deployment [agent_retrieval_agent]",
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::command:local:Command::Talk to My Docs [dev_mori_20251216] Build Frontend"
+                    ],
+                    "provider": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:providers:datarobot::default_0_10_22_github_/api.github.com/datarobot-community/pulumi-datarobot::a5acf804-27a0-4e4f-93a8-7864755856b3",
+                    "propertyDependencies": {
+                        "baseEnvironmentId": [],
+                        "files": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::command:local:Command::Talk to My Docs [dev_mori_20251216] Build Frontend"
+                        ],
+                        "resources": [],
+                        "runtimeParameterValues": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::custom:datarobot:CustomModelDeployment$datarobot:index/deployment:Deployment::Talk to My Docs Agent Deployment [agent_retrieval_agent]",
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/deployment:Deployment::Talk to My Docs LLM Blueprint Deployment [dev_mori_20251216]",
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/apiTokenCredential:ApiTokenCredential::Talk to My Docs Session Secret Key [dev_mori_20251216]",
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/apiTokenCredential:ApiTokenCredential::Talk to My Docs Database URI [dev_mori_20251216]"
+                        ]
+                    },
+                    "created": "2025-12-16T08:28:14.375972713Z",
+                    "modified": "2025-12-16T08:28:14.375972713Z",
+                    "sourcePosition": "project:///infra/web.py#221"
+                },
+                {
+                    "urn": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/customApplication:CustomApplication::Talk to My Docs [dev_mori_20251216]",
+                    "custom": true,
+                    "id": "6941181efa584afee0c0b3e8",
+                    "type": "datarobot:index/customApplication:CustomApplication",
+                    "inputs": {
+                        "allowAutoStopping": true,
+                        "name": "Talk to My Docs [dev_mori_20251216]-8e29398",
+                        "resources": {
+                            "replicas": 1,
+                            "resourceLabel": "cpu.xlarge",
+                            "serviceWebRequestsOnRootPath": true,
+                            "sessionAffinity": false
+                        },
+                        "sourceVersionId": "694117f9c683c947aec0b3e7",
+                        "useCaseIds": [
+                            "69410db7b327ab2a14c0b1b0"
+                        ]
+                    },
+                    "outputs": {
+                        "allowAutoStopping": true,
+                        "applicationUrl": "https://app.jp.datarobot.com/custom_applications/6941181efa584afee0c0b3e8/",
+                        "externalAccessEnabled": false,
+                        "id": "6941181efa584afee0c0b3e8",
+                        "name": "Talk to My Docs [dev_mori_20251216]-8e29398",
+                        "resources": {
+                            "replicas": 1,
+                            "resourceLabel": "cpu.xlarge",
+                            "serviceWebRequestsOnRootPath": true,
+                            "sessionAffinity": false
+                        },
+                        "sourceId": "694117f9c683c947aec0b3e5",
+                        "sourceVersionId": "694117f9c683c947aec0b3e7",
+                        "useCaseIds": [
+                            "69410db7b327ab2a14c0b1b0"
+                        ]
+                    },
+                    "parent": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:pulumi:Stack::talk-to-my-docs-dev_mori_20251216",
+                    "dependencies": [
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/useCase:UseCase::Talk to My Docs [PRE-EXISTING]",
+                        "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/applicationSource:ApplicationSource::Talk to My Docs [dev_mori_20251216]"
+                    ],
+                    "provider": "urn:pulumi:dev_mori_20251216::talk-to-my-docs::pulumi:providers:datarobot::default_0_10_22_github_/api.github.com/datarobot-community/pulumi-datarobot::a5acf804-27a0-4e4f-93a8-7864755856b3",
+                    "propertyDependencies": {
+                        "allowAutoStopping": [],
+                        "resources": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/applicationSource:ApplicationSource::Talk to My Docs [dev_mori_20251216]"
+                        ],
+                        "sourceVersionId": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/applicationSource:ApplicationSource::Talk to My Docs [dev_mori_20251216]"
+                        ],
+                        "useCaseIds": [
+                            "urn:pulumi:dev_mori_20251216::talk-to-my-docs::datarobot:index/useCase:UseCase::Talk to My Docs [PRE-EXISTING]"
+                        ]
+                    },
+                    "created": "2025-12-16T08:35:34.529723818Z",
+                    "modified": "2025-12-16T08:35:34.529723818Z",
+                    "sourcePosition": "project:///infra/web.py#235"
+                }
+            ],
+            "metadata": {}
+        }
+    }
+}

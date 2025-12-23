@@ -1,0 +1,126 @@
+# Copyright 2025 DataRobot, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import asyncio
+import json
+import logging
+from functools import partial
+from typing import TYPE_CHECKING
+
+from core.persistent_fs.dr_file_system import get_file_system
+
+from core import document_loader
+
+if TYPE_CHECKING:
+    from app.files.models import File, FileRepository
+    from app.knowledge_bases import KnowledgeBase, KnowledgeBaseRepository
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+def calculate_token_count(encoded_content: dict[int, str]) -> int:
+    """
+    Calculate the estimated token count from encoded content.
+
+    Args:
+        encoded_content: Dictionary mapping page numbers to text content
+
+    Returns:
+        Estimated token count (total characters / 4)
+    """
+    total_chars = sum(len(text) for text in encoded_content.values())
+    return total_chars // 4
+
+
+async def get_or_create_encoded_content(
+    file: "File",
+    file_repo: "FileRepository",
+    knowledge_base: "KnowledgeBase | None" = None,
+    knowledge_base_repo: "KnowledgeBaseRepository | None" = None,
+) -> dict[int, str] | None:
+    """
+    Get encoded content for a file, creating and caching it if it doesn't exist.
+
+    Args:
+        file: File object containing the path and metadata
+        file_repo: Optional FileRepository for updating file token count
+        knowledge_base: Optional KnowledgeBase to update token count
+        knowledge_base_repo: Optional KnowledgeBaseRepository for updating token count
+
+    Returns:
+        Dictionary mapping page numbers to text content, or None if encoding fails
+    """
+    fs = get_file_system()
+    if not file.file_path or not fs.exists(file.file_path):
+        return None
+
+    file_path = file.file_path
+    encoded_path = f"{file_path}.encoded"
+
+    # Check if encoded file already exists and is newer than the original
+    if fs.exists(encoded_path) and fs.modified(encoded_path) >= fs.modified(file_path):
+        try:
+            with fs.open(encoded_path, "r", encoding="utf-8") as f:
+                content_str = f.read()
+                content = json.loads(content_str)
+                # Ensure we return the correct type
+                if isinstance(content, dict):
+                    return {int(k): str(v) for k, v in content.items()}
+                # If cached content is not a dict, fall through to re-encode
+        except Exception as e:
+            logger.warning(f"Failed to load cached encoded content: {e}")
+
+    # Encode the document
+    try:
+        # Run document conversion in a thread pool since it's CPU-bound
+        loop = asyncio.get_event_loop()
+        encoded_content = await loop.run_in_executor(
+            None,
+            partial(
+                document_loader.convert_document_to_text,
+                document_path=file_path,
+                file_system=fs,
+            ),
+        )
+
+        # Cache the encoded content
+        try:
+            with fs.open(encoded_path, "w", encoding="utf-8") as f:
+                f.write(json.dumps(encoded_content, ensure_ascii=False, indent=2))
+        except Exception as e:
+            logger.warning(f"Failed to cache encoded content: {e}")
+
+        # Update token counts if repositories are provided
+        token_increment = calculate_token_count(encoded_content)
+
+        # Update knowledge base token count if provided
+        if knowledge_base and knowledge_base_repo and knowledge_base.id:
+            new_kb_token_count = knowledge_base.token_count + token_increment
+            await knowledge_base_repo.update_knowledge_base_token_count(
+                knowledge_base, new_kb_token_count
+            )
+
+        # Update file token count if file repository is provided
+        if file_repo and file.id:
+            from app.files.models import FileUpdate
+
+            file_update = FileUpdate(size_tokens=token_increment)
+            await file_repo.update_file(file.id, file_update, file.owner_id)
+
+        return encoded_content
+
+    except Exception as e:
+        logger.error(f"Failed to encode document {file_path}: {e}")
+        return None

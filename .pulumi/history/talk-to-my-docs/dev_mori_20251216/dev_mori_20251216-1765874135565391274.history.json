@@ -1,0 +1,45 @@
+{
+    "kind": "update",
+    "startTime": 1765872863,
+    "message": "v0.2.9",
+    "environment": {
+        "exec.kind": "cli",
+        "git.author": "datarobot-devinfragit7",
+        "git.author.email": "datarobot-devinfragit7@datarobot.com",
+        "git.committer": "datarobot-devinfragit7",
+        "git.committer.email": "datarobot-devinfragit7@datarobot.com",
+        "git.dirty": "true",
+        "git.head": "cc3f2164068c73fe3db2eb541ad8296d3e14aeb1",
+        "git.headName": "refs/heads/main",
+        "pulumi.arch": "amd64",
+        "pulumi.env.PULUMI_BACKEND_URL": "set",
+        "pulumi.env.PULUMI_CONFIG_PASSPHRASE": "set",
+        "pulumi.env.PULUMI_HOME": "set",
+        "pulumi.os": "linux",
+        "pulumi.version": "v3.212.0",
+        "runtime.executable": "/home/notebooks/storage/infra/.venv/bin/python",
+        "runtime.metadata.toolchain": "Uv",
+        "runtime.metadata.toolchainVersion": "0.9.17",
+        "runtime.metadata.typechecker": "None",
+        "runtime.name": "python",
+        "runtime.version": "3.11.14",
+        "stack.environments": "[]",
+        "updatePlan": "false",
+        "vcs.kind": "github.com",
+        "vcs.owner": "datarobot-community",
+        "vcs.repo": "talk-to-my-docs-agents",
+        "vcs.root": "infra"
+    },
+    "config": {
+        "datarobot:tracecontext": "talk-to-my-docs",
+        "pulumi:tags": {
+            "pulumi:template": "python"
+        }
+    },
+    "version": 0,
+    "result": "succeeded",
+    "endTime": 1765874135,
+    "resourceChanges": {
+        "create": 18
+    }
+}
