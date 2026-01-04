@@ -158,10 +158,10 @@ class MyAgent(CrewAIAgent):
       1) Requirement Extractor: ユーザー要望を構造化制約に正規化
       2) Spot Researcher: レストラン/観光地を探索（URL付き）
       3) Itinerary Optimizer: 時間割と移動方針を守って行程作成（Plan A/B）
-      4) Quality Checker: 最終出力（日本語Markdown + 統合JSON）を作成
+      4) Quality Checker: 最終出力（統合JSON形式）を作成
 
     強制ルール:
-      - 最終回答は必ず日本語
+      - 最終回答はJSON形式のみ
       - スポットは可能な限りURLを付与（取れない場合は要確認として明示）
     """
 
