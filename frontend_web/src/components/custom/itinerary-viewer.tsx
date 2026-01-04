@@ -1,7 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ExternalLink, Clock, MapPin, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 // Type definitions for the itinerary JSON structure
 interface TimelineItem {
@@ -100,9 +99,9 @@ function TimelineItemCard({ item }: { item: TimelineItem }) {
                         </a>
                     )}
                     {isVerified ? (
-                        <CheckCircle2 className="h-4 w-4 text-green-500" title="検証済み" />
+                        <CheckCircle2 className="h-4 w-4 text-green-500" aria-label="検証済み" />
                     ) : (
-                        <AlertCircle className="h-4 w-4 text-yellow-500" title="要確認" />
+                        <AlertCircle className="h-4 w-4 text-yellow-500" aria-label="要確認" />
                     )}
                 </div>
             </div>
@@ -139,7 +138,7 @@ function TimelineItemCard({ item }: { item: TimelineItem }) {
     );
 }
 
-function PlanView({ plan, planName }: { plan: Plan; planName: string }) {
+function PlanView({ plan }: { plan: Plan }) {
     if (!plan || !plan.timeline || plan.timeline.length === 0) {
         return (
             <div className="text-center text-muted-foreground py-8">
@@ -222,21 +221,21 @@ export function ItineraryViewer({ data }: ItineraryViewerProps) {
                         <TabsTrigger value="plan-b">Plan B</TabsTrigger>
                     </TabsList>
                     <TabsContent value="plan-a" className="mt-4">
-                        <PlanView plan={data.plan_a!} planName="Plan A" />
+                        <PlanView plan={data.plan_a!} />
                     </TabsContent>
                     <TabsContent value="plan-b" className="mt-4">
-                        <PlanView plan={data.plan_b!} planName="Plan B" />
+                        <PlanView plan={data.plan_b!} />
                     </TabsContent>
                 </Tabs>
             ) : hasPlanA ? (
                 <div>
                     <h3 className="text-xl font-semibold mb-4">Plan A</h3>
-                    <PlanView plan={data.plan_a!} planName="Plan A" />
+                    <PlanView plan={data.plan_a!} />
                 </div>
             ) : hasPlanB ? (
                 <div>
                     <h3 className="text-xl font-semibold mb-4">Plan B</h3>
-                    <PlanView plan={data.plan_b!} planName="Plan B" />
+                    <PlanView plan={data.plan_b!} />
                 </div>
             ) : null}
 
