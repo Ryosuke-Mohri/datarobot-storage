@@ -35,6 +35,55 @@ export function unwrapMarkdownCodeBlock(message: string): string {
         .replace(/<think>[\s\S]*?<\/think>/g, '');
 }
 
+/**
+ * Try to parse a string as JSON. Returns the parsed object if successful, null otherwise.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function tryParseJson(content: string): any | null {
+    if (!content || typeof content !== 'string') {
+        return null;
+    }
+    
+    const trimmed = content.trim();
+    
+    // Check if it looks like JSON (starts with { or [)
+    if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) {
+        return null;
+    }
+    
+    try {
+        return JSON.parse(trimmed);
+    } catch {
+        // Try extracting JSON from markdown code blocks
+        const jsonMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/);
+        if (jsonMatch) {
+            try {
+                return JSON.parse(jsonMatch[1].trim());
+            } catch {
+                return null;
+            }
+        }
+        return null;
+    }
+}
+
+/**
+ * Check if content is a valid itinerary JSON structure
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function isItineraryJson(obj: any): boolean {
+    if (!obj || typeof obj !== 'object') {
+        return false;
+    }
+    
+    // Check for itinerary-specific structure
+    return (
+        (obj.plan_a !== undefined || obj.plan_b !== undefined) ||
+        (obj.summary !== undefined && obj.timeline !== undefined) ||
+        (obj.constraints !== undefined && obj.candidates !== undefined)
+    );
+}
+
 const DEFAULT_CHAT_NAME = 'New Chat';
 export const getChatNameOrDefaultWithTimestamp = (chat: IChat) => {
     const chatName = chat.name || DEFAULT_CHAT_NAME;

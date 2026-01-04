@@ -474,26 +474,58 @@ constraints JSON と candidates JSON を使い、最適化した行程を作成�
     def task_finalize_output(self) -> Task:
         return Task(
             description="""
-【最重要】出力は日本語のみ（英語禁止）。
+【最重要】出力はJSON形式のみ（マークダウン禁止）。
 
-行程JSONを検証し、最終回答をMarkdownで生成する。
+行程JSONを検証し、統合JSON形式で返す。
 
 必須要件：
-- 店/観光地のURLを必ず併記する（url=null の場合は『URL未取得（要確認）』と明記）
-- verified / needs_verification を本文で分かるように表記する
 - 時間計算の整合性をチェックし、矛盾があれば修正する
+- 全ての情報を構造化JSON形式で返す
 
-Markdownに含めるもの：
-1) 概要（雰囲気、総所要時間、移動方針：1km以上タクシーなど）
-2) Plan A（タイムライン表：開始/終了/内容/場所/URL/メモ/移動手段/要確認）
-3) Plan B（同上）
-4) 予約・混雑・雨天時の注意点
-5) 最後に統合JSONを ```json``` で添付（constraints + candidates + itinerary を1つに）
+出力スキーマ（JSONのみ）：
+{
+  "summary": {
+    "total_duration_min": number,
+    "mobility_policy": "string",
+    "atmosphere": "string"
+  },
+  "plan_a": {
+    "title": "string",
+    "timeline": [
+      {
+        "start": "HH:MM",
+        "end": "HH:MM",
+        "activity_type": "meet|walk|attraction|meal|cafe|shopping|move|other",
+        "name": "string",
+        "area_detail": "string",
+        "url": "string|null",
+        "verification": "verified|needs_verification",
+        "stay_min": number,
+        "tips": ["string"],
+        "check_opening_hours": true|false,
+        "reservation_suggested": true|false,
+        "move_mode": "walk|taxi|train|other"
+      }
+    ],
+    "total_minutes": number,
+    "estimated_cost_per_person_jpy": {"min": number|null, "max": number|null}
+  },
+  "plan_b": {
+    "title": "string",
+    "timeline": [...],
+    "total_minutes": number,
+    "estimated_cost_per_person_jpy": {"min": number|null, "max": number|null}
+  },
+  "notes": ["string"],
+  "constraints": {...},
+  "candidates": {...}
+}
 
 注意：
-- Markdown本文は日本語のみ。
-- JSONキーは英語のままで良い。
+- JSONのみを出力する（マークダウンや説明文は含めない）
+- JSONキーは英語のままで良い
+- 出力は有効なJSON形式であること
 """.strip(),
-            expected_output="日本語Markdown（URL併記）＋統合JSON。",
+            expected_output="統合JSON（constraints + candidates + itinerary）。",
             agent=self.agent_quality_checker,
         )
