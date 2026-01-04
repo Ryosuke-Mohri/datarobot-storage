@@ -1,5 +1,30 @@
 # エージェントテストコマンド
 
+## 0. 事前準備: 依存関係のインストール
+
+**重要**: 初回実行時やエラーが発生した場合は、まず依存関係をインストールしてください。
+
+```bash
+cd agent_retrieval_agent
+task agent:req
+# または
+task agent:install
+```
+
+エラー `ModuleNotFoundError: No module named 'datarobot_genai'` が発生した場合は、以下を試してください：
+
+```bash
+# 仮想環境の問題をクリア
+unset VIRTUAL_ENV
+
+# 依存関係を再インストール
+cd agent_retrieval_agent
+task agent:req
+
+# または直接uvを使用
+uv sync --all-extras
+```
+
 ## 1. 開発サーバーを起動
 
 ```bash
