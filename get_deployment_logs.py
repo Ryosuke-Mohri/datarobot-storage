@@ -32,42 +32,66 @@ def get_deployment_logs(deployment_id: Optional[str] = None):
             print(f"デプロイメント: {deployment.label}")
             print(f"ID: {deployment.id}")
             
-            # 利用可能な属性を安全に取得
-            if hasattr(deployment, 'description'):
+            # 基本情報を表示
+            if hasattr(deployment, 'description') and deployment.description:
                 print(f"説明: {deployment.description}")
-            if hasattr(deployment, 'created'):
-                print(f"作成日時: {deployment.created}")
             if hasattr(deployment, 'status'):
                 print(f"ステータス: {deployment.status}")
+            if hasattr(deployment, 'importance'):
+                print(f"重要度: {deployment.importance}")
+            
+            # ヘルス情報を表示
+            print(f"\n=== ヘルス情報 ===")
+            
+            # サービスヘルス
+            if hasattr(deployment, 'service_health'):
+                print(f"サービスヘルス:")
+                print(json.dumps(deployment.service_health, indent=2, ensure_ascii=False, default=str))
+            
+            # モデルヘルス
+            if hasattr(deployment, 'model_health'):
+                print(f"\nモデルヘルス:")
+                print(json.dumps(deployment.model_health, indent=2, ensure_ascii=False, default=str))
+            
+            # 精度ヘルス
+            if hasattr(deployment, 'accuracy_health'):
+                print(f"\n精度ヘルス:")
+                print(json.dumps(deployment.accuracy_health, indent=2, ensure_ascii=False, default=str))
+            
+            # 公平性ヘルス
+            if hasattr(deployment, 'fairness_health'):
+                print(f"\n公平性ヘルス:")
+                print(json.dumps(deployment.fairness_health, indent=2, ensure_ascii=False, default=str))
             
             # ヘルス設定を取得（メソッドが存在する場合）
             try:
                 health_settings = deployment.get_health_settings()
-                print(f"\nヘルス設定:")
+                print(f"\n=== ヘルス設定 ===")
                 print(json.dumps(health_settings, indent=2, ensure_ascii=False, default=str))
             except AttributeError:
-                print("\nヘルス設定メソッドが利用できません")
+                pass  # メソッドが存在しない場合はスキップ
             except Exception as e:
                 print(f"\nヘルス設定取得エラー: {e}")
             
-            # 設定を取得
-            try:
-                settings = deployment.get_settings()
-                print(f"\n設定:")
-                print(json.dumps(settings, indent=2, ensure_ascii=False, default=str))
-            except Exception as e:
-                print(f"\n設定取得エラー: {e}")
+            # モデル情報
+            if hasattr(deployment, 'model'):
+                print(f"\n=== モデル情報 ===")
+                print(json.dumps(deployment.model, indent=2, ensure_ascii=False, default=str))
             
-            # 利用可能な属性をすべて表示（デバッグ用）
-            print(f"\n利用可能な属性:")
-            attrs = [attr for attr in dir(deployment) if not attr.startswith('_') and not callable(getattr(deployment, attr, None))]
-            for attr in sorted(attrs)[:20]:  # 最初の20個のみ表示
-                try:
-                    value = getattr(deployment, attr)
-                    if not callable(value):
-                        print(f"  {attr}: {value}")
-                except:
-                    pass
+            # 予測環境情報
+            if hasattr(deployment, 'prediction_environment'):
+                print(f"\n=== 予測環境 ===")
+                print(json.dumps(deployment.prediction_environment, indent=2, ensure_ascii=False, default=str))
+            
+            # 予測使用状況
+            if hasattr(deployment, 'prediction_usage'):
+                print(f"\n=== 予測使用状況 ===")
+                print(json.dumps(deployment.prediction_usage, indent=2, ensure_ascii=False, default=str))
+            
+            # ガバナンス情報
+            if hasattr(deployment, 'governance'):
+                print(f"\n=== ガバナンス ===")
+                print(json.dumps(deployment.governance, indent=2, ensure_ascii=False, default=str))
             
         except Exception as e:
             print(f"デプロイメント取得エラー: {e}")
