@@ -14,11 +14,12 @@ import os
 import sys
 import datarobot as dr
 import json
+import requests
 from datetime import datetime
 from typing import Optional
 
 def get_custom_model_details(custom_model_id: str):
-    """カスタムモデルの詳細情報を取得"""
+    """カスタムモデルの詳細情報を取得（REST API経由）"""
     api_token = os.getenv("DATAROBOT_API_TOKEN")
     endpoint = os.getenv("DATAROBOT_ENDPOINT", "https://app.jp.datarobot.com/api/v2")
     
@@ -26,81 +27,74 @@ def get_custom_model_details(custom_model_id: str):
         print("エラー: DATAROBOT_API_TOKEN環境変数が設定されていません")
         sys.exit(1)
     
-    dr.Client(token=api_token, endpoint=endpoint)
+    headers = {"Authorization": f"Bearer {api_token}", "Content-Type": "application/json"}
     
     try:
-        # CustomModel.get()が使えない場合があるので、list()で検索
-        print(f"カスタムモデルID {custom_model_id} を検索中...")
-        custom_models = dr.CustomModel.list()
-        custom_model = None
-        for cm in custom_models:
-            if cm.id == custom_model_id:
-                custom_model = cm
-                break
+        # カスタムモデルの詳細を取得
+        print(f"カスタムモデルID {custom_model_id} の詳細を取得中...")
+        custom_model_url = f"{endpoint}/customModels/{custom_model_id}/"
+        response = requests.get(custom_model_url, headers=headers)
         
-        if not custom_model:
-            print(f"エラー: カスタムモデルID {custom_model_id} が見つかりません")
-            print(f"利用可能なカスタムモデル数: {len(custom_models)}")
+        if not response.ok:
+            print(f"カスタムモデル取得エラー (HTTP {response.status_code}): {response.text}")
             return
         
-        print(f"カスタムモデル: {custom_model.name}")
-        print(f"ID: {custom_model.id}")
-        if hasattr(custom_model, 'created'):
-            print(f"作成日時: {custom_model.created}")
+        custom_model_data = response.json()
+        print(f"カスタムモデル: {custom_model_data.get('name', 'N/A')}")
+        print(f"ID: {custom_model_data.get('id', 'N/A')}")
+        if custom_model_data.get('created'):
+            print(f"作成日時: {custom_model_data.get('created')}")
         
-        # バージョンを取得
+        # バージョン一覧を取得
         print(f"\n=== バージョン情報 ===")
-        try:
-            versions = custom_model.get_versions()
-            if versions:
-                latest_version = versions[0]
-                print(f"最新バージョンID: {latest_version.id}")
-                print(f"バージョンラベル: {getattr(latest_version, 'label', 'N/A')}")
-                if hasattr(latest_version, 'created'):
-                    print(f"作成日時: {latest_version.created}")
-                if hasattr(latest_version, 'version_status'):
-                    print(f"バージョンステータス: {latest_version.version_status}")
-                
-                # エラーメッセージ
-                if hasattr(latest_version, 'validation_error') and latest_version.validation_error:
-                    print(f"\n=== 検証エラー ===")
-                    print(latest_version.validation_error)
-                
-                # ビルドログを取得（REST APIを使用）
-                print(f"\n=== ビルドログを取得中（REST API経由） ===")
-                import requests
-                version_id = latest_version.id
-                build_logs_url = f"{endpoint}/customModels/{custom_model_id}/versions/{version_id}/buildLogs/"
-                headers = {"Authorization": f"Bearer {api_token}"}
-                try:
-                    response = requests.get(build_logs_url, headers=headers)
-                    if response.ok:
-                        build_logs_data = response.json()
-                        if build_logs_data.get('logs'):
-                            print(build_logs_data['logs'])
-                        else:
-                            print("ビルドログがまだ生成されていません")
-                    else:
-                        print(f"ビルドログ取得エラー (HTTP {response.status_code}): {response.text}")
-                except Exception as e:
-                    print(f"ビルドログ取得エラー: {e}")
-                
-                # バージョンの詳細属性を表示
-                print(f"\n=== バージョンの詳細属性 ===")
-                important_attrs = ['id', 'label', 'version_status', 'created', 'validation_error']
-                for attr in important_attrs:
-                    if hasattr(latest_version, attr):
-                        try:
-                            value = getattr(latest_version, attr)
-                            if not callable(value) and value is not None:
-                                print(f"{attr}: {value}")
-                        except:
-                            pass
-                
-        except Exception as e:
-            print(f"バージョン取得エラー: {e}")
-            import traceback
-            traceback.print_exc()
+        versions_url = f"{endpoint}/customModels/{custom_model_id}/versions/"
+        versions_response = requests.get(versions_url, headers=headers)
+        
+        if not versions_response.ok:
+            print(f"バージョン一覧取得エラー (HTTP {versions_response.status_code}): {versions_response.text}")
+            return
+        
+        versions_data = versions_response.json()
+        if not versions_data:
+            print("バージョンが見つかりません")
+            return
+        
+        # 最新バージョン（最初の要素）を取得
+        latest_version = versions_data[0]
+        version_id = latest_version.get('id')
+        print(f"最新バージョンID: {version_id}")
+        print(f"バージョンラベル: {latest_version.get('label', 'N/A')}")
+        if latest_version.get('created'):
+            print(f"作成日時: {latest_version.get('created')}")
+        if latest_version.get('versionStatus'):
+            print(f"バージョンステータス: {latest_version.get('versionStatus')}")
+        
+        # 検証エラー
+        if latest_version.get('validationError'):
+            print(f"\n=== 検証エラー ===")
+            validation_error = latest_version.get('validationError')
+            if isinstance(validation_error, dict):
+                print(json.dumps(validation_error, indent=2, ensure_ascii=False))
+            else:
+                print(validation_error)
+        
+        # ビルドログを取得
+        print(f"\n=== ビルドログを取得中 ===")
+        build_logs_url = f"{endpoint}/customModels/{custom_model_id}/versions/{version_id}/buildLogs/"
+        build_logs_response = requests.get(build_logs_url, headers=headers)
+        
+        if build_logs_response.ok:
+            build_logs_data = build_logs_response.json()
+            if build_logs_data.get('logs'):
+                print(build_logs_data['logs'])
+            else:
+                print("ビルドログがまだ生成されていません")
+        else:
+            print(f"ビルドログ取得エラー (HTTP {build_logs_response.status_code}): {build_logs_response.text}")
+        
+        # バージョンの詳細情報を表示
+        print(f"\n=== バージョンの詳細情報 ===")
+        print(json.dumps(latest_version, indent=2, ensure_ascii=False, default=str))
             
     except Exception as e:
         print(f"カスタムモデル取得エラー: {e}")
