@@ -149,17 +149,24 @@ deployment_id = "your-agent-deployment-id"
 try:
     deployment = dr.Deployment.get(deployment_id)
     
-    # ヘルスステータス
-    print(f"Health: {deployment.health}")
-    print(f"Service Health: {deployment.service_health}")
+    print(f"Deployment: {deployment.label}")
+    print(f"ID: {deployment.id}")
     
-    # エラーメッセージ
-    if hasattr(deployment, 'last_prediction_error'):
-        print(f"Last Prediction Error: {deployment.last_prediction_error}")
+    # ヘルス設定（メソッドが存在する場合）
+    try:
+        health_settings = deployment.get_health_settings()
+        print(f"Health Settings: {health_settings}")
+    except AttributeError:
+        print("Health settings method not available")
+    except Exception as e:
+        print(f"Error getting health settings: {e}")
     
     # 設定
-    settings = deployment.get_settings()
-    print(f"Settings: {settings}")
+    try:
+        settings = deployment.get_settings()
+        print(f"Settings: {settings}")
+    except Exception as e:
+        print(f"Error getting settings: {e}")
     
 except Exception as e:
     print(f"Error: {e}")
