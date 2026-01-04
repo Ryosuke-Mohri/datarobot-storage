@@ -29,7 +29,20 @@ def get_custom_model_details(custom_model_id: str):
     dr.Client(token=api_token, endpoint=endpoint)
     
     try:
-        custom_model = dr.CustomModel.get(custom_model_id)
+        # CustomModel.get()が使えない場合があるので、list()で検索
+        print(f"カスタムモデルID {custom_model_id} を検索中...")
+        custom_models = dr.CustomModel.list()
+        custom_model = None
+        for cm in custom_models:
+            if cm.id == custom_model_id:
+                custom_model = cm
+                break
+        
+        if not custom_model:
+            print(f"エラー: カスタムモデルID {custom_model_id} が見つかりません")
+            print(f"利用可能なカスタムモデル数: {len(custom_models)}")
+            return
+        
         print(f"カスタムモデル: {custom_model.name}")
         print(f"ID: {custom_model.id}")
         if hasattr(custom_model, 'created'):
@@ -53,27 +66,33 @@ def get_custom_model_details(custom_model_id: str):
                     print(f"\n=== 検証エラー ===")
                     print(latest_version.validation_error)
                 
-                # ビルドログを取得
+                # ビルドログを取得（REST APIを使用）
+                print(f"\n=== ビルドログを取得中（REST API経由） ===")
+                import requests
+                version_id = latest_version.id
+                build_logs_url = f"{endpoint}/customModels/{custom_model_id}/versions/{version_id}/buildLogs/"
+                headers = {"Authorization": f"Bearer {api_token}"}
                 try:
-                    if hasattr(latest_version, 'get_build_logs'):
-                        build_logs = latest_version.get_build_logs()
-                        if build_logs:
-                            print(f"\n=== ビルドログ ===")
-                            print(build_logs)
-                except AttributeError:
-                    print("\nビルドログ取得メソッドが利用できません")
+                    response = requests.get(build_logs_url, headers=headers)
+                    if response.ok:
+                        build_logs_data = response.json()
+                        if build_logs_data.get('logs'):
+                            print(build_logs_data['logs'])
+                        else:
+                            print("ビルドログがまだ生成されていません")
+                    else:
+                        print(f"ビルドログ取得エラー (HTTP {response.status_code}): {response.text}")
                 except Exception as e:
-                    print(f"\nビルドログ取得エラー: {e}")
+                    print(f"ビルドログ取得エラー: {e}")
                 
                 # バージョンの詳細属性を表示
                 print(f"\n=== バージョンの詳細属性 ===")
-                version_attrs = [attr for attr in dir(latest_version) if not attr.startswith('_')]
-                important_attrs = ['id', 'label', 'version_status', 'created', 'validation_error', 'build_logs']
+                important_attrs = ['id', 'label', 'version_status', 'created', 'validation_error']
                 for attr in important_attrs:
                     if hasattr(latest_version, attr):
                         try:
                             value = getattr(latest_version, attr)
-                            if not callable(value):
+                            if not callable(value) and value is not None:
                                 print(f"{attr}: {value}")
                         except:
                             pass
