@@ -6,6 +6,8 @@ DataRobotデプロイメントのログを取得するスクリプト
     python get_deployment_logs.py
     # または特定のデプロイメントIDを指定
     DEPLOYMENT_ID=your-deployment-id python get_deployment_logs.py
+    # または特定のカスタムモデルIDを指定
+    CUSTOM_MODEL_ID=your-custom-model-id python get_deployment_logs.py
 """
 
 import os
@@ -15,7 +17,78 @@ import json
 from datetime import datetime
 from typing import Optional
 
-def get_deployment_logs(deployment_id: Optional[str] = None):
+def get_custom_model_details(custom_model_id: str):
+    """カスタムモデルの詳細情報を取得"""
+    api_token = os.getenv("DATAROBOT_API_TOKEN")
+    endpoint = os.getenv("DATAROBOT_ENDPOINT", "https://app.jp.datarobot.com/api/v2")
+    
+    if not api_token:
+        print("エラー: DATAROBOT_API_TOKEN環境変数が設定されていません")
+        sys.exit(1)
+    
+    dr.Client(token=api_token, endpoint=endpoint)
+    
+    try:
+        custom_model = dr.CustomModel.get(custom_model_id)
+        print(f"カスタムモデル: {custom_model.name}")
+        print(f"ID: {custom_model.id}")
+        if hasattr(custom_model, 'created'):
+            print(f"作成日時: {custom_model.created}")
+        
+        # バージョンを取得
+        print(f"\n=== バージョン情報 ===")
+        try:
+            versions = custom_model.get_versions()
+            if versions:
+                latest_version = versions[0]
+                print(f"最新バージョンID: {latest_version.id}")
+                print(f"バージョンラベル: {getattr(latest_version, 'label', 'N/A')}")
+                if hasattr(latest_version, 'created'):
+                    print(f"作成日時: {latest_version.created}")
+                if hasattr(latest_version, 'version_status'):
+                    print(f"バージョンステータス: {latest_version.version_status}")
+                
+                # エラーメッセージ
+                if hasattr(latest_version, 'validation_error') and latest_version.validation_error:
+                    print(f"\n=== 検証エラー ===")
+                    print(latest_version.validation_error)
+                
+                # ビルドログを取得
+                try:
+                    if hasattr(latest_version, 'get_build_logs'):
+                        build_logs = latest_version.get_build_logs()
+                        if build_logs:
+                            print(f"\n=== ビルドログ ===")
+                            print(build_logs)
+                except AttributeError:
+                    print("\nビルドログ取得メソッドが利用できません")
+                except Exception as e:
+                    print(f"\nビルドログ取得エラー: {e}")
+                
+                # バージョンの詳細属性を表示
+                print(f"\n=== バージョンの詳細属性 ===")
+                version_attrs = [attr for attr in dir(latest_version) if not attr.startswith('_')]
+                important_attrs = ['id', 'label', 'version_status', 'created', 'validation_error', 'build_logs']
+                for attr in important_attrs:
+                    if hasattr(latest_version, attr):
+                        try:
+                            value = getattr(latest_version, attr)
+                            if not callable(value):
+                                print(f"{attr}: {value}")
+                        except:
+                            pass
+                
+        except Exception as e:
+            print(f"バージョン取得エラー: {e}")
+            import traceback
+            traceback.print_exc()
+            
+    except Exception as e:
+        print(f"カスタムモデル取得エラー: {e}")
+        import traceback
+        traceback.print_exc()
+
+def get_deployment_logs(deployment_id: Optional[str] = None, custom_model_id: Optional[str] = None):
     """デプロイメントのログを取得"""
     api_token = os.getenv("DATAROBOT_API_TOKEN")
     endpoint = os.getenv("DATAROBOT_ENDPOINT", "https://app.jp.datarobot.com/api/v2")
@@ -25,6 +98,10 @@ def get_deployment_logs(deployment_id: Optional[str] = None):
         sys.exit(1)
     
     dr.Client(token=api_token, endpoint=endpoint)
+    
+    if custom_model_id:
+        get_custom_model_details(custom_model_id)
+        return
     
     if deployment_id:
         try:
@@ -138,5 +215,6 @@ def get_custom_model_logs():
 
 if __name__ == "__main__":
     deployment_id = os.getenv("DEPLOYMENT_ID")
-    get_deployment_logs(deployment_id)
+    custom_model_id = os.getenv("CUSTOM_MODEL_ID")
+    get_deployment_logs(deployment_id, custom_model_id)
 
