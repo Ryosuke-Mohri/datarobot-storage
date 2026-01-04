@@ -56,30 +56,44 @@ def get_custom_model_details(custom_model_id: str):
         
         versions_data = versions_response.json()
         
-        # レスポンスがリストかどうか確認
-        if not isinstance(versions_data, list):
+        # レスポンス形式を確認（リストまたは辞書の可能性）
+        if isinstance(versions_data, dict):
+            # 辞書形式の場合、dataキーまたは直接リストを取得
+            if 'data' in versions_data:
+                versions_list = versions_data['data']
+            elif 'count' in versions_data:
+                # countキーがある場合、dataキーを探す
+                versions_list = versions_data.get('data', [])
+            else:
+                print(f"予期しないレスポンス形式（辞書）: {list(versions_data.keys())}")
+                return
+        elif isinstance(versions_data, list):
+            versions_list = versions_data
+        else:
             print(f"予期しないレスポンス形式: {type(versions_data)}")
-            print(f"レスポンス内容: {json.dumps(versions_data, indent=2, ensure_ascii=False)}")
             return
         
-        if not versions_data:
+        if not versions_list:
             print("バージョンが見つかりません")
             return
         
         # 最新バージョン（最初の要素）を取得
-        latest_version = versions_data[0]
+        latest_version = versions_list[0]
         version_id = latest_version.get('id')
         print(f"最新バージョンID: {version_id}")
         print(f"バージョンラベル: {latest_version.get('label', 'N/A')}")
         if latest_version.get('created'):
             print(f"作成日時: {latest_version.get('created')}")
-        if latest_version.get('versionStatus'):
-            print(f"バージョンステータス: {latest_version.get('versionStatus')}")
+        
+        # バージョンステータス（versionStatusまたはversion_status）
+        version_status = latest_version.get('versionStatus') or latest_version.get('version_status')
+        if version_status:
+            print(f"バージョンステータス: {version_status}")
         
         # 検証エラー
-        if latest_version.get('validationError'):
+        validation_error = latest_version.get('validationError') or latest_version.get('validation_error')
+        if validation_error:
             print(f"\n=== 検証エラー ===")
-            validation_error = latest_version.get('validationError')
             if isinstance(validation_error, dict):
                 print(json.dumps(validation_error, indent=2, ensure_ascii=False))
             else:
@@ -92,16 +106,19 @@ def get_custom_model_details(custom_model_id: str):
         
         if build_logs_response.ok:
             build_logs_data = build_logs_response.json()
-            if build_logs_data.get('logs'):
-                print(build_logs_data['logs'])
+            logs = build_logs_data.get('logs') or build_logs_data.get('log') or build_logs_data.get('buildLog')
+            if logs:
+                print(logs)
             else:
                 print("ビルドログがまだ生成されていません")
+                print(f"レスポンス: {build_logs_data}")
         else:
             print(f"ビルドログ取得エラー (HTTP {build_logs_response.status_code}): {build_logs_response.text}")
         
-        # バージョンの詳細情報を表示
-        print(f"\n=== バージョンの詳細情報 ===")
-        print(json.dumps(latest_version, indent=2, ensure_ascii=False, default=str))
+        # 簡潔な要約情報のみ表示
+        print(f"\n=== 要約情報 ===")
+        print(f"バージョン数: {len(versions_list)}")
+        print(f"最新バージョン: {latest_version.get('label', 'N/A')} (ID: {version_id})")
             
     except Exception as e:
         print(f"カスタムモデル取得エラー: {e}")
