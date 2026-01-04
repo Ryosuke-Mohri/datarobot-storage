@@ -11,32 +11,158 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import os
+
+from __future__ import annotations
+
 import re
-from textwrap import dedent
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
-import models
 from config import Config
-from core.document_loader import SUPPORTED_FILE_TYPES
-from crewai import LLM, Agent, Crew, CrewOutput, Task
-from flask import json
-from helpers import CrewAIEventListener, create_inputs_from_completion_params
-from openai.types.chat import CompletionCreateParams
-from ragas.messages import AIMessage
-from tool import (
-    DocumentReadTool,
-    FileListTool,
-    KnowledgeBaseContentTool,
-    KnowledgeBaseSearchTool,
-)
+from crewai import LLM, Agent, Task
+from datarobot_genai.crewai.agent import build_llm
+from datarobot_genai.crewai.base import CrewAIAgent
+from datarobot_genai.crewai.events import CrewAIEventListener
 
 
-class MyAgent:
-    """MyAgent is a custom agent that uses CrewAI to plan, write, and edit content.
-    It utilizes DataRobot's LLM Gateway or a specific deployment for language model interactions.
-    This example illustrates 3 agents that handle content creation tasks, including planning, writing,
-    and editing blog posts.
+def _parse_jp_date_prompt(user_text: str) -> Dict[str, Any]:
+    """
+    半構造化の日本語プロンプトをbest-effortでパースする。
+
+    例:
+      集合場所：六本木駅
+      解散場所：渋谷駅
+      開始時間：15:00
+      解散時間：21:30
+      要件：
+      - 観光1箇所は90分以内
+      - 食事は120分
+      - 予算は1人10,000円まで
+      - 静かめの店がいい
+      - お酒が美味しくて景色がきれいな場所がいい
+      - 1km以上の距離はタクシー移動をすること
+
+    注意:
+      - ここでは「抽出できるものだけ抽出」する。
+      - 最終的な正規化は Requirement Extractor（LLM）で行う。
+    """
+    text = (user_text or "").strip()
+
+    def pick(pattern: str) -> Optional[str]:
+        m = re.search(pattern, text, flags=re.MULTILINE)
+        return m.group(1).strip() if m else None
+
+    meeting = pick(r"^集合場所：\s*(.+)$")
+    dropoff = pick(r"^解散場所：\s*(.+)$")
+
+    def normalize_time(t: Optional[str]) -> Optional[str]:
+        if not t:
+            return None
+        t = t.strip().replace("：", ":")
+
+        # HH:MM
+        m = re.match(r"^([0-2]?\d):([0-5]\d)$", t)
+        if m:
+            return f"{int(m.group(1)):02d}:{int(m.group(2)):02d}"
+
+        # "15時" / "15時00分"
+        m = re.match(r"^([0-2]?\d)\s*時(?:\s*([0-5]?\d)\s*分)?$", t)
+        if m:
+            hh = int(m.group(1))
+            mm = int(m.group(2)) if m.group(2) is not None else 0
+            return f"{hh:02d}:{mm:02d}"
+
+        return None
+
+    start_time = normalize_time(pick(r"^開始時間：\s*(.+)$"))
+    end_time = normalize_time(pick(r"^解散時間：\s*(.+)$"))
+
+    # "要件：" 以降の箇条書きを取得（- / ・）
+    req_block = ""
+    m = re.search(r"^要件：\s*\n([\s\S]+)$", text, flags=re.MULTILINE)
+    if m:
+        req_block = m.group(1)
+
+    req_lines: List[str] = []
+    for line in req_block.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        if line.startswith("-"):
+            req_lines.append(line.lstrip("-").strip())
+        elif line.startswith("・"):
+            req_lines.append(line.lstrip("・").strip())
+
+    sightseeing_max_min: Optional[int] = None
+    meal_minutes: Optional[int] = None
+    budget_max_jpy: Optional[int] = None
+    taxi_threshold_km: Optional[float] = None
+
+    def parse_jpy_amount(s: str) -> Optional[int]:
+        s = s.strip()
+        # 10,000円 / 10000円
+        m1 = re.search(r"([0-9,]+)\s*円", s)
+        if m1:
+            return int(m1.group(1).replace(",", ""))
+
+        # 1万円 / 2.5万円
+        m2 = re.search(r"(\d+(?:\.\d+)?)\s*万\s*円?", s)
+        if m2:
+            return int(float(m2.group(1)) * 10000)
+
+        return None
+
+    for r in req_lines:
+        mm = re.search(r"観光.*?(\d+)\s*分", r)
+        if mm and any(k in r for k in ["以内", "まで", "以下"]):
+            sightseeing_max_min = int(mm.group(1))
+
+        mm = re.search(r"食事.*?(\d+)\s*分", r)
+        if mm:
+            meal_minutes = int(mm.group(1))
+
+        if "予算" in r:
+            amt = parse_jpy_amount(r)
+            if amt is not None and any(k in r for k in ["まで", "以内", "以下"]):
+                budget_max_jpy = amt
+
+        mm = re.search(r"(\d+(?:\.\d+)?)\s*km以上.*タクシー", r)
+        if mm:
+            taxi_threshold_km = float(mm.group(1))
+
+    parse_confidence = (
+        "high"
+        if (meeting or dropoff or start_time or end_time or req_lines)
+        else "low"
+    )
+
+    return {
+        "meeting_place": meeting,
+        "dropoff_place": dropoff,
+        "time_window": {"start": start_time, "end": end_time},
+        "requirements_raw": req_lines,
+        "extracted": {
+            "sightseeing_max_min": sightseeing_max_min,
+            "meal_minutes": meal_minutes,
+            "budget_max_jpy": budget_max_jpy,
+            "taxi_threshold_km": taxi_threshold_km,
+        },
+        "parse_confidence": parse_confidence,
+    }
+
+
+class MyAgent(CrewAIAgent):
+    """
+    デートプラン（行程）提案エージェント。
+
+    Flow:
+      1) Requirement Extractor: ユーザー要望を構造化制約に正規化
+      2) Spot Researcher: レストラン/観光地を探索（URL付き）
+      3) Itinerary Optimizer: 時間割と移動方針を守って行程作成（Plan A/B）
+      4) Quality Checker: 最終出力（日本語Markdown + 統合JSON）を作成
+
+    強制ルール:
+      - 最終回答は必ず日本語
+      - スポットは可能な限りURLを付与（取れない場合は要確認として明示）
     """
 
     def __init__(
@@ -45,456 +171,329 @@ class MyAgent:
         api_base: Optional[str] = None,
         model: Optional[str] = None,
         verbose: Optional[Union[bool, str]] = True,
-        timeout: Optional[int] = 300,
+        timeout: Optional[int] = 90,
         **kwargs: Any,
     ):
-        """Initializes the MyAgent class with API key, base URL, model, and verbosity settings.
-
-        Args:
-            api_key: Optional[str]: API key for authentication with DataRobot services.
-                Defaults to None, in which case it will use the DATAROBOT_API_TOKEN environment variable.
-            api_base: Optional[str]: Base URL for the DataRobot API.
-                Defaults to None, in which case it will use the DATAROBOT_ENDPOINT environment variable.
-            model: Optional[str]: The LLM model to use.
-                Defaults to None.
-            verbose: Optional[Union[bool, str]]: Whether to enable verbose logging.
-                Accepts boolean or string values ("true"/"false"). Defaults to True.
-            timeout: Optional[int]: How long to wait for the agent to respond.
-                Defaults to 90 seconds.
-            **kwargs: Any: Additional keyword arguments passed to the agent.
-                Contains any parameters received in the CompletionCreateParams.
-
-        Returns:
-            None
-        """
-        self.api_key = api_key or os.environ.get("DATAROBOT_API_TOKEN")
-        self.api_base = api_base or os.environ.get("DATAROBOT_ENDPOINT")
-        self.model = model
+        super().__init__(
+            api_key=api_key,
+            api_base=api_base,
+            model=model,
+            verbose=verbose,
+            timeout=timeout,
+            **kwargs,
+        )
         self.config = Config()
         self.default_model = self.config.llm_default_model
-        if not self.default_model.startswith("datarobot/"):
-            self.default_model = f"datarobot/{self.default_model}"
-        self.timeout = timeout
-        if isinstance(verbose, str):
-            self.verbose = verbose.lower() == "true"
-        elif isinstance(verbose, bool):
-            self.verbose = verbose
         self.event_listener = CrewAIEventListener()
-        self.knowledge_base_files: Dict[str, dict[str, str]] = {}
 
-    @property
-    def api_base_litellm(self) -> str:
-        """Returns a modified version of the API base URL suitable for LiteLLM.
-
-        Strips 'api/v2/' or 'api/v2' from the end of the URL if present.
-
-        Returns:
-            str: The modified API base URL.
-        """
-        if self.api_base:
-            return re.sub(r"api/v2/?$", "", self.api_base)
-        return "https://api.datarobot.com"
-
-    def model_factory(
+    def llm(
         self,
-        model: str | None = None,
-        use_deployment: bool = True,
+        preferred_model: str | None = None,
         auto_model_override: bool = True,
     ) -> LLM:
-        """Returns the model to use for the LLM.
-
-        If a model is provided, it will be used. Otherwise, the default model will be used.
-        If use_deployment is True, the model will be used with the deployment ID
-        from the config/environment variable LLM_DEPLOYMENT_ID. If False, it will use the
-        LLM Gateway.
-
-        Args:
-            model: Optional[str]: The model to use. If none, it defaults to config.llm_default_model.
-            use_deployment: Optional[bool]: Whether to use the deployment ID from the config.
-                Defaults to True.
-            auto_model_override: Optional[bool]: If True, it will try and use the model
-                specified in the request but automatically back out if the LLM Gateway is
-                not available.
-
-        Returns:
-            str: The model to use.
-        """
-        api_base = (
-            f"{self.api_base_litellm}/api/v2/deployments/{self.config.llm_deployment_id}/chat/completions"
-            if use_deployment
-            else self.api_base_litellm
-        )
-        if model is None:
-            model = self.default_model
+        model = preferred_model or self.default_model
         if auto_model_override and not self.config.use_datarobot_llm_gateway:
             model = self.default_model
         if self.verbose:
             print(f"Using model: {model}")
-        return LLM(
-            model=model,
-            api_base=api_base,
+        return build_llm(
+            api_base=self.api_base,
             api_key=self.api_key,
+            model=model,
+            deployment_id=self.config.llm_deployment_id,
             timeout=self.timeout,
         )
 
-    @property
-    def file_list_tool(self) -> FileListTool:
-        return FileListTool()
+    def make_kickoff_inputs(self, user_prompt_content: str) -> dict[str, Any]:
+        parsed = _parse_jp_date_prompt(str(user_prompt_content))
+        return {
+            "user_request": str(user_prompt_content),
+            "parsed_request_json": parsed,
+        }
 
     @property
-    def document_read_tool(self) -> DocumentReadTool:
-        return DocumentReadTool()
+    def agents(self) -> List[Agent]:
+        return [
+            self.agent_requirement_extractor,
+            self.agent_spot_researcher,
+            self.agent_itinerary_optimizer,
+            self.agent_quality_checker,
+        ]
 
     @property
-    def knowledge_base_content_tool(self) -> KnowledgeBaseContentTool:
-        """Returns the KnowledgeBaseContentTool instance."""
-        return KnowledgeBaseContentTool(knowledge_base=self.knowledge_base_files)
+    def tasks(self) -> List[Task]:
+        return [
+            self.task_extract_requirements,
+            self.task_search_spots,
+            self.task_build_itinerary,
+            self.task_finalize_output,
+        ]
 
+    # -----------------------
+    # Agents
+    # -----------------------
     @property
-    def knowledge_base_search_tool(self) -> KnowledgeBaseSearchTool:
-        """Returns the KnowledgeBaseSearchTool instance."""
-        return KnowledgeBaseSearchTool(knowledge_base=self.knowledge_base_files)
-
-    @property
-    def agent_file_searcher(self) -> Agent:
+    def agent_requirement_extractor(self) -> Agent:
         return Agent(
-            role="File Searcher",
-            goal='Find the most closely related filenames and their contents from a list of files on the topic: "{topic}" as it relates to the question: "{question}". Your services aren\'t needed if the document is in the question already.',
-            backstory="You are an expert at searching and reading files for helpful information. You can identify the most relevant"
-            "file from a list of files. You are given a list of files and a topic. ",
-            allow_delegation=False,
-            verbose=self.verbose,
-            max_iter=3,
-            llm=self.model_factory(
-                model="datarobot/bedrock/anthropic.claude-sonnet-4-20250514-v1:0",
-                use_deployment=True,
-            ),
-        )
-
-    @property
-    def task_file_search(self) -> Task:
-        return Task(
-            name="File List",
-            description=dedent(
-                """
-                Find the most relevant files to "{topic}" and "{question}" from a list of files.
-                You should always use your tools to determine what files are available.
-                Your task is complete if no files are relevant.
-
-                The chance that the files are relevant is quite low,
-                so you should only select files if they are very clearly relevant.
-                Please return only filenames that have extensions in the approved extension list.
-                This extension list is: """
-                + str(SUPPORTED_FILE_TYPES)
-                + """.
-
-                If no relevant files are found, return an empty array.
-            """
-            ).strip(),
-            expected_output="A JSON object with an array of file paths",
-            output_pydantic=models.FileSearchOutput,
-            agent=self.agent_file_searcher,
-            tools=[self.file_list_tool],
-        )
-
-    @property
-    def task_write(self) -> Task:
-        return Task(
-            name="File Read",
-            description=dedent("""
-                1. Read the contents of the files you are given.
-                2. Think and understand deeply the contents of the file.
-                3. Determine the best way to summarize this information in a concise and understandable way.
-                4. Create a summary that answers the question, "{question}".
-
-                It is extremely critical that you do your best to answer this question.
-                If no file was provided by the file searcher, state 'No file content available to answer the question.'
-            """).strip(),
-            expected_output="A well-written summary that answers the question in markdown format, or a clear statement if no file content is available.",
-            agent=self.agent_file_searcher,
-            tools=[self.document_read_tool],
-        )
-
-    @property
-    def document_in_question_agent(self) -> Agent:
-        """An agent that can be used to answer questions about a document."""
-        return Agent(
-            role="Document Question Answerer",
-            goal=dedent("""
-                If the question: "{question}" contains the phrase:
-                "Here are the relevant documents with each document separated by three dashes",
-                then you should read the pages of the documents from the question and answer the question prior to that phrase.
-            """).strip(),
-            backstory=dedent("""
-                You are an expert at reading documents and answering questions about them, and when the question includes a document,
-                you'll know you should take action to respond to it.
-            """).strip(),
-            allow_delegation=False,
-            max_iter=5,
-            verbose=self.verbose,
-            llm=self.model_factory(
-                model="datarobot/azure/gpt-4o-2024-11-20",
-                use_deployment=True,
-            ),
-        )
-
-    @property
-    def task_in_question_write(self) -> Task:
-        return Task(
-            name="Embedded Document Question Answering",
-            description=dedent("""
-                1. Check if the "{question}" contains the phrase "Here is the relevant document with each page separated by three dashes:".
-                2. If it does, separate the question from the document content.
-                3. Think and understand deeply the contents of the document part of the question.
-                4. Determine the best way to summarize this information in a concise and understandable way.
-                5. Create a summary that answers the question part of "{question}".
-                6. If the phrase is not found, respond with "No embedded document found in question."
-
-                It is extremely critical that you do your best to answer this question.
-            """).strip(),
-            expected_output="A well-written summary in markdown format that answers the question using the embedded document, or a clear statement if no embedded document is found.",
-            agent=self.document_in_question_agent,
-        )
-
-    @property
-    def knowledge_base_agent(self) -> Agent:
-        """An agent that searches through knowledge base files and answers questions using their content."""
-        return Agent(
-            role="Knowledge Base Specialist",
-            goal=(
-                "Given a knowledge base with files and limited content previews, first identify the most relevant files "
-                'for answering the question: "{question}", then retrieve and analyze their full content to provide a comprehensive answer.'
-            ),
+            role="Requirement Extractor",
+            goal="【日本語で】ユーザー要望を、検索と行程作成に使える構造化制約（条件）に正規化する。",
             backstory=(
-                "You are an expert at both analyzing file metadata and reading comprehensive document content. "
-                "You can identify the most relevant files from knowledge base systems where full content isn't immediately available, "
-                "and then synthesize information from multiple documents to provide accurate, well-sourced answers. "
-                "You have a two-step process: first analyze file previews to select relevant files, then read their full content to answer questions."
+                "あなたは曖昧な要望を、計画条件へ変換する専門家。回答は必ず日本語。"
+                "ユーザーへ追加質問はしない。足りない情報は妥当なデフォルトを置き、assumptions に明記する。"
+                "入力に parsed_request_json があり parse_confidence が high の場合、それを最優先で採用する。"
             ),
-            allow_delegation=True,
-            verbose=self.verbose,
-            max_iter=5,
-            llm=self.model_factory(
-                model="datarobot/vertex_ai/gemini-2.5-flash",
-                use_deployment=True,
-            ),
-        )
-
-    @property
-    def task_knowledge_base_file_search(self) -> Task:
-        return Task(
-            name="Knowledge Base File Search",
-            description=dedent("""
-                Analyze the knowledge base `files` provided in this JSON:
-
-                ``` {knowledge_base}```
-
-                to identify which files are most relevant for answering the question: "{question}".
-                If there is nothing in between the ``` and ``` symbols, respond with 'No knowledge base files available.'
-
-                Look at file names, metadata, the topic "{topic}", and any content previews to make your determination.
-                Select the most relevant files that would likely contain the information needed to answer the question.
-                You select them by what is assigned the 'uuid' key in the knowledge base json list of files.
-
-                DO NOT select any keys such as owner_uuid or project_uuid (these are not file UUIDs). Only the key 'uuid'.
-
-                IMPORTANT: Format your response as a clear list of UUIDs, one per line, like:
-                Selected UUIDs:
-                - [actual-uuid-from-knowledge-base]
-                - [actual-uuid-from-knowledge-base]
-
-                Only use the actual UUIDs found in the provided knowledge base data.
-            """).strip(),
-            expected_output="A clearly formatted list of the most relevant file UUIDs from the knowledge base, with each UUID on its own line, or 'No knowledge base files available.'",
-            output_pydantic=models.UUIDListOutput,
-            agent=self.knowledge_base_agent,
-        )
-
-    @property
-    def task_knowledge_base_content_answer(self) -> Task:
-        return Task(
-            description=dedent("""
-                IMPORTANT: You have previously identified relevant file UUIDs in your previous task output.
-                You must carefully examine the context from your previous task to extract these UUIDs.
-                CRITICAL: You MUST use your tool to get the content from those files
-
-                Using your full content tool is expensive, so be sure to search first using the UUIDs you found,
-                and then decide if you need to read the full content.
-
-                Your task:
-                1. Look at the output from your previous Knowledge Base File Search task
-                2. Find any lines that start with '- ' followed by a UUID in standard format
-                3. Extract ALL actual UUIDs from those lines (NOT the examples from instructions)
-                4. Search the contents of those UUIDs using keywords and/or regex patterns from the question
-                5. If you do not have UUIDs, use search to find them.
-                5. Use the search results to determine which files are most relevant from the list of UUIDs
-                6. Use the knowledge base content tool with the extracted UUIDs as a list if you think the search
-                   results weren't sufficient to answer the question properly
-                7. Read and understand the content deeply
-                8. Create a comprehensive answer to the question: "{question}" on the topic "{topic}"
-
-                CRITICAL INSTRUCTIONS:
-                - Never call the tool with an empty list
-                - Only call the tool with UUIDs you extracted from your previous output
-                - Never call the Knowledge Base Content Tool more than once!!!
-                - Ignore any example UUIDs from instructions or documentation
-                - If no UUIDs were found in your previous output, respond that no relevant files were identified
-            """).strip(),
-            expected_output="A comprehensive, well-formatted markdown summary answering the question using the knowledge base content.",
-            agent=self.knowledge_base_agent,
-            tools=[self.knowledge_base_content_tool, self.knowledge_base_search_tool],
-        )
-
-    @property
-    def finalizer_agent(self) -> Agent:
-        """An agent that coordinates and finalizes the outputs from all other agents."""
-        return Agent(
-            role="Response Finalizer",
-            goal=(
-                "Analyze the outputs from all previous agents and provide a single, coherent, well-formatted answer to the question: "
-                '"{question}" from the topic: "{topic}"'
-            ),
-            backstory=(
-                "You are an expert coordinator who takes the work from multiple specialized agents "
-                "and creates a final, polished response. You can determine which agent provided the "
-                "most relevant information and synthesize multiple sources when needed. "
-                "You never output raw tool results, full documents, or incomplete information."
-            ),
-            max_iter=5,
             allow_delegation=False,
             verbose=self.verbose,
-            llm=self.model_factory(
-                model="datarobot/vertex_ai/gemini-2.5-flash",
-                use_deployment=True,
-            ),
+            llm=self.llm(preferred_model="datarobot/azure/gpt-4o-mini"),
+            tools=self.mcp_tools,
         )
 
     @property
-    def task_finalize_response(self) -> Task:
-        return Task(
-            description=dedent("""
-                Analyze all the outputs from the previous agents and create a single, coherent answer to: "{question}".
-
-                You have access to:
-                1. File search results and file-based content analysis
-                2. Embedded document analysis (if present in the question)
-                3. Knowledge base search and content analysis
-
-                Your job is to:
-                1. Determine which agents found relevant information
-                2. Synthesize the most relevant and accurate information
-                3. Create a well-formatted, comprehensive response
-                4. Ignore any 'not available' or 'not found' responses
-                5. If multiple sources provide information, combine them intelligently
-                6. If no sources provide useful information, clearly state that no relevant information was found
-
-                Never output raw tool results, file paths, or technical details - only the final answer.
-            """).strip(),
-            expected_output="A single, well-formatted markdown response that directly answers the user's question using the most relevant information found by all agents.",
-            agent=self.finalizer_agent,
-        )
-
-    def crew(self) -> Crew:
-        return Crew(
-            agents=[
-                self.agent_file_searcher,
-                self.document_in_question_agent,
-                self.knowledge_base_agent,
-                self.finalizer_agent,
-            ],
-            tasks=[
-                self.task_file_search,
-                self.task_write,
-                self.task_in_question_write,
-                self.task_knowledge_base_file_search,
-                self.task_knowledge_base_content_answer,
-                self.task_finalize_response,
-            ],
+    def agent_spot_researcher(self) -> Agent:
+        return Agent(
+            role="Spot Researcher",
+            goal="【日本語で】条件に合うレストラン・観光地候補を複数探索し、可能な限りURL付きで返す。",
+            backstory=(
+                "あなたはローカルスポット探索の専門家。回答は必ず日本語。"
+                "利用可能なら tools（places/web search 等）で実在確認し、URLを付与する。"
+                "URLは優先順：公式サイト > Google Maps > 食べログ/Retty/一休/Tripadvisor等。"
+                "URLが取得できない場合は url=null とし、verification=needs_verification とする。"
+            ),
+            allow_delegation=False,
             verbose=self.verbose,
+            llm=self.llm(preferred_model="datarobot/azure/gpt-4o-mini"),
+            tools=self.mcp_tools,
         )
 
-    def _extract_and_store_knowledge_base_content(self, base: dict[str, Any]) -> None:
-        """Extracts and stores the encoded content from knowledge base files."""
-        for file_info in base["files"]:
-            file_uuid = file_info["uuid"]
-            if "encoded_content" in file_info:
-                if not file_info["encoded_content"]:
-                    # This shouldn't happen in prod, but if you don't have libreoffice installed,
-                    # or persistence of the KB is missing it can happen.
-                    continue
-                self.knowledge_base_files[file_uuid] = file_info["encoded_content"]
-                del file_info[
-                    "encoded_content"
-                ]  # Remove encoded_content from working inputs
-                file_info["encoded_content"] = self.knowledge_base_files[file_uuid].get(
-                    "1", ""
-                )[:500]  # preview
+    @property
+    def agent_itinerary_optimizer(self) -> Agent:
+        return Agent(
+            role="Itinerary Optimizer",
+            goal="【日本語で】時間枠・滞在時間・移動方針を守り、実現可能なデート行程（Plan A/B）を作る。",
+            backstory=(
+                "あなたは行程最適化のプロ。回答は必ず日本語。"
+                "開店時間等の不確実性があれば check_opening_hours=true として明示する。"
+                "Plan A/Plan B の2案を出し、雨天・混雑・予約不可などのリスクに備える。"
+            ),
+            allow_delegation=False,
+            verbose=self.verbose,
+            llm=self.llm(preferred_model="datarobot/azure/gpt-4o-mini"),
+            tools=self.mcp_tools,
+        )
 
-    def run(
-        self, completion_create_params: CompletionCreateParams
-    ) -> tuple[CrewOutput, list[Any]]:
-        """Run the agent with the provided completion parameters.
+    @property
+    def agent_quality_checker(self) -> Agent:
+        return Agent(
+            role="Quality Checker",
+            goal="【日本語で】最終出力（Markdown）を品質担保し、URL併記・時間整合・要確認事項を明確化する。",
+            backstory=(
+                "あなたは校閲・品質保証の専門家。回答は必ず日本語。"
+                "時間計算（開始/終了、合計分）の矛盾を修正し、verified と needs_verification を本文で区別する。"
+                "Markdown本文は日本語のみ。最後に統合JSONを添付する。"
+            ),
+            allow_delegation=False,
+            verbose=self.verbose,
+            llm=self.llm(),
+            tools=self.mcp_tools,
+        )
 
-        [THIS METHOD IS REQUIRED FOR THE AGENT TO WORK WITH DRUM SERVER]
+    # -----------------------
+    # Tasks
+    # -----------------------
+    @property
+    def task_extract_requirements(self) -> Task:
+        return Task(
+            description="""
+あなたは以下を受け取る：
+- user_request（生テキスト）
+- parsed_request_json（可能なら事前パース結果）
 
-        Inputs can be extracted from the completion_create_params in several ways. A helper function
-        `create_inputs_from_completion_params` is provided to extract the inputs as json or a string
-        from the 'user' portion of the input prompt. Alternatively you can extract and use one or
-        more inputs or messages from the completion_create_params["messages"] field.
+【最優先ルール】
+parsed_request_json の parse_confidence が high の場合、
+そこに含まれる meeting_place / dropoff_place / time_window / extracted を優先して採用する。
 
-        Args:
-            completion_create_params (CompletionCreateParams): The parameters for
-                the completion request, which includes the input topic and other settings.
-        Returns:
-            tuple[CrewOutput, list[Any]]: A tuple containing a list of messages (events) and the crew output.
+【重要】回答は必ず日本語（JSON内の値も日本語）。
 
-        """
-        # Example helper for extracting inputs as a json from the completion_create_params["messages"]
-        # field with the 'user' role: (e.g. {"topic": "Artificial Intelligence"})
-        inputs = create_inputs_from_completion_params(completion_create_params)
-        # If inputs are a string, convert to a dictionary with 'topic' key for this example.
-        if isinstance(inputs, str):
-            inputs = {"topic": inputs}
+出力は JSON のみ。スキーマ：
+{
+  "meeting_place": "string|null",
+  "dropoff_place": "string|null",
+  "area": "string (主な行動エリア。集合/解散から推定)",
+  "date": "string (YYYY-MM-DD。なければ null)",
+  "time_window": {"start": "HH:MM|null", "end": "HH:MM|null"},
+  "stay_durations_min": {
+     "meal": number|null,
+     "sightseeing_max": number|null,
+     "cafe": number|null,
+     "buffer": number|null
+  },
+  "budget_per_person_jpy": {"min": number|null, "max": number|null},
+  "preferences": {
+     "quiet_place": true|false|null,
+     "good_alcohol": true|false|null,
+     "nice_view": true|false|null
+  },
+  "mobility_policy": {
+     "taxi_over_km": number|null,
+     "walk_under_km": number|null
+  },
+  "must_have": ["string"],
+  "avoid": ["string"],
+  "assumptions": ["string"],
+  "open_questions": []
+}
 
-        # If you want to use the inputs for training, you can uncomment this
-        #
-        # with open("agent_inputs.json", "w") as f:
-        #     json.dump(inputs, f, indent=4)
+ルール：
+- ユーザーに質問しない。
+- 不足は null にしつつ、妥当なデフォルトを assumptions に明記。
+- requirements_raw を must_have / preferences / mobility_policy に落とす。
+""".strip(),
+            expected_output="正規化された制約条件(JSON)。",
+            agent=self.agent_requirement_extractor,
+        )
 
-        # Handle knowledge base content extraction and storage
-        if "knowledge_base" in inputs:
-            # Extract and store encoded_content, remove from working inputs
-            self._extract_and_store_knowledge_base_content(inputs["knowledge_base"])
-            self.knowledge_base_content_tool.knowledge_base = self.knowledge_base_files
-            inputs["topic"] = inputs["knowledge_base"]["description"]
-        else:
-            inputs["knowledge_base"] = ""
-        # Print commands may need flush=True to ensure they are displayed in real-time.
-        print("Running agent with inputs:", flush=True)
-        print(json.dumps(inputs, indent=4), flush=True)
+    @property
+    def task_search_spots(self) -> Task:
+        return Task(
+            description="""
+【重要】回答は必ず日本語（JSON内の値も日本語）。
 
-        crew = self.crew()
-        # Check if we are using training data
-        output = crew.agents[0]._use_trained_data(".")
-        if len(output) > 1:
-            print("Using training data.", flush=True)
-        # Run the crew with the inputs
-        crew_output = crew.kickoff(inputs=inputs)
+抽出済みの constraints JSON を使い、エリア周辺のレストラン・観光地を検索する。
 
-        # Extract the response text from the crew output
-        response_text = str(crew_output.raw)
+可能ならツール（places/web search）で実在確認し、必ずURLを付与する。
+- URLは優先順：公式サイト > Google Maps > 食べログ/Retty/一休/トリップアドバイザー等
+- URLが取得できない場合は url を null にし、verification を needs_verification にする。
 
-        # Create a list of events from the event listener
-        events = self.event_listener.messages
-        if len(events) > 0:
-            last_message = events[-1].content
-            if last_message != response_text:
-                events.append(AIMessage(content=response_text))
-        else:
-            events = None
-        # The `events` variable is used to compute agentic metrics
-        # (e.g. Task Adherence, Agent Goal Accuracy, Agent Goal Accuracy with Reference,
-        # Tool Call Accuracy).
-        # If you are not interested in these metrics, you can also return None instead.
-        # This will reduce the size of the response significantly.
-        return crew_output, events
+出力は JSON のみ。スキーマ：
+{
+  "restaurants": [
+    {
+      "name": "string",
+      "category": "string",
+      "area_detail": "string",
+      "price_range": "string (例：¥¥ / 予算感)",
+      "opening_hours_note": "string|null",
+      "why_recommended": "string",
+      "url": "string|null",
+      "source": "official|google_maps|tabelog|retty|ikyu|other|unknown",
+      "verification": "verified|needs_verification"
+    }
+  ],
+  "attractions": [
+    {
+      "name": "string",
+      "type": "string (例：美術館/展望/公園/散策/買い物)",
+      "area_detail": "string",
+      "opening_hours_note": "string|null",
+      "estimated_stay_min": number,
+      "why_recommended": "string",
+      "url": "string|null",
+      "source": "official|google_maps|tripadvisor|other|unknown",
+      "verification": "verified|needs_verification"
+    }
+  ],
+  "notes": ["string"]
+}
+
+最低でも restaurants 6件、attractions 6件を返す。
+静かめ・お酒・景色などの好みがあれば、why_recommended に反映する。
+""".strip(),
+            expected_output="URL付き候補リスト(JSON)。",
+            agent=self.agent_spot_researcher,
+        )
+
+    @property
+    def task_build_itinerary(self) -> Task:
+        return Task(
+            description="""
+【重要】回答は必ず日本語（JSON内の値も日本語）。
+
+constraints JSON と candidates JSON を使い、最適化した行程を作成する。
+
+要件：
+- Plan A と Plan B の2案
+- time_window に収める（nullなら『4時間』を仮置きし assumptions へ）
+- 観光は sightseeing_max 以内、食事は meal 分
+- 1km以上はタクシー（taxi_over_km）を優先。徒歩は1km未満を基本。
+- 不確実な営業時間は check_opening_hours=true
+- timeline各要素に url と verification を必ず入れる（不明なら null/needs_verification）
+
+出力は JSON のみ。スキーマ：
+{
+  "plan_a": {
+    "title": "string",
+    "timeline": [
+      {
+        "start": "HH:MM",
+        "end": "HH:MM",
+        "activity_type": "meet|walk|attraction|meal|cafe|shopping|move|other",
+        "name": "string",
+        "area_detail": "string",
+        "url": "string|null",
+        "verification": "verified|needs_verification",
+        "stay_min": number,
+        "tips": ["string"],
+        "check_opening_hours": true|false,
+        "reservation_suggested": true|false,
+        "move_mode": "walk|taxi|train|other"
+      }
+    ],
+    "total_minutes": number,
+    "estimated_cost_per_person_jpy": {"min": number|null, "max": number|null}
+  },
+  "plan_b": {
+    "title": "string",
+    "timeline": [
+      {
+        "start": "HH:MM",
+        "end": "HH:MM",
+        "activity_type": "meet|walk|attraction|meal|cafe|shopping|move|other",
+        "name": "string",
+        "area_detail": "string",
+        "url": "string|null",
+        "verification": "verified|needs_verification",
+        "stay_min": number,
+        "tips": ["string"],
+        "check_opening_hours": true|false,
+        "reservation_suggested": true|false,
+        "move_mode": "walk|taxi|train|other"
+      }
+    ],
+    "total_minutes": number,
+    "estimated_cost_per_person_jpy": {"min": number|null, "max": number|null}
+  },
+  "optimization_notes": ["string"],
+  "assumptions": ["string"]
+}
+""".strip(),
+            expected_output="Plan A / Plan B 行程(JSON)。",
+            agent=self.agent_itinerary_optimizer,
+        )
+
+    @property
+    def task_finalize_output(self) -> Task:
+        return Task(
+            description="""
+【最重要】出力は日本語のみ（英語禁止）。
+
+行程JSONを検証し、最終回答をMarkdownで生成する。
+
+必須要件：
+- 店/観光地のURLを必ず併記する（url=null の場合は『URL未取得（要確認）』と明記）
+- verified / needs_verification を本文で分かるように表記する
+- 時間計算の整合性をチェックし、矛盾があれば修正する
+
+Markdownに含めるもの：
+1) 概要（雰囲気、総所要時間、移動方針：1km以上タクシーなど）
+2) Plan A（タイムライン表：開始/終了/内容/場所/URL/メモ/移動手段/要確認）
+3) Plan B（同上）
+4) 予約・混雑・雨天時の注意点
+5) 最後に統合JSONを ```json``` で添付（constraints + candidates + itinerary を1つに）
+
+注意：
+- Markdown本文は日本語のみ。
+- JSONキーは英語のままで良い。
+""".strip(),
+            expected_output="日本語Markdown（URL併記）＋統合JSON。",
+            agent=self.agent_quality_checker,
+        )
