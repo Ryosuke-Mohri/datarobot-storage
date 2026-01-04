@@ -55,6 +55,13 @@ def get_custom_model_details(custom_model_id: str):
             return
         
         versions_data = versions_response.json()
+        
+        # レスポンスがリストかどうか確認
+        if not isinstance(versions_data, list):
+            print(f"予期しないレスポンス形式: {type(versions_data)}")
+            print(f"レスポンス内容: {json.dumps(versions_data, indent=2, ensure_ascii=False)}")
+            return
+        
         if not versions_data:
             print("バージョンが見つかりません")
             return
