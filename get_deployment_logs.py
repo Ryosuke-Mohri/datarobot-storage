@@ -85,13 +85,38 @@ def get_custom_model_details(custom_model_id: str):
         if latest_version.get('created'):
             print(f"作成日時: {latest_version.get('created')}")
         
-        # バージョンステータス（versionStatusまたはversion_status）
-        version_status = latest_version.get('versionStatus') or latest_version.get('version_status')
+        # バージョンの詳細情報を取得
+        version_detail_url = f"{endpoint}/customModels/{custom_model_id}/versions/{version_id}/"
+        version_detail_response = requests.get(version_detail_url, headers=headers)
+        
+        version_detail = None
+        if version_detail_response.ok:
+            version_detail = version_detail_response.json()
+        else:
+            # 既に取得したバージョン情報を使用
+            version_detail = latest_version
+        
+        # バージョンステータス（様々なキー名を試す）
+        version_status = (
+            version_detail.get('versionStatus') or 
+            version_detail.get('version_status') or 
+            version_detail.get('status') or
+            latest_version.get('versionStatus') or 
+            latest_version.get('version_status') or
+            latest_version.get('status')
+        )
         if version_status:
             print(f"バージョンステータス: {version_status}")
         
-        # 検証エラー
-        validation_error = latest_version.get('validationError') or latest_version.get('validation_error')
+        # 検証エラー（様々なキー名を試す）
+        validation_error = (
+            version_detail.get('validationError') or 
+            version_detail.get('validation_error') or
+            version_detail.get('error') or
+            latest_version.get('validationError') or 
+            latest_version.get('validation_error') or
+            latest_version.get('error')
+        )
         if validation_error:
             print(f"\n=== 検証エラー ===")
             if isinstance(validation_error, dict):
@@ -99,21 +124,44 @@ def get_custom_model_details(custom_model_id: str):
             else:
                 print(validation_error)
         
-        # ビルドログを取得
+        # ビルドログを取得（複数のエンドポイントを試す）
         print(f"\n=== ビルドログを取得中 ===")
-        build_logs_url = f"{endpoint}/customModels/{custom_model_id}/versions/{version_id}/buildLogs/"
-        build_logs_response = requests.get(build_logs_url, headers=headers)
+        build_log_endpoints = [
+            f"{endpoint}/customModels/{custom_model_id}/versions/{version_id}/buildLogs/",
+            f"{endpoint}/customModels/{custom_model_id}/versions/{version_id}/buildLog/",
+            f"{endpoint}/customModels/{custom_model_id}/versions/{version_id}/logs/",
+        ]
         
-        if build_logs_response.ok:
-            build_logs_data = build_logs_response.json()
-            logs = build_logs_data.get('logs') or build_logs_data.get('log') or build_logs_data.get('buildLog')
-            if logs:
-                print(logs)
-            else:
-                print("ビルドログがまだ生成されていません")
-                print(f"レスポンス: {build_logs_data}")
-        else:
-            print(f"ビルドログ取得エラー (HTTP {build_logs_response.status_code}): {build_logs_response.text}")
+        build_logs_found = False
+        for build_logs_url in build_log_endpoints:
+            build_logs_response = requests.get(build_logs_url, headers=headers)
+            if build_logs_response.ok:
+                build_logs_data = build_logs_response.json()
+                logs = build_logs_data.get('logs') or build_logs_data.get('log') or build_logs_data.get('buildLog') or build_logs_data.get('data')
+                if logs:
+                    print(f"ビルドログ ({build_logs_url}):")
+                    print(logs)
+                    build_logs_found = True
+                    break
+                elif build_logs_data:
+                    print(f"ビルドログデータ ({build_logs_url}):")
+                    print(json.dumps(build_logs_data, indent=2, ensure_ascii=False)[:2000])  # 最初の2000文字のみ
+                    build_logs_found = True
+                    break
+        
+        if not build_logs_found:
+            print("ビルドログが見つかりません（すべてのエンドポイントで404）")
+            print("注: DataRobot UIで確認してください: Applications > Custom Models > [Model] > Versions > [Version] > Build Logs")
+        
+        # バージョンの詳細情報からエラー関連のフィールドを確認
+        if version_detail:
+            error_fields = [k for k in version_detail.keys() if 'error' in k.lower() or 'status' in k.lower() or 'fail' in k.lower()]
+            if error_fields:
+                print(f"\n=== エラー関連フィールド ===")
+                for field in error_fields:
+                    value = version_detail.get(field)
+                    if value:
+                        print(f"{field}: {value}")
         
         # 簡潔な要約情報のみ表示
         print(f"\n=== 要約情報 ===")
